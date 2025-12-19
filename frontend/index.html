@@ -31,6 +31,13 @@
             <h1><i class="fas fa-atom"></i> HKDSE Physics AI Tutor</h1>
             <p>上傳題目照片，獲得 DSE 風格分步講解</p>
 
+            <!-- User Stats Panel (shown when logged in) -->
+            <div class="header-stats-panel" id="headerStats" hidden>
+                <a href="/leaderboard.html" class="leaderboard-link">
+                    <i class="fas fa-trophy"></i> 排行榜
+                </a>
+            </div>
+
             <!-- Auth Section -->
             <div class="auth-section" id="authSection">
                 <!-- Logged out state -->
@@ -212,6 +219,35 @@
             <div class="result-card">
                 <h2><i class="fas fa-book"></i> 術語對照</h2>
                 <div id="glossaryContent" class="result-content glossary"></div>
+            </div>
+
+            <!-- Practice Section -->
+            <div class="result-card practice-card" id="practiceSection" hidden>
+                <h2><i class="fas fa-dumbbell"></i> 練習時間 Practice Time!</h2>
+                <div class="practice-content">
+                    <div class="practice-question" id="practiceQuestion">
+                        <p class="practice-loading">
+                            <i class="fas fa-spinner fa-spin"></i> 正在生成練習題...
+                        </p>
+                    </div>
+                    <div class="practice-options" id="practiceOptions"></div>
+                    <div class="practice-actions">
+                        <button class="btn-primary" id="submitPractice" disabled>
+                            <i class="fas fa-check"></i> 提交答案 Submit
+                        </button>
+                        <button class="btn-secondary" id="skipPractice">
+                            <i class="fas fa-forward"></i> 跳過 Skip
+                        </button>
+                        <button class="btn-secondary" id="nextPractice" hidden>
+                            <i class="fas fa-redo"></i> 再來一題 Next
+                        </button>
+                    </div>
+                    <div class="practice-result" id="practiceResult" hidden></div>
+                    <div class="practice-stats" id="practiceStats">
+                        <span class="stat-item">🔥 連續: <span id="currentStreak">0</span></span>
+                        <span class="stat-item">🎯 積分: <span id="totalPoints">0</span></span>
+                    </div>
+                </div>
             </div>
         </section>
 

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排行榜 Leaderboard - HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/leaderboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-trophy"></i> 排行榜 Leaderboard</h1>
+            <p>看看誰是物理高手！</p>
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> 返回主頁</a>
+        </header>
+
+        <!-- Tabs -->
+        <div class="leaderboard-tabs">
+            <button class="tab-btn active" data-tab="global">
+                <i class="fas fa-globe"></i> 總榜
+            </button>
+            <button class="tab-btn" data-tab="weekly">
+                <i class="fas fa-calendar-week"></i> 本週
+            </button>
+            <button class="tab-btn" data-tab="daily">
+                <i class="fas fa-calendar-day"></i> 今日
+            </button>
+        </div>
+
+        <!-- User Rank Card -->
+        <div class="user-rank-card" id="userRankCard" hidden>
+            <div class="user-rank-info">
+                <span class="rank-badge" id="userRankBadge">#--</span>
+                <span class="user-name" id="userRankName">--</span>
+            </div>
+            <div class="user-rank-stats">
+                <span class="stat"><i class="fas fa-star"></i> <span id="userRankPoints">0</span> pts</span>
+                <span class="stat"><i class="fas fa-fire"></i> <span id="userRankStreak">0</span> streak</span>
+            </div>
+        </div>
+
+        <!-- Leaderboard List -->
+        <div class="leaderboard-container">
+            <div class="leaderboard-loading" id="leaderboardLoading">
+                <i class="fas fa-spinner fa-spin"></i> 載入中...
+            </div>
+            <div class="leaderboard-list" id="leaderboardList"></div>
+            <div class="leaderboard-empty" id="leaderboardEmpty" hidden>
+                <i class="fas fa-users"></i>
+                <p>暫無數據，成為第一個上榜的人！</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>HKDSE Physics AI Tutor | 練習更多，排名更高！</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentTab = 'global';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTab = btn.dataset.tab;
+                    loadLeaderboard(currentTab);
+                });
+            });
+
+            // Load initial leaderboard
+            loadLeaderboard('global');
+        });
+
+        async function loadLeaderboard(type) {
+            const list = document.getElementById('leaderboardList');
+            const loading = document.getElementById('leaderboardLoading');
+            const empty = document.getElementById('leaderboardEmpty');
+            const userCard = document.getElementById('userRankCard');
+
+            loading.hidden = false;
+            list.innerHTML = '';
+            empty.hidden = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/leaderboard?type=${type}`, {
+                    credentials: 'include',
+                });
+
+                if (!response.ok) throw new Error('Failed to load leaderboard');
+
+                const data = await response.json();
+
+                loading.hidden = true;
+
+                if (data.leaderboard.length === 0) {
+                    empty.hidden = false;
+                    return;
+                }
+
+                // Render leaderboard
+                list.innerHTML = data.leaderboard.map((entry, index) => `
+                    <div class="leaderboard-item ${index < 3 ? 'top-' + (index + 1) : ''}">
+                        <div class="rank">
+                            ${getRankIcon(index + 1)}
+                        </div>
+                        <div class="player-info">
+                            <span class="player-name">${escapeHtml(entry.name)}</span>
+                        </div>
+                        <div class="player-stats">
+                            <span class="points">${entry.points.toLocaleString()} pts</span>
+                            <span class="streak">🔥 ${entry.streak}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Show user rank if logged in
+                if (data.userRank) {
+                    userCard.hidden = false;
+                    document.getElementById('userRankBadge').textContent = 
+                        typeof data.userRank.rank === 'number' ? `#${data.userRank.rank}` : data.userRank.rank;
+                    document.getElementById('userRankName').textContent = data.userRank.name;
+                    document.getElementById('userRankPoints').textContent = data.userRank.points.toLocaleString();
+                    document.getElementById('userRankStreak').textContent = data.userRank.streak;
+                } else {
+                    userCard.hidden = true;
+                }
+
+            } catch (err) {
+                console.error('Failed to load leaderboard:', err);
+                loading.hidden = true;
+                list.innerHTML = '<div class="error">載入失敗，請重試</div>';
+            }
+        }
+
+        function getRankIcon(rank) {
+            if (rank === 1) return '🥇';
+            if (rank === 2) return '🥈';
+            if (rank === 3) return '🥉';
+            return rank;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+
+</html>

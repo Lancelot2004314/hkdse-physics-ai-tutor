@@ -105,6 +105,7 @@ const API_BASE = '/api';
 document.addEventListener('DOMContentLoaded', async () => {
     initializeEventListeners();
     initializeAuthListeners();
+    initPracticeEventListeners();
     loadChatHistory();
     initializeDebugPanel();
 
@@ -113,6 +114,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Check current auth state
     await checkAuthState();
+
+    // Load user stats if logged in
+    await loadUserStats();
 
     debugLog.info('App initialized');
 });
@@ -443,7 +447,7 @@ async function handleSubmit() {
 
 function displayResults(data) {
     resultsSection.hidden = false;
-    
+
     // Check if this is Socratic mode (has _socratic flag or specific summary)
     const isSocraticMode = data._socratic || (data.problemSummary && data.problemSummary.includes('Socratic'));
 
@@ -460,7 +464,7 @@ function displayResults(data) {
                 const lines = step.split('\n');
                 const question = lines[0];
                 const hints = lines.slice(1).filter(l => l.trim());
-                
+
                 return `
                 <div class="step socratic-step">
                     <div class="step-number">❓ ${i + 1}</div>
@@ -553,7 +557,245 @@ function displayResults(data) {
     if (window.MathJax && window.MathJax.typesetPromise) {
         MathJax.typesetPromise().catch(err => console.warn('MathJax error:', err));
     }
+
+    // Show practice section for logged-in users (not in Socratic mode)
+    if (currentUser && !isSocraticMode) {
+        initPracticeSection(data);
+    }
 }
+
+// ==================== Practice Section ====================
+let currentPracticeId = null;
+let selectedAnswer = null;
+
+async function initPracticeSection(data) {
+    const practiceSection = document.getElementById('practiceSection');
+    const practiceQuestion = document.getElementById('practiceQuestion');
+    const practiceOptions = document.getElementById('practiceOptions');
+    const practiceResult = document.getElementById('practiceResult');
+    const submitPractice = document.getElementById('submitPractice');
+    const skipPractice = document.getElementById('skipPractice');
+    const nextPractice = document.getElementById('nextPractice');
+
+    // Reset state
+    currentPracticeId = null;
+    selectedAnswer = null;
+    practiceResult.hidden = true;
+    submitPractice.disabled = true;
+    nextPractice.hidden = true;
+    skipPractice.hidden = false;
+
+    // Show section with loading state
+    practiceSection.hidden = false;
+    practiceQuestion.innerHTML = '<p class="practice-loading"><i class="fas fa-spinner fa-spin"></i> 正在生成練習題...</p>';
+    practiceOptions.innerHTML = '';
+
+    try {
+        // Get the original question text
+        const originalQuestion = data.problemSummary || problemSummary || '';
+        const originalAnswer = data.answer?.finalAnswer || '';
+
+        const response = await fetch(`${API_BASE}/practice/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                originalQuestion,
+                originalAnswer,
+                topic: data.topic || '',
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to generate practice question');
+        }
+
+        const practiceData = await response.json();
+        currentPracticeId = practiceData.id;
+
+        // Display question
+        practiceQuestion.innerHTML = `<p class="question-text">${formatMathSafe(practiceData.question)}</p>`;
+
+        // Display options
+        practiceOptions.innerHTML = practiceData.options.map((option, index) => `
+            <label class="practice-option" data-answer="${['A', 'B', 'C', 'D'][index]}">
+                <input type="radio" name="practiceAnswer" value="${['A', 'B', 'C', 'D'][index]}">
+                <span class="option-text">${formatMathSafe(option)}</span>
+            </label>
+        `).join('');
+
+        // Add click handlers
+        document.querySelectorAll('.practice-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.practice-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedAnswer = option.dataset.answer;
+                submitPractice.disabled = false;
+            });
+        });
+
+        // Re-render MathJax
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise([practiceSection]).catch(err => console.warn('MathJax error:', err));
+        }
+
+        debugLog.success('Practice question generated', { id: practiceData.id });
+
+    } catch (err) {
+        console.error('Failed to generate practice:', err);
+        practiceQuestion.innerHTML = '<p class="practice-error">無法生成練習題，請稍後再試</p>';
+    }
+}
+
+async function submitPracticeAnswer() {
+    if (!currentPracticeId || !selectedAnswer) return;
+
+    const submitBtn = document.getElementById('submitPractice');
+    const practiceResult = document.getElementById('practiceResult');
+    const nextPractice = document.getElementById('nextPractice');
+    const skipPractice = document.getElementById('skipPractice');
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+
+    try {
+        const response = await fetch(`${API_BASE}/practice/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                practiceId: currentPracticeId,
+                userAnswer: selectedAnswer,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to submit answer');
+        }
+
+        const result = await response.json();
+
+        // Show result
+        practiceResult.hidden = false;
+        practiceResult.className = `practice-result ${result.isCorrect ? 'correct' : 'incorrect'}`;
+        
+        let bonusText = '';
+        if (result.streakBonus > 0) {
+            bonusText = ` (+${result.streakBonus} 連續獎勵)`;
+        }
+        if (result.isFirstOfDay) {
+            bonusText += ' (+5 首題獎勵)';
+        }
+
+        practiceResult.innerHTML = result.isCorrect
+            ? `<div class="result-icon">✅</div>
+               <div class="result-text">答對了！+${result.pointsEarned} 積分${bonusText}</div>`
+            : `<div class="result-icon">❌</div>
+               <div class="result-text">答錯了！正確答案是 ${result.correctAnswer}</div>`;
+
+        // Highlight correct/wrong answers
+        document.querySelectorAll('.practice-option').forEach(option => {
+            if (option.dataset.answer === result.correctAnswer) {
+                option.classList.add('correct-answer');
+            } else if (option.dataset.answer === selectedAnswer && !result.isCorrect) {
+                option.classList.add('wrong-answer');
+            }
+            option.querySelector('input').disabled = true;
+        });
+
+        // Update stats display
+        document.getElementById('currentStreak').textContent = result.newStreak;
+        document.getElementById('totalPoints').textContent = result.totalPoints;
+
+        // Show next button
+        nextPractice.hidden = false;
+        skipPractice.hidden = true;
+
+        debugLog.success('Practice answer submitted', result);
+
+    } catch (err) {
+        console.error('Failed to submit practice answer:', err);
+        practiceResult.hidden = false;
+        practiceResult.className = 'practice-result error';
+        practiceResult.innerHTML = '<div class="result-text">提交失敗，請重試</div>';
+    }
+
+    submitBtn.innerHTML = '<i class="fas fa-check"></i> 提交答案 Submit';
+}
+
+function skipPracticeQuestion() {
+    const practiceSection = document.getElementById('practiceSection');
+    practiceSection.hidden = true;
+    currentPracticeId = null;
+    selectedAnswer = null;
+}
+
+async function loadNextPractice() {
+    // Get the stored problem data and regenerate
+    if (lastRequestData) {
+        initPracticeSection({
+            problemSummary: problemSummary,
+            answer: { finalAnswer: previousAnswer },
+        });
+    }
+}
+
+// Practice event listeners (added in DOMContentLoaded)
+function initPracticeEventListeners() {
+    const submitPractice = document.getElementById('submitPractice');
+    const skipPractice = document.getElementById('skipPractice');
+    const nextPractice = document.getElementById('nextPractice');
+
+    if (submitPractice) {
+        submitPractice.addEventListener('click', submitPracticeAnswer);
+    }
+    if (skipPractice) {
+        skipPractice.addEventListener('click', skipPracticeQuestion);
+    }
+    if (nextPractice) {
+        nextPractice.addEventListener('click', loadNextPractice);
+    }
+}
+
+// Load user stats on page load
+async function loadUserStats() {
+    try {
+        const response = await fetch(`${API_BASE}/user/stats`, {
+            credentials: 'include',
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (data.loggedIn && data.stats) {
+            // Update stats display
+            const streakEl = document.getElementById('currentStreak');
+            const pointsEl = document.getElementById('totalPoints');
+            
+            if (streakEl) streakEl.textContent = data.stats.currentStreak;
+            if (pointsEl) pointsEl.textContent = data.stats.totalPoints;
+
+            // Update header stats panel if exists
+            updateHeaderStats(data.stats);
+        }
+    } catch (err) {
+        console.warn('Failed to load user stats:', err);
+    }
+}
+
+// Update header stats display
+function updateHeaderStats(stats) {
+    const headerStats = document.getElementById('headerStats');
+    if (headerStats && stats) {
+        headerStats.innerHTML = `
+            <span class="header-stat">🎮 ${stats.totalPoints} pts</span>
+            <span class="header-stat">🔥 ${stats.currentStreak}</span>
+        `;
+        headerStats.hidden = false;
+    }
+}
+
+// ==================== End Practice Section ====================
 
 async function handleChatSend() {
     const message = chatInput.value.trim();
@@ -735,12 +977,12 @@ function formatMath(text) {
 function toggleHint(button) {
     const wrapper = button.closest('.hint-wrapper');
     const content = wrapper.querySelector('.hint-content');
-    
+
     if (content.classList.contains('hidden')) {
         content.classList.remove('hidden');
         button.textContent = '🙈 隱藏提示 / Hide Hint';
         button.classList.add('revealed');
-        
+
         // Re-render MathJax for the revealed hint
         if (window.MathJax && window.MathJax.typesetPromise) {
             MathJax.typesetPromise([content]).catch(err => console.warn('MathJax error:', err));
@@ -756,16 +998,16 @@ function toggleHint(button) {
 function checkSocraticAnswer(questionIndex) {
     const input = document.querySelector(`.socratic-input[data-question="${questionIndex}"]`);
     const answer = input.value.trim();
-    
+
     if (!answer) {
         alert('請輸入你的答案 / Please enter your answer');
         return;
     }
-    
+
     // Show encouragement and reveal all hints for this question
     const step = input.closest('.socratic-step');
     const hints = step.querySelectorAll('.hint-content.hidden');
-    
+
     hints.forEach(hint => {
         hint.classList.remove('hidden');
         const button = hint.previousElementSibling;
@@ -775,7 +1017,7 @@ function checkSocraticAnswer(questionIndex) {
             button.classList.add('revealed');
         }
     });
-    
+
     // Add feedback message
     const feedback = document.createElement('div');
     feedback.className = 'socratic-feedback';
@@ -783,13 +1025,13 @@ function checkSocraticAnswer(questionIndex) {
         <div class="your-answer">📝 你的答案 / Your answer: ${escapeHtml(answer)}</div>
         <div class="feedback-text">👍 好的嘗試！請查看提示來驗證你的思路。/ Good attempt! Check the hints to verify your thinking.</div>
     `;
-    
+
     // Remove existing feedback if any
     const existingFeedback = step.querySelector('.socratic-feedback');
     if (existingFeedback) existingFeedback.remove();
-    
+
     input.closest('.socratic-input-wrapper').after(feedback);
-    
+
     // Re-render MathJax
     if (window.MathJax && window.MathJax.typesetPromise) {
         MathJax.typesetPromise([step]).catch(err => console.warn('MathJax error:', err));

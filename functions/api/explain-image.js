@@ -131,13 +131,13 @@ export async function onRequestPost(context) {
     let parsedResponse;
     try {
       let textToParse = visionResult.text;
-      
+
       // Strip markdown code blocks if present
       const codeBlockMatch = textToParse.match(/```(?:json)?\s*([\s\S]*?)```/);
       if (codeBlockMatch) {
         textToParse = codeBlockMatch[1];
       }
-      
+
       // Extract JSON object
       const jsonMatch = textToParse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
@@ -152,10 +152,10 @@ export async function onRequestPost(context) {
         .replace(/```json\s*/g, '')
         .replace(/```/g, '')
         .trim();
-      
+
       // Try to extract meaningful content
       const paragraphs = rawText.split(/\n\n+/).filter(p => p.trim());
-      
+
       parsedResponse = {
         problemSummary: 'Analysis Result',
         answer: {

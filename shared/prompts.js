@@ -91,3 +91,33 @@ Output JSON:
   "explanation": "Details if needed",
   "examTip": "Optional tip"
 }`;
+
+export const PRACTICE_QUESTION_PROMPT = `Generate a similar HKDSE Physics practice question based on the original.
+
+## Rules
+1. Keep the SAME physics concept and difficulty level
+2. Change numerical values (different numbers)
+3. Modify the scenario slightly (different object, situation)
+4. Provide 4 multiple choice options (A, B, C, D)
+5. Match the language of the original question
+6. Use $...$ for math with DOUBLE backslash in JSON: "$\\\\frac{1}{2}$"
+
+## Output JSON (STRICT)
+{
+  "question": "A car accelerates from rest with acceleration $a = 5$ m/s². What is its velocity after $t = 4$ s?",
+  "options": [
+    "A. $10$ m/s",
+    "B. $15$ m/s", 
+    "C. $20$ m/s",
+    "D. $25$ m/s"
+  ],
+  "correctAnswer": "C",
+  "explanation": "Using $v = u + at = 0 + 5 \\\\times 4 = 20$ m/s",
+  "topic": "Kinematics"
+}
+
+## Important
+- Output ONLY valid JSON
+- correctAnswer must be exactly "A", "B", "C", or "D"
+- Make sure the correct answer is actually correct!
+- Options should be plausible (common mistakes as wrong options)`;
