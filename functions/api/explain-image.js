@@ -141,7 +141,7 @@ async function callGeminiVision(apiKey, base64Data, mimeType, systemPrompt, user
     contents: [
       {
         parts: [
-          { text: systemPrompt + '\n\n' + userPrompt },
+          { text: systemPrompt + '\n\n' + userPrompt + '\n\nIMPORTANT: You MUST respond with valid JSON only, no markdown or extra text.' },
           {
             inline_data: {
               mime_type: mimeType,
@@ -154,7 +154,6 @@ async function callGeminiVision(apiKey, base64Data, mimeType, systemPrompt, user
     generationConfig: {
       temperature: 0.3,
       maxOutputTokens: 4096,
-      responseMimeType: 'application/json',
     },
   };
 
@@ -172,9 +171,9 @@ async function callGeminiVision(apiKey, base64Data, mimeType, systemPrompt, user
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Gemini API error:', errorData);
-      return { success: false, error: 'AI 服務暫時不可用' };
+      const errorText = await response.text().catch(() => '');
+      console.error('Gemini API error:', response.status, errorText);
+      return { success: false, error: `AI 服務錯誤 (${response.status})` };
     }
 
     const data = await response.json();
