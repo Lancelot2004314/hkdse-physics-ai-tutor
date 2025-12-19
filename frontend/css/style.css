@@ -601,6 +601,10 @@ body {
     padding: 20px;
 }
 
+.modal[hidden] {
+    display: none !important;
+}
+
 .modal-content {
     background: var(--bg-secondary);
     border-radius: var(--radius);
