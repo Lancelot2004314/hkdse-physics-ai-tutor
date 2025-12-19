@@ -42,10 +42,10 @@ export async function onRequestPost(context) {
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
     const mimeType = image.match(/^data:(image\/\w+);base64,/)?.[1] || 'image/jpeg';
 
-    // Call Gemini Vision API
-    const geminiApiKey = env.GOOGLE_GEMINI_API_KEY;
-    if (!geminiApiKey) {
-      console.error('GOOGLE_GEMINI_API_KEY not configured');
+    // Call Qwen Vision API (通义千问)
+    const qwenApiKey = env.QWEN_API_KEY;
+    if (!qwenApiKey) {
+      console.error('QWEN_API_KEY not configured');
       return errorResponse(500, '服務配置錯誤，請聯繫管理員');
     }
 
@@ -65,36 +65,36 @@ export async function onRequestPost(context) {
       userPrompt += `\n\n學生答案/思路：${studentAttempt}`;
     }
 
-    // Call Gemini Vision
-    const geminiResult = await callGeminiVision(
-      geminiApiKey,
+    // Call Qwen Vision
+    const visionResult = await callQwenVision(
+      qwenApiKey,
       base64Data,
       mimeType,
       systemPrompt,
       userPrompt
     );
 
-    if (!geminiResult.success) {
-      return errorResponse(500, geminiResult.error || 'AI 分析失敗');
+    if (!visionResult.success) {
+      return errorResponse(500, visionResult.error || 'AI 分析失敗');
     }
 
-    // Parse Gemini response
+    // Parse Qwen response
     let parsedResponse;
     try {
       // Try to extract JSON from response
-      const jsonMatch = geminiResult.text.match(/\{[\s\S]*\}/);
+      const jsonMatch = visionResult.text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         parsedResponse = JSON.parse(jsonMatch[0]);
       } else {
         throw new Error('No JSON found in response');
       }
     } catch (parseErr) {
-      console.error('Failed to parse Gemini response:', parseErr);
+      console.error('Failed to parse Qwen response:', parseErr);
       // Return a structured fallback
       parsedResponse = {
         problemSummary: '題目分析',
         answer: {
-          steps: [geminiResult.text],
+          steps: [visionResult.text],
           commonMistakes: [],
           examTips: [],
           finalAnswer: '請參考上方解答',
@@ -134,27 +134,31 @@ export async function onRequestPost(context) {
   }
 }
 
-async function callGeminiVision(apiKey, base64Data, mimeType, systemPrompt, userPrompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPrompt) {
+  // 通义千问 VL (Vision-Language) API
+  const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
 
   const requestBody = {
-    contents: [
-      {
-        parts: [
-          { text: systemPrompt + '\n\n' + userPrompt + '\n\nIMPORTANT: You MUST respond with valid JSON only, no markdown or extra text.' },
-          {
-            inline_data: {
-              mime_type: mimeType,
-              data: base64Data,
-            },
-          },
-        ],
-      },
-    ],
-    generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: 4096,
+    model: 'qwen-vl-plus',
+    input: {
+      messages: [
+        {
+          role: 'system',
+          content: [{ text: systemPrompt + '\n\nIMPORTANT: You MUST respond with valid JSON only, no markdown or extra text.' }]
+        },
+        {
+          role: 'user',
+          content: [
+            { image: `data:${mimeType};base64,${base64Data}` },
+            { text: userPrompt }
+          ]
+        }
+      ]
     },
+    parameters: {
+      temperature: 0.3,
+      max_tokens: 4096
+    }
   };
 
   try {
@@ -163,7 +167,10 @@ async function callGeminiVision(apiKey, base64Data, mimeType, systemPrompt, user
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
       body: JSON.stringify(requestBody),
       signal: controller.signal,
     });
@@ -172,14 +179,15 @@ async function callGeminiVision(apiKey, base64Data, mimeType, systemPrompt, user
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
-      console.error('Gemini API error:', response.status, errorText);
+      console.error('Qwen API error:', response.status, errorText);
       return { success: false, error: `AI 服務錯誤 (${response.status})` };
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data.output?.choices?.[0]?.message?.content?.[0]?.text;
 
     if (!text) {
+      console.error('Qwen response:', JSON.stringify(data));
       return { success: false, error: '無法解析 AI 回覆' };
     }
 
@@ -189,7 +197,7 @@ async function callGeminiVision(apiKey, base64Data, mimeType, systemPrompt, user
     if (err.name === 'AbortError') {
       return { success: false, error: '請求超時，請重試' };
     }
-    console.error('Gemini API call failed:', err);
+    console.error('Qwen API call failed:', err);
     return { success: false, error: 'AI 服務連接失敗' };
   }
 }

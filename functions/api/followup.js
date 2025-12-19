@@ -50,8 +50,8 @@ export async function onRequestPost(context) {
     // Choose API based on needsVision
     let result;
     if (needsVision && image) {
-      // Use Gemini Vision for image-related followups
-      result = await callGeminiVision(env.GOOGLE_GEMINI_API_KEY, image, prompt, followupQuestion);
+      // Use Qwen Vision for image-related followups
+      result = await callQwenVision(env.QWEN_API_KEY, image, prompt, followupQuestion);
     } else {
       // Use DeepSeek for text-only followups (cheaper)
       result = await callDeepSeek(env.DEEPSEEK_API_KEY, prompt, followupQuestion, chatHistory);
@@ -157,36 +157,35 @@ async function callDeepSeek(apiKey, systemPrompt, userQuestion, chatHistory) {
   }
 }
 
-async function callGeminiVision(apiKey, imageBase64, systemPrompt, userQuestion) {
+async function callQwenVision(apiKey, imageBase64, systemPrompt, userQuestion) {
   if (!apiKey) {
     return { success: false, error: 'API 未配置' };
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-  // Extract base64 data
-  const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
-  const mimeType = imageBase64.match(/^data:(image\/\w+);base64,/)?.[1] || 'image/jpeg';
+  // 通义千问 VL (Vision-Language) API
+  const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
 
   const requestBody = {
-    contents: [
-      {
-        parts: [
-          { text: systemPrompt + '\n\n學生追問：' + userQuestion },
-          {
-            inline_data: {
-              mime_type: mimeType,
-              data: base64Data,
-            },
-          },
-        ],
-      },
-    ],
-    generationConfig: {
-      temperature: 0.5,
-      maxOutputTokens: 1024,
-      responseMimeType: 'application/json',
+    model: 'qwen-vl-plus',
+    input: {
+      messages: [
+        {
+          role: 'system',
+          content: [{ text: systemPrompt }]
+        },
+        {
+          role: 'user',
+          content: [
+            { image: imageBase64 },
+            { text: userQuestion }
+          ]
+        }
+      ]
     },
+    parameters: {
+      temperature: 0.5,
+      max_tokens: 1024
+    }
   };
 
   try {
@@ -195,7 +194,10 @@ async function callGeminiVision(apiKey, imageBase64, systemPrompt, userQuestion)
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
       body: JSON.stringify(requestBody),
       signal: controller.signal,
     });
@@ -203,12 +205,12 @@ async function callGeminiVision(apiKey, imageBase64, systemPrompt, userQuestion)
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.error('Gemini API error:', await response.text());
+      console.error('Qwen API error:', await response.text());
       return { success: false, error: 'AI 服務暫時不可用' };
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data.output?.choices?.[0]?.message?.content?.[0]?.text;
 
     if (!text) {
       return { success: false, error: '無法解析 AI 回覆' };
@@ -220,7 +222,7 @@ async function callGeminiVision(apiKey, imageBase64, systemPrompt, userQuestion)
     if (err.name === 'AbortError') {
       return { success: false, error: '請求超時' };
     }
-    console.error('Gemini API call failed:', err);
+    console.error('Qwen API call failed:', err);
     return { success: false, error: 'AI 服務連接失敗' };
   }
 }
