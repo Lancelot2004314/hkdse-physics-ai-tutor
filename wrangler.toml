@@ -1,0 +1,6 @@
+# Cloudflare Pages project configuration
+name = "hkdse-physics-ai-tutor"
+compatibility_date = "2024-01-01"
+
+# Pages-specific config (handled via dashboard for secrets)
+# Functions are auto-detected from /functions directory

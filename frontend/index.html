@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-atom"></i> HKDSE Physics AI Tutor</h1>
+            <p>上傳題目照片，獲得 DSE 風格分步講解</p>
+        </header>
+
+        <!-- Upload Section -->
+        <section class="upload-section" id="uploadSection">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="imageInput" accept="image/*" capture="environment" hidden>
+                <div class="upload-placeholder" id="uploadPlaceholder">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>點擊或拖放上傳題目照片</p>
+                    <span>支援 JPG, PNG, WebP（最大 3MB）</span>
+                </div>
+                <div class="image-preview" id="imagePreview" hidden>
+                    <img id="previewImg" src="" alt="Preview">
+                    <button class="btn-remove" id="removeImage">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question Input -->
+            <div class="input-group">
+                <label for="questionInput">你的問題（可選但建議填寫）</label>
+                <textarea id="questionInput" placeholder="例如：點解要用 F=ma？我唔明白第二步..."></textarea>
+            </div>
+
+            <!-- Options -->
+            <div class="options-row">
+                <div class="option-group">
+                    <label for="levelSelect">程度</label>
+                    <select id="levelSelect">
+                        <option value="basic">基礎</option>
+                        <option value="standard" selected>標準 DSE</option>
+                        <option value="advanced">進階/衝星</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="modeSelect">模式</label>
+                    <select id="modeSelect">
+                        <option value="direct" selected>直接講解</option>
+                        <option value="socratic">蘇格拉底引導</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Student Attempt (Optional) -->
+            <div class="input-group collapsible">
+                <button class="collapse-toggle" id="toggleAttempt">
+                    <i class="fas fa-chevron-down"></i> 填寫你的答案/思路（可選）
+                </button>
+                <textarea id="studentAttempt" placeholder="你的答案或卡住的地方..." hidden></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="btn-primary" id="submitBtn" disabled>
+                <i class="fas fa-paper-plane"></i> 獲取講解
+            </button>
+        </section>
+
+        <!-- Loading -->
+        <div class="loading" id="loading" hidden>
+            <div class="spinner"></div>
+            <p>AI 正在分析題目...</p>
+        </div>
+
+        <!-- Results Section -->
+        <section class="results-section" id="resultsSection" hidden>
+            <div class="result-card">
+                <h2><i class="fas fa-lightbulb"></i> 題目摘要</h2>
+                <div id="problemSummary" class="result-content"></div>
+            </div>
+
+            <div class="result-card">
+                <h2><i class="fas fa-list-ol"></i> 分步講解</h2>
+                <div id="stepsContent" class="result-content steps-list"></div>
+            </div>
+
+            <div class="result-card">
+                <h2><i class="fas fa-exclamation-triangle"></i> 常見錯誤</h2>
+                <div id="mistakesContent" class="result-content"></div>
+            </div>
+
+            <div class="result-card">
+                <h2><i class="fas fa-star"></i> Exam Tips</h2>
+                <div id="tipsContent" class="result-content"></div>
+            </div>
+
+            <div class="result-card">
+                <h2><i class="fas fa-check-circle"></i> 驗算檢查</h2>
+                <div id="verificationContent" class="result-content"></div>
+            </div>
+
+            <div class="result-card collapsible">
+                <button class="collapse-toggle" id="toggleAnswer">
+                    <i class="fas fa-eye"></i> 顯示最終答案
+                </button>
+                <div id="finalAnswer" class="result-content final-answer" hidden></div>
+            </div>
+
+            <div class="result-card">
+                <h2><i class="fas fa-book"></i> 術語對照</h2>
+                <div id="glossaryContent" class="result-content glossary"></div>
+            </div>
+        </section>
+
+        <!-- Chat Box -->
+        <section class="chat-section" id="chatSection" hidden>
+            <h2><i class="fas fa-comments"></i> 繼續追問</h2>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area">
+                <div class="chat-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="needsVision">
+                        <span>需要看圖</span>
+                    </label>
+                </div>
+                <div class="chat-input-row">
+                    <textarea id="chatInput" placeholder="繼續問關於這道題的問題..."></textarea>
+                    <button class="btn-send" id="sendChat">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Question Button -->
+        <button class="btn-secondary" id="newQuestionBtn" hidden>
+            <i class="fas fa-plus"></i> 問新題目
+        </button>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>HKDSE Physics AI Tutor | 僅作學習輔助，不保證滿分</p>
+        </footer>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

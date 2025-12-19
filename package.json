@@ -1,0 +1,17 @@
+{
+  "name": "hkdse-physics-ai-tutor",
+  "version": "1.0.0",
+  "description": "HKDSE Physics AI Tutor - Smart explanation with vision and chat",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev frontend --port 8788",
+    "deploy": "wrangler pages deploy frontend --project-name hkdse-physics-ai-tutor",
+    "tail": "wrangler pages deployment tail --project-name hkdse-physics-ai-tutor"
+  },
+  "keywords": ["hkdse", "physics", "ai", "tutor", "cloudflare", "education"],
+  "author": "Lancelot",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.99.0"
+  }
+}
