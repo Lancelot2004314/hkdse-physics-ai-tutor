@@ -61,6 +61,7 @@ const removeImage = document.getElementById('removeImage');
 const questionInput = document.getElementById('questionInput');
 const levelSelect = document.getElementById('levelSelect');
 const modeSelect = document.getElementById('modeSelect');
+const visionModelSelect = document.getElementById('visionModelSelect');
 const toggleAttempt = document.getElementById('toggleAttempt');
 const studentAttempt = document.getElementById('studentAttempt');
 const submitBtn = document.getElementById('submitBtn');
@@ -361,6 +362,7 @@ async function handleSubmit() {
 
     if (isImageMode) {
         requestPayload.image = currentImageBase64;
+        requestPayload.visionModel = visionModelSelect.value; // 'auto', 'gpt4o', 'gpt4o-mini', 'qwen-vl', 'gemini'
     } else {
         requestPayload.problemText = problemText;
     }
