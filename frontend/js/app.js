@@ -744,6 +744,9 @@ async function handleGoogleOAuthCallback() {
             debugLog.success('Google login successful', data.user);
             currentUser = data.user;
             updateAuthUI();
+            // Close login modal
+            loginModal.hidden = true;
+            loginStatus.hidden = true;
             showSuccess('登入成功！');
         } else {
             debugLog.error('Google login failed', data);
