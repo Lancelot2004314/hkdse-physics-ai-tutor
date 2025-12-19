@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice History - HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/thinka.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo"><i class="fas fa-atom"></i></div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Guest</div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
+                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+                <li class="nav-item active"><a href="/practice-history.html"><i class="fas fa-history"></i> Practice History</a></li>
+                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> AI Tutor</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Practice History</h1>
+            </header>
+
+            <!-- Filters -->
+            <div class="stats-filters" style="margin-bottom: 25px;">
+                <div class="config-item" style="min-width: 150px;">
+                    <label>Subject</label>
+                    <select id="subjectFilter">
+                        <option value="">All</option>
+                        <option value="physics">Physics</option>
+                    </select>
+                </div>
+                <div class="config-item" style="min-width: 200px;">
+                    <label>Search</label>
+                    <input type="text" id="searchInput" placeholder="Search...">
+                </div>
+            </div>
+
+            <!-- History Table -->
+            <div class="chart-container" style="padding: 0; overflow: hidden;">
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Date <i class="fas fa-sort-down"></i></th>
+                            <th>Subject</th>
+                            <th>No. of Questions</th>
+                            <th>Time Limit</th>
+                            <th>Score</th>
+                            <th>Grade</th>
+                            <th>Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px;">
+                                <i class="fas fa-spinner fa-spin"></i> Loading...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentPage = 1;
+        const limit = 20;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadHistory();
+            initEventListeners();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('userName').textContent = user.name || user.email?.split('@')[0];
+                    document.getElementById('userEmail').textContent = user.email || '';
+                } else {
+                    window.location.href = '/?login=true';
+                }
+            } catch (err) {
+                console.error('Auth check failed:', err);
+            }
+        }
+
+        async function loadHistory() {
+            const search = document.getElementById('searchInput').value;
+            
+            try {
+                const response = await fetch(
+                    `${API_BASE}/quiz/history?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(search)}`,
+                    { credentials: 'include' }
+                );
+                
+                if (!response.ok) throw new Error('Failed to load history');
+                
+                const data = await response.json();
+                renderHistory(data.sessions);
+                renderPagination(data.pagination);
+                
+            } catch (err) {
+                console.error('Failed to load history:', err);
+                document.getElementById('historyBody').innerHTML = `
+                    <tr><td colspan="7" style="text-align: center; padding: 40px;">
+                        Failed to load history
+                    </td></tr>
+                `;
+            }
+        }
+
+        function renderHistory(sessions) {
+            const tbody = document.getElementById('historyBody');
+            
+            if (sessions.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="7" style="text-align: center; padding: 40px;">
+                        No practice history found
+                    </td></tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = sessions.map(s => `
+                <tr onclick="viewSession('${s.id}')" style="cursor: pointer;">
+                    <td>${formatDate(s.createdAt)}</td>
+                    <td>Senior Secondary (HKDSE) - Physics</td>
+                    <td>${s.questionCount}</td>
+                    <td>${s.timeLimit} min</td>
+                    <td>${s.score} / ${s.maxScore} (${s.percentage}%)</td>
+                    <td><span class="grade-badge grade-${s.grade?.toLowerCase().replace('*', 's')}">${s.grade}</span></td>
+                    <td><button class="btn-small" onclick="event.stopPropagation(); viewSession('${s.id}')">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination(pagination) {
+            const container = document.getElementById('pagination');
+            const totalPages = pagination.totalPages;
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="period-btn ${i === currentPage ? 'active' : ''}" 
+                         onclick="goToPage(${i})">${i}</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            loadHistory();
+        }
+
+        function viewSession(sessionId) {
+            window.location.href = `/quiz-review.html?session=${sessionId}`;
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toISOString().split('T')[0];
+        }
+
+        function initEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', debounce(() => {
+                currentPage = 1;
+                loadHistory();
+            }, 500));
+
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+                window.location.href = '/';
+            });
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+    </script>
+</body>
+</html>

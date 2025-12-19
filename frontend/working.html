@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working - HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/thinka.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+</head>
+<body>
+    <!-- Header with Timer -->
+    <header class="working-header">
+        <button class="back-btn" onclick="confirmExit()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1>Working</h1>
+        <div class="timer-display" id="timerDisplay">Time Left: --:--:--</div>
+    </header>
+    
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar" style="width: 100%"></div>
+
+    <!-- Main Content -->
+    <div class="question-area">
+        <!-- Question Content -->
+        <div class="question-content">
+            <div class="question-header">
+                <span class="question-number" id="questionNumber">1.</span>
+                <div class="question-actions">
+                    <span class="question-score" id="questionScore">Score: 1</span>
+                    <button id="refreshBtn" title="Refresh"><i class="fas fa-redo"></i></button>
+                    <button id="flagBtn" title="Flag"><i class="fas fa-flag"></i></button>
+                    <button id="bookmarkBtn" title="Bookmark"><i class="fas fa-bookmark"></i></button>
+                </div>
+            </div>
+
+            <div class="question-text" id="questionText">
+                Loading question...
+            </div>
+
+            <!-- MC Options -->
+            <div class="mc-options" id="mcOptions" hidden></div>
+
+            <!-- Short/Long Answer -->
+            <div class="answer-input-section" id="answerSection" hidden>
+                <h3>Write your answer here</h3>
+                <div class="input-tools">
+                    <button class="input-tool"><i class="fas fa-function"></i> Insert Math</button>
+                    <button class="input-tool"><i class="fas fa-camera"></i> Upload Image</button>
+                    <button class="input-tool"><i class="fas fa-pencil-alt"></i> Draw</button>
+                </div>
+                <textarea class="answer-textarea" id="answerTextarea" placeholder="Type your answer..."></textarea>
+            </div>
+
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button class="btn-nav" id="prevBtn" disabled>
+                    <i class="fas fa-chevron-left"></i> PREV
+                </button>
+                <button class="btn-submit" id="submitBtn">SUBMIT</button>
+                <button class="btn-nav" id="nextBtn">
+                    NEXT <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Question Navigation Sidebar -->
+        <div class="question-nav">
+            <div class="nav-list" id="navList"></div>
+        </div>
+    </div>
+
+    <!-- Submit Confirmation Modal -->
+    <div class="modal" id="submitModal" hidden>
+        <div class="modal-content">
+            <h2>Submit Quiz?</h2>
+            <p id="submitMessage">You have answered X of Y questions.</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeSubmitModal()">Continue</button>
+                <button class="btn-primary" onclick="submitQuiz()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div class="modal" id="resultsModal" hidden>
+        <div class="modal-content results-content">
+            <h2>Quiz Complete!</h2>
+            <div class="results-summary" id="resultsSummary"></div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="reviewAnswers()">Review Answers</button>
+                <button class="btn-primary" onclick="window.location.href='/free-practice.html'">New Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let quizData = null;
+        let currentIndex = 0;
+        let answers = [];
+        let flaggedQuestions = new Set();
+        let timeRemaining = 0;
+        let timerInterval = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get session data
+            const sessionData = sessionStorage.getItem('quizSession');
+            if (sessionData) {
+                quizData = JSON.parse(sessionData);
+            } else {
+                // Try to load from URL param
+                const urlParams = new URLSearchParams(window.location.search);
+                const sessionId = urlParams.get('session');
+                if (sessionId) {
+                    await loadSession(sessionId);
+                } else {
+                    alert('No quiz session found');
+                    window.location.href = '/free-practice.html';
+                    return;
+                }
+            }
+
+            if (quizData && quizData.questions) {
+                initQuiz();
+            }
+        });
+
+        async function loadSession(sessionId) {
+            try {
+                const response = await fetch(`${API_BASE}/quiz/${sessionId}`, {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    quizData = await response.json();
+                }
+            } catch (err) {
+                console.error('Failed to load session:', err);
+            }
+        }
+
+        function initQuiz() {
+            answers = new Array(quizData.questions.length).fill('');
+            timeRemaining = (quizData.timeLimit || 60) * 60;
+            
+            renderNavigation();
+            displayQuestion(0);
+            startTimer();
+            initEventListeners();
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                updateProgressBar();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Time is up!');
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeRemaining / 3600);
+            const minutes = Math.floor((timeRemaining % 3600) / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `Time Left: ${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function updateProgressBar() {
+            const totalTime = (quizData.timeLimit || 60) * 60;
+            const percentage = (timeRemaining / totalTime) * 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            
+            if (percentage < 20) {
+                document.getElementById('progressBar').style.background = 'var(--danger)';
+            } else if (percentage < 50) {
+                document.getElementById('progressBar').style.background = 'var(--warning)';
+            }
+        }
+
+        function renderNavigation() {
+            const navList = document.getElementById('navList');
+            navList.innerHTML = quizData.questions.map((_, i) => `
+                <button class="nav-item-btn ${i === 0 ? 'current' : ''}" 
+                        data-index="${i}" onclick="goToQuestion(${i})">
+                    ${i + 1}
+                </button>
+            `).join('');
+        }
+
+        function displayQuestion(index) {
+            const question = quizData.questions[index];
+            currentIndex = index;
+
+            // Update question number and score
+            document.getElementById('questionNumber').textContent = `${index + 1}.`;
+            document.getElementById('questionScore').textContent = `Score: ${question.score || 1}`;
+
+            // Update question text
+            document.getElementById('questionText').innerHTML = formatMath(question.question);
+
+            // Handle different question types
+            const mcOptions = document.getElementById('mcOptions');
+            const answerSection = document.getElementById('answerSection');
+
+            if (question.type === 'mc') {
+                mcOptions.hidden = false;
+                answerSection.hidden = true;
+                renderMCOptions(question.options, answers[index]);
+            } else {
+                mcOptions.hidden = true;
+                answerSection.hidden = false;
+                document.getElementById('answerTextarea').value = answers[index] || '';
+            }
+
+            // Update navigation
+            updateNavHighlight();
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === quizData.questions.length - 1;
+
+            // Update flag button
+            document.getElementById('flagBtn').classList.toggle('active', flaggedQuestions.has(index));
+
+            // Re-render MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function renderMCOptions(options, selectedAnswer) {
+            const container = document.getElementById('mcOptions');
+            container.innerHTML = options.map((option, i) => {
+                const letter = String.fromCharCode(65 + i);
+                const isSelected = selectedAnswer === letter;
+                return `
+                    <div class="mc-option ${isSelected ? 'selected' : ''}" 
+                         data-answer="${letter}" onclick="selectMCOption('${letter}')">
+                        <span class="option-letter">${letter}.</span>
+                        <span class="option-text">${formatMath(option.replace(/^[A-D]\.\s*/, ''))}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectMCOption(letter) {
+            answers[currentIndex] = letter;
+            document.querySelectorAll('.mc-option').forEach(el => {
+                el.classList.toggle('selected', el.dataset.answer === letter);
+            });
+            updateNavHighlight();
+        }
+
+        function formatMath(text) {
+            if (!text) return '';
+            return text.replace(/\n/g, '<br>');
+        }
+
+        function updateNavHighlight() {
+            document.querySelectorAll('.nav-item-btn').forEach((btn, i) => {
+                btn.classList.remove('current', 'answered', 'flagged');
+                if (i === currentIndex) btn.classList.add('current');
+                if (answers[i]) btn.classList.add('answered');
+                if (flaggedQuestions.has(i)) btn.classList.add('flagged');
+            });
+        }
+
+        function goToQuestion(index) {
+            saveCurrentAnswer();
+            displayQuestion(index);
+        }
+
+        function saveCurrentAnswer() {
+            const question = quizData.questions[currentIndex];
+            if (question.type !== 'mc') {
+                answers[currentIndex] = document.getElementById('answerTextarea').value;
+            }
+        }
+
+        function initEventListeners() {
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    saveCurrentAnswer();
+                    displayQuestion(currentIndex - 1);
+                }
+            });
+
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                if (currentIndex < quizData.questions.length - 1) {
+                    saveCurrentAnswer();
+                    displayQuestion(currentIndex + 1);
+                }
+            });
+
+            document.getElementById('flagBtn').addEventListener('click', () => {
+                if (flaggedQuestions.has(currentIndex)) {
+                    flaggedQuestions.delete(currentIndex);
+                } else {
+                    flaggedQuestions.add(currentIndex);
+                }
+                document.getElementById('flagBtn').classList.toggle('active');
+                updateNavHighlight();
+            });
+
+            document.getElementById('bookmarkBtn').addEventListener('click', bookmarkQuestion);
+
+            document.getElementById('submitBtn').addEventListener('click', () => {
+                saveCurrentAnswer();
+                const answeredCount = answers.filter(a => a).length;
+                document.getElementById('submitMessage').textContent = 
+                    `You have answered ${answeredCount} of ${quizData.questions.length} questions.`;
+                document.getElementById('submitModal').hidden = false;
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
+                if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
+                if (e.key >= 'A' && e.key <= 'D' && quizData.questions[currentIndex].type === 'mc') {
+                    selectMCOption(e.key.toUpperCase());
+                }
+            });
+        }
+
+        async function bookmarkQuestion() {
+            const question = quizData.questions[currentIndex];
+            try {
+                await fetch(`${API_BASE}/bookmarks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        sessionId: quizData.sessionId,
+                        questionIndex: currentIndex,
+                        questionText: question.question,
+                        questionType: question.type,
+                        options: question.options,
+                        topic: question.topic,
+                        difficulty: question.difficulty,
+                    }),
+                });
+                document.getElementById('bookmarkBtn').classList.add('active');
+                alert('Question bookmarked!');
+            } catch (err) {
+                console.error('Bookmark failed:', err);
+            }
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').hidden = true;
+        }
+
+        async function submitQuiz() {
+            document.getElementById('submitModal').hidden = true;
+            clearInterval(timerInterval);
+
+            const totalTime = (quizData.timeLimit || 60) * 60;
+            const timeSpent = totalTime - timeRemaining;
+
+            try {
+                const response = await fetch(`${API_BASE}/quiz/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        sessionId: quizData.sessionId,
+                        answers,
+                        timeSpent,
+                    }),
+                });
+
+                if (response.ok) {
+                    const results = await response.json();
+                    showResults(results);
+                } else {
+                    throw new Error('Submit failed');
+                }
+            } catch (err) {
+                console.error('Submit error:', err);
+                alert('Failed to submit quiz. Please try again.');
+            }
+        }
+
+        function showResults(results) {
+            const summary = document.getElementById('resultsSummary');
+            summary.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Score</span>
+                    <span class="result-value">${results.score} / ${results.maxScore}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Percentage</span>
+                    <span class="result-value">${results.percentage}%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Grade</span>
+                    <span class="result-value grade">${results.grade}</span>
+                </div>
+            `;
+            document.getElementById('resultsModal').hidden = false;
+            
+            // Store results for review
+            sessionStorage.setItem('quizResults', JSON.stringify(results));
+        }
+
+        function reviewAnswers() {
+            window.location.href = `/quiz-review.html?session=${quizData.sessionId}`;
+        }
+
+        function confirmExit() {
+            if (confirm('Are you sure you want to leave? Your progress will be lost.')) {
+                clearInterval(timerInterval);
+                window.location.href = '/free-practice.html';
+            }
+        }
+    </script>
+</body>
+</html>

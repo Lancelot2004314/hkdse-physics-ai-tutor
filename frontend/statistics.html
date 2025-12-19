@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/thinka.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo"><i class="fas fa-atom"></i></div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Guest</div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
+                <li class="nav-item active"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> Practice History</a></li>
+                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> AI Tutor</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Statistics</h1>
+            </header>
+
+            <!-- Filters -->
+            <div class="stats-filters">
+                <div class="config-item" style="min-width: 200px;">
+                    <label>Subject</label>
+                    <select id="subjectFilter" disabled>
+                        <option>Senior Secondary (HKDSE) - Physics</option>
+                    </select>
+                </div>
+                <div class="period-buttons">
+                    <button class="period-btn" data-period="7D">7D</button>
+                    <button class="period-btn" data-period="1M">1M</button>
+                    <button class="period-btn" data-period="3M">3M</button>
+                    <button class="period-btn" data-period="6M">6M</button>
+                    <button class="period-btn active" data-period="1Y">1Y</button>
+                    <button class="period-btn" data-period="ALL">LONGEST</button>
+                </div>
+                <div class="date-range">
+                    <label>From</label>
+                    <input type="date" id="fromDate">
+                    <span>—</span>
+                    <label>To</label>
+                    <input type="date" id="toDate">
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="header-tabs" style="margin-bottom: 25px;">
+                <button class="tab-btn active" data-tab="overview">OVERVIEW</button>
+                <button class="tab-btn" data-tab="chapter">BY CHAPTER</button>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overviewTab">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Practices Done</div>
+                        <div class="stat-value" id="practicesDone">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Questions Done</div>
+                        <div class="stat-value" id="questionsDone">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Time Spent per Question</div>
+                        <div class="stat-value" id="timePerQuestion">0s</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Average Score</div>
+                        <div class="stat-value" id="avgScore">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Global Ranking</div>
+                        <div class="stat-value" id="globalRanking">#--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Expected Grade</div>
+                        <div class="stat-value grade" id="expectedGrade">--</div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="chart-container">
+                    <h3>Average Score</h3>
+                    <canvas id="scoreChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- By Chapter Tab -->
+            <div id="chapterTab" hidden>
+                <div class="chart-container">
+                    <h3>Performance by Chapter</h3>
+                    <table class="history-table" id="chapterTable">
+                        <thead>
+                            <tr>
+                                <th>Chapter</th>
+                                <th>Practices</th>
+                                <th>Avg Score</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentPeriod = '1Y';
+        let scoreChart = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadStats();
+            initEventListeners();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('userName').textContent = user.name || user.email?.split('@')[0];
+                    document.getElementById('userEmail').textContent = user.email || '';
+                } else {
+                    window.location.href = '/?login=true';
+                }
+            } catch (err) {
+                console.error('Auth check failed:', err);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats?period=${currentPeriod}`, {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) throw new Error('Failed to load stats');
+                
+                const data = await response.json();
+                
+                // Update overview cards
+                document.getElementById('practicesDone').textContent = data.overview.practicesDone;
+                document.getElementById('questionsDone').textContent = data.overview.questionsDone;
+                document.getElementById('timePerQuestion').textContent = data.overview.timePerQuestion + 's';
+                document.getElementById('avgScore').textContent = data.overview.avgScore + '%';
+                document.getElementById('globalRanking').textContent = '#' + data.overview.globalRanking;
+                document.getElementById('expectedGrade').textContent = data.overview.expectedGrade;
+                
+                // Update grade color
+                const gradeEl = document.getElementById('expectedGrade');
+                if (data.overview.expectedGrade === 'U') {
+                    gradeEl.classList.add('grade-u');
+                }
+                
+                // Update chart
+                updateChart(data.trend);
+                
+                // Update chapter table
+                updateChapterTable(data.byChapter);
+                
+            } catch (err) {
+                console.error('Failed to load stats:', err);
+            }
+        }
+
+        function updateChart(trendData) {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            
+            if (scoreChart) {
+                scoreChart.destroy();
+            }
+            
+            scoreChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: trendData.map(d => d.date),
+                    datasets: [{
+                        label: 'Average Score',
+                        data: trendData.map(d => d.avgScore),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChapterTable(chapterData) {
+            const tbody = document.querySelector('#chapterTable tbody');
+            tbody.innerHTML = chapterData.map(ch => `
+                <tr>
+                    <td>${ch.topic}</td>
+                    <td>${ch.practiceCount}</td>
+                    <td>${ch.avgScore}%</td>
+                </tr>
+            `).join('');
+        }
+
+        function initEventListeners() {
+            // Period buttons
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentPeriod = btn.dataset.period;
+                    loadStats();
+                });
+            });
+
+            // Tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    document.getElementById('overviewTab').hidden = btn.dataset.tab !== 'overview';
+                    document.getElementById('chapterTab').hidden = btn.dataset.tab !== 'chapter';
+                });
+            });
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+                window.location.href = '/';
+            });
+        }
+    </script>
+</body>
+</html>

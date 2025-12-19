@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/thinka.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo"><i class="fas fa-atom"></i></div>
+                <div class="user-info">
+                    <div class="user-name" id="sideUserName">Guest</div>
+                    <div class="user-email" id="sideUserEmail"></div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
+                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> Practice History</a></li>
+                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item active"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> AI Tutor</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Profile</h1>
+            </header>
+
+            <!-- User Profile Section -->
+            <div class="profile-section">
+                <div class="profile-avatar">
+                    <div class="avatar-image" id="avatarImage">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <button class="avatar-edit">Edit</button>
+                </div>
+                <div class="profile-form">
+                    <h2>User Profile</h2>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="profileName" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="profileEmail" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Language</label>
+                        <select id="profileLanguage">
+                            <option value="en">English</option>
+                            <option value="zh-HK">繁體中文</option>
+                            <option value="zh-CN">简体中文</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>I am a...</label>
+                        <select id="profileRole">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="parent">Parent</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" id="saveProfileBtn" style="margin-top: 20px;">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Payment Section -->
+            <div class="payment-section">
+                <h2>Payment</h2>
+                <div class="plans-grid">
+                    <div class="plan-card free">
+                        <h3>Free</h3>
+                        <div class="plan-price">$0<span>/month</span></div>
+                        <ul class="plan-features">
+                            <li>5 questions per practice</li>
+                            <li>3 practices per day</li>
+                            <li>Basic statistics</li>
+                        </ul>
+                        <button class="btn-secondary" disabled>Current Plan</button>
+                    </div>
+                    <div class="plan-card premium">
+                        <div class="plan-badge">Discount limited to first 1,000 users!</div>
+                        <h3>Premium</h3>
+                        <div class="plan-price">
+                            <span class="original">$59</span> $40<span>/month</span>
+                        </div>
+                        <ul class="plan-features">
+                            <li><strong>Unlimited</strong> questions per practice</li>
+                            <li><strong>Unlimited</strong> practices per day</li>
+                            <li>Advanced statistics</li>
+                            <li>30 days money back guarantee</li>
+                        </ul>
+                        <button class="btn-primary">Upgrade to Premium</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .profile-section {
+            display: flex;
+            gap: 40px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .profile-avatar {
+            text-align: center;
+        }
+        .avatar-image {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .avatar-edit {
+            padding: 6px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .profile-form {
+            flex: 1;
+        }
+        .profile-form h2 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-size: 0.9em;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+        }
+        .payment-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 30px;
+        }
+        .payment-section h2 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .plan-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+        }
+        .plan-card.premium {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+        }
+        .plan-badge {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ef4444;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            white-space: nowrap;
+        }
+        .plan-card h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+        .plan-price {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .plan-price span {
+            font-size: 0.5em;
+            font-weight: 400;
+        }
+        .plan-price .original {
+            text-decoration: line-through;
+            opacity: 0.6;
+            font-size: 0.6em;
+        }
+        .plan-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        .plan-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .plan-card.free .plan-features li {
+            border-color: var(--border);
+        }
+        .plan-card button {
+            width: 100%;
+        }
+    </style>
+
+    <script>
+        const API_BASE = '/api';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProfile();
+            initEventListeners();
+        });
+
+        async function loadProfile() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                if (response.ok) {
+                    currentUser = await response.json();
+                    
+                    document.getElementById('sideUserName').textContent = currentUser.name || currentUser.email?.split('@')[0];
+                    document.getElementById('sideUserEmail').textContent = currentUser.email || '';
+                    document.getElementById('profileName').value = currentUser.name || '';
+                    document.getElementById('profileEmail').value = currentUser.email || '';
+                    document.getElementById('profileLanguage').value = currentUser.language || 'en';
+                    document.getElementById('profileRole').value = currentUser.role || 'student';
+                } else {
+                    window.location.href = '/?login=true';
+                }
+            } catch (err) {
+                console.error('Failed to load profile:', err);
+            }
+        }
+
+        function initEventListeners() {
+            document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+                window.location.href = '/';
+            });
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('profileName').value;
+            const language = document.getElementById('profileLanguage').value;
+            const role = document.getElementById('profileRole').value;
+            
+            try {
+                // Note: Profile update API would need to be implemented
+                alert('Profile saved! (API not yet implemented)');
+            } catch (err) {
+                console.error('Failed to save profile:', err);
+            }
+        }
+    </script>
+</body>
+</html>

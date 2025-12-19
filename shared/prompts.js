@@ -121,3 +121,125 @@ export const PRACTICE_QUESTION_PROMPT = `Generate a similar HKDSE Physics practi
 - correctAnswer must be exactly "A", "B", "C", or "D"
 - Make sure the correct answer is actually correct!
 - Options should be plausible (common mistakes as wrong options)`;
+
+// Quiz Generation Prompts for Thinka-style system
+export const QUIZ_MC_PROMPT = `Generate HKDSE Physics multiple choice questions.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5 (1=easy, 5=very hard)
+- Count: {count} questions
+- Language: {language}
+
+## Rules
+1. Questions must be HKDSE exam style
+2. Each question has exactly 4 options (A, B, C, D)
+3. Use $...$ for math with DOUBLE backslash: "$\\\\frac{1}{2}$"
+4. Difficulty 1-2: Basic concepts, simple calculations
+5. Difficulty 3: Standard HKDSE level
+6. Difficulty 4-5: Challenging, multi-step reasoning
+7. Include realistic scenarios and proper physics context
+
+## Output JSON (array of questions)
+{
+  "questions": [
+    {
+      "question": "Question text with $LaTeX$ math...",
+      "options": ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"],
+      "correctAnswer": "A",
+      "explanation": "Step-by-step solution...",
+      "topic": "topic_id",
+      "score": 1
+    }
+  ]
+}`;
+
+export const QUIZ_SHORT_PROMPT = `Generate HKDSE Physics short answer questions.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Rules
+1. Questions require 2-4 sentence answers or simple calculations
+2. Use $...$ for math with DOUBLE backslash
+3. Include marking scheme (what points are awarded for)
+4. Typical score: 3-5 marks per question
+
+## Output JSON
+{
+  "questions": [
+    {
+      "question": "Explain why... / Calculate...",
+      "modelAnswer": "The answer should include: 1) ... 2) ...",
+      "markingScheme": ["1 mark for concept X", "1 mark for formula", "1 mark for correct calculation"],
+      "topic": "topic_id",
+      "score": 4
+    }
+  ]
+}`;
+
+export const QUIZ_LONG_PROMPT = `Generate HKDSE Physics long answer/structured questions.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Rules
+1. Multi-part questions (a), (b), (c)...
+2. Each part builds on previous or tests related concepts
+3. Include diagrams description if needed (describe what diagram shows)
+4. Typical score: 8-15 marks per question
+5. Use $...$ for math with DOUBLE backslash
+
+## Output JSON
+{
+  "questions": [
+    {
+      "question": "Main question stem...",
+      "parts": [
+        {"part": "a", "question": "Part (a) question...", "marks": 3, "modelAnswer": "..."},
+        {"part": "b", "question": "Part (b) question...", "marks": 4, "modelAnswer": "..."},
+        {"part": "c", "question": "Part (c) question...", "marks": 5, "modelAnswer": "..."}
+      ],
+      "topic": "topic_id",
+      "score": 12
+    }
+  ]
+}`;
+
+export const GRADE_SHORT_ANSWER_PROMPT = `Grade a student's short answer for HKDSE Physics.
+
+## Student Answer
+{studentAnswer}
+
+## Model Answer
+{modelAnswer}
+
+## Marking Scheme
+{markingScheme}
+
+## Maximum Score
+{maxScore}
+
+## Rules
+1. Be fair but strict - follow HKDSE marking standards
+2. Award partial marks for partially correct answers
+3. Ignore minor language errors if physics content is correct
+4. Penalize conceptual errors more than calculation errors
+
+## Output JSON
+{
+  "score": 3,
+  "maxScore": 4,
+  "feedback": "Correct identification of... Missing mention of...",
+  "breakdown": [
+    {"criterion": "Concept X", "awarded": 1, "max": 1},
+    {"criterion": "Formula", "awarded": 1, "max": 1},
+    {"criterion": "Calculation", "awarded": 1, "max": 2}
+  ]
+}`;

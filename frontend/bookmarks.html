@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmarks - HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/thinka.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        MathJax = { tex: { inlineMath: [['$', '$']], processEscapes: true } };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo"><i class="fas fa-atom"></i></div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Guest</div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
+                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> Practice History</a></li>
+                <li class="nav-item active"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> AI Tutor</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Bookmarks</h1>
+            </header>
+
+            <!-- Filters -->
+            <div class="stats-filters" style="margin-bottom: 25px;">
+                <div class="config-item">
+                    <label>Type</label>
+                    <select id="typeFilter">
+                        <option value="">All</option>
+                        <option value="mc">MC</option>
+                        <option value="short">Short Answer</option>
+                        <option value="long">Long Answer</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bookmarks Grid -->
+            <div class="bookmarks-grid" id="bookmarksGrid">
+                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .bookmarks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .bookmark-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+        .bookmark-card .bookmark-type {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+        .bookmark-card .question-preview {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow: hidden;
+        }
+        .bookmark-card .bookmark-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+        }
+        .bookmark-card .delete-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .bookmark-card .delete-btn:hover {
+            color: var(--danger);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+    </style>
+
+    <script>
+        const API_BASE = '/api';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadBookmarks();
+            initEventListeners();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('userName').textContent = user.name || user.email?.split('@')[0];
+                    document.getElementById('userEmail').textContent = user.email || '';
+                } else {
+                    window.location.href = '/?login=true';
+                }
+            } catch (err) {
+                console.error('Auth check failed:', err);
+            }
+        }
+
+        async function loadBookmarks() {
+            const type = document.getElementById('typeFilter').value;
+            
+            try {
+                let url = `${API_BASE}/bookmarks`;
+                if (type) url += `?type=${type}`;
+                
+                const response = await fetch(url, { credentials: 'include' });
+                if (!response.ok) throw new Error('Failed to load bookmarks');
+                
+                const data = await response.json();
+                renderBookmarks(data.bookmarks);
+                
+            } catch (err) {
+                console.error('Failed to load bookmarks:', err);
+            }
+        }
+
+        function renderBookmarks(bookmarks) {
+            const grid = document.getElementById('bookmarksGrid');
+            
+            if (bookmarks.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <i class="fas fa-bookmark"></i>
+                        <p>No bookmarks yet</p>
+                        <p>Bookmark questions during practice to review them later</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = bookmarks.map(b => `
+                <div class="bookmark-card">
+                    <button class="delete-btn" onclick="deleteBookmark('${b.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <span class="bookmark-type">${b.questionType.toUpperCase()}</span>
+                    <div class="question-preview">${b.questionText}</div>
+                    <div class="bookmark-meta">
+                        <span>${b.topic || 'General'}</span>
+                        <span>${formatDate(b.createdAt)}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        async function deleteBookmark(id) {
+            if (!confirm('Delete this bookmark?')) return;
+            
+            try {
+                await fetch(`${API_BASE}/bookmarks?id=${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                loadBookmarks();
+            } catch (err) {
+                console.error('Delete failed:', err);
+            }
+        }
+
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleDateString();
+        }
+
+        function initEventListeners() {
+            document.getElementById('typeFilter').addEventListener('change', loadBookmarks);
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+                window.location.href = '/';
+            });
+        }
+    </script>
+</body>
+</html>
