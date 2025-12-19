@@ -443,6 +443,9 @@ async function handleSubmit() {
 
 function displayResults(data) {
     resultsSection.hidden = false;
+    
+    // Check if this is Socratic mode (has _socratic flag or specific summary)
+    const isSocraticMode = data._socratic || (data.problemSummary && data.problemSummary.includes('Socratic'));
 
     // Problem Summary - use formatMathSafe to handle LaTeX
     document.getElementById('problemSummary').innerHTML = formatMathSafe(data.problemSummary || '');
@@ -450,12 +453,48 @@ function displayResults(data) {
     // Steps - use formatMathSafe for LaTeX support
     const stepsContent = document.getElementById('stepsContent');
     if (data.answer?.steps?.length) {
-        stepsContent.innerHTML = data.answer.steps.map((step, i) => `
-            <div class="step">
-                <div class="step-number">${i + 1}</div>
-                <div class="step-content">${formatMathSafe(step)}</div>
-            </div>
-        `).join('');
+        if (isSocraticMode) {
+            // Interactive Socratic mode with progressive hints
+            stepsContent.innerHTML = data.answer.steps.map((step, i) => {
+                // Parse step to separate question from hints
+                const lines = step.split('\n');
+                const question = lines[0];
+                const hints = lines.slice(1).filter(l => l.trim());
+                
+                return `
+                <div class="step socratic-step">
+                    <div class="step-number">❓ ${i + 1}</div>
+                    <div class="step-content">
+                        <div class="socratic-question">${formatMathSafe(question)}</div>
+                        ${hints.length > 0 ? `
+                        <div class="socratic-hints">
+                            ${hints.map((hint, j) => `
+                                <div class="hint-wrapper" data-hint="${j}">
+                                    <button class="hint-toggle" onclick="toggleHint(this)">
+                                        💡 顯示提示 ${j + 1} / Show Hint ${j + 1}
+                                    </button>
+                                    <div class="hint-content hidden">${formatMathSafe(hint.replace(/^💡\s*/, ''))}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+                        <div class="socratic-input-wrapper">
+                            <input type="text" class="socratic-input" placeholder="輸入你的答案... / Your answer..." data-question="${i}">
+                            <button class="socratic-check" onclick="checkSocraticAnswer(${i})">檢查 / Check</button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        } else {
+            // Normal mode
+            stepsContent.innerHTML = data.answer.steps.map((step, i) => `
+                <div class="step">
+                    <div class="step-number">${i + 1}</div>
+                    <div class="step-content">${formatMathSafe(step)}</div>
+                </div>
+            `).join('');
+        }
     } else {
         stepsContent.innerHTML = '<p class="empty-hint">No steps available</p>';
     }
@@ -690,6 +729,71 @@ function formatMathSafe(text) {
 // Legacy function for backward compatibility
 function formatMath(text) {
     return formatMathSafe(text);
+}
+
+// Socratic mode interaction functions
+function toggleHint(button) {
+    const wrapper = button.closest('.hint-wrapper');
+    const content = wrapper.querySelector('.hint-content');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        button.textContent = '🙈 隱藏提示 / Hide Hint';
+        button.classList.add('revealed');
+        
+        // Re-render MathJax for the revealed hint
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise([content]).catch(err => console.warn('MathJax error:', err));
+        }
+    } else {
+        content.classList.add('hidden');
+        const hintNum = parseInt(wrapper.dataset.hint) + 1;
+        button.textContent = `💡 顯示提示 ${hintNum} / Show Hint ${hintNum}`;
+        button.classList.remove('revealed');
+    }
+}
+
+function checkSocraticAnswer(questionIndex) {
+    const input = document.querySelector(`.socratic-input[data-question="${questionIndex}"]`);
+    const answer = input.value.trim();
+    
+    if (!answer) {
+        alert('請輸入你的答案 / Please enter your answer');
+        return;
+    }
+    
+    // Show encouragement and reveal all hints for this question
+    const step = input.closest('.socratic-step');
+    const hints = step.querySelectorAll('.hint-content.hidden');
+    
+    hints.forEach(hint => {
+        hint.classList.remove('hidden');
+        const button = hint.previousElementSibling;
+        if (button && button.classList.contains('hint-toggle')) {
+            const hintNum = parseInt(button.closest('.hint-wrapper').dataset.hint) + 1;
+            button.textContent = `🙈 隱藏提示 / Hide Hint`;
+            button.classList.add('revealed');
+        }
+    });
+    
+    // Add feedback message
+    const feedback = document.createElement('div');
+    feedback.className = 'socratic-feedback';
+    feedback.innerHTML = `
+        <div class="your-answer">📝 你的答案 / Your answer: ${escapeHtml(answer)}</div>
+        <div class="feedback-text">👍 好的嘗試！請查看提示來驗證你的思路。/ Good attempt! Check the hints to verify your thinking.</div>
+    `;
+    
+    // Remove existing feedback if any
+    const existingFeedback = step.querySelector('.socratic-feedback');
+    if (existingFeedback) existingFeedback.remove();
+    
+    input.closest('.socratic-input-wrapper').after(feedback);
+    
+    // Re-render MathJax
+    if (window.MathJax && window.MathJax.typesetPromise) {
+        MathJax.typesetPromise([step]).catch(err => console.warn('MathJax error:', err));
+    }
 }
 
 // Chat history persistence

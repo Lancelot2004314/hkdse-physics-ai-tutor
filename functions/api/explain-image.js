@@ -127,10 +127,19 @@ export async function onRequestPost(context) {
       await saveTokenUsage(env.DB, user?.id || null, usedModel, visionResult.usage, 'explain-image');
     }
 
-    // Parse response
+    // Parse response - handle markdown code blocks
     let parsedResponse;
     try {
-      const jsonMatch = visionResult.text.match(/\{[\s\S]*\}/);
+      let textToParse = visionResult.text;
+      
+      // Strip markdown code blocks if present
+      const codeBlockMatch = textToParse.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        textToParse = codeBlockMatch[1];
+      }
+      
+      // Extract JSON object
+      const jsonMatch = textToParse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         parsedResponse = JSON.parse(jsonMatch[0]);
       } else {
@@ -138,11 +147,19 @@ export async function onRequestPost(context) {
       }
     } catch (parseErr) {
       console.error('Failed to parse vision response:', parseErr);
-      // Fallback: show raw response in a clean format
+      // Fallback: split raw response into readable paragraphs
+      const rawText = visionResult.text
+        .replace(/```json\s*/g, '')
+        .replace(/```/g, '')
+        .trim();
+      
+      // Try to extract meaningful content
+      const paragraphs = rawText.split(/\n\n+/).filter(p => p.trim());
+      
       parsedResponse = {
         problemSummary: 'Analysis Result',
         answer: {
-          steps: [visionResult.text],
+          steps: paragraphs.length > 0 ? paragraphs : [rawText],
           commonMistakes: [],
           examTips: [],
           finalAnswer: 'See explanation above',

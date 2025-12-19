@@ -76,11 +76,19 @@ export async function onRequestPost(context) {
       await saveTokenUsage(env.DB, user?.id || null, 'deepseek', result.usage, 'explain-text');
     }
 
-    // Parse DeepSeek response
+    // Parse DeepSeek response - handle markdown code blocks
     let parsedResponse;
     try {
-      // Try to extract JSON from response
-      const jsonMatch = result.text.match(/\{[\s\S]*\}/);
+      let textToParse = result.text;
+      
+      // Strip markdown code blocks if present
+      const codeBlockMatch = textToParse.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        textToParse = codeBlockMatch[1];
+      }
+      
+      // Extract JSON object
+      const jsonMatch = textToParse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         parsedResponse = JSON.parse(jsonMatch[0]);
       } else {
@@ -88,11 +96,18 @@ export async function onRequestPost(context) {
       }
     } catch (parseErr) {
       console.error('Failed to parse DeepSeek response:', parseErr);
-      // Fallback: show raw response in a clean format
+      // Fallback: split raw response into readable paragraphs
+      const rawText = result.text
+        .replace(/```json\s*/g, '')
+        .replace(/```/g, '')
+        .trim();
+      
+      const paragraphs = rawText.split(/\n\n+/).filter(p => p.trim());
+      
       parsedResponse = {
         problemSummary: 'Analysis Result',
         answer: {
-          steps: [result.text],
+          steps: paragraphs.length > 0 ? paragraphs : [rawText],
           commonMistakes: [],
           examTips: [],
           finalAnswer: 'See explanation above',
@@ -103,27 +118,33 @@ export async function onRequestPost(context) {
     }
 
     // Handle Socratic mode - map to unified structure if needed
-    if (mode === 'socratic' && parsedResponse.guidingQuestions) {
-      // Convert Socratic output to standard format
-      const steps = parsedResponse.guidingQuestions.map((q, i) => {
-        let stepContent = `${q.question}`;
-        if (q.hint1) stepContent += `\n💡 ${q.hint1}`;
-        if (q.hint2) stepContent += `\n💡 ${q.hint2}`;
-        if (q.hint3) stepContent += `\n💡 ${q.hint3}`;
-        return stepContent;
-      });
+    if (mode === 'socratic') {
+      if (parsedResponse.guidingQuestions) {
+        // Convert Socratic output to standard format
+        const steps = parsedResponse.guidingQuestions.map((q, i) => {
+          let stepContent = `${q.question}`;
+          if (q.hint1) stepContent += `\n💡 ${q.hint1}`;
+          if (q.hint2) stepContent += `\n💡 ${q.hint2}`;
+          if (q.hint3) stepContent += `\n💡 ${q.hint3}`;
+          return stepContent;
+        });
 
-      parsedResponse = {
-        problemSummary: 'Socratic Mode - Think through guided questions',
-        answer: {
-          steps: steps,
-          commonMistakes: [],
-          examTips: parsedResponse.nextStep ? [parsedResponse.nextStep] : [],
-          finalAnswer: 'Think about the questions above first',
-        },
-        verification: 'Guided mode',
-        glossary: parsedResponse.glossary || {},
-      };
+        parsedResponse = {
+          problemSummary: 'Socratic Mode - Think through guided questions',
+          answer: {
+            steps: steps,
+            commonMistakes: [],
+            examTips: parsedResponse.nextStep ? [parsedResponse.nextStep] : [],
+            finalAnswer: 'Think about the questions above first',
+          },
+          verification: 'Guided mode',
+          glossary: parsedResponse.glossary || {},
+          _socratic: true,
+        };
+      } else {
+        // Even if format is different, mark as socratic
+        parsedResponse._socratic = true;
+      }
     }
 
     return new Response(JSON.stringify(parsedResponse), {

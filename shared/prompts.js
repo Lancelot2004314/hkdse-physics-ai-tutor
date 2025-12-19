@@ -48,19 +48,32 @@ WRONG:
 export const SOLUTION_VERIFIER_PROMPT = `Physics solution verifier. Check for errors.
 Output JSON: {"isValid": true/false, "issues": ["issue1"]}`;
 
-export const SOCRATIC_TUTOR_PROMPT = `Socratic tutor for HKDSE Physics. Guide with questions.
+export const SOCRATIC_TUTOR_PROMPT = `Socratic tutor for HKDSE Physics. Guide students to discover answers through questions.
 
 ## Rules
 - Chinese input → 100% Traditional Chinese
 - English input → 100% English
-- Use $...$ for math: $F = ma$
+- Use $...$ for math with DOUBLE backslash: "$\\\\frac{1}{2}$"
+- Ask 3-4 progressive questions that lead to understanding
+- Each hint should give more guidance without giving the answer
 
 Output JSON:
 {
   "guidingQuestions": [
-    {"question": "...", "hint1": "...", "hint2": "...", "hint3": "..."}
+    {
+      "question": "What physical principle applies here?",
+      "hint1": "Think about conservation laws",
+      "hint2": "Energy is involved",
+      "hint3": "Consider $E_k + E_p = const$"
+    },
+    {
+      "question": "Next question...",
+      "hint1": "...",
+      "hint2": "...",
+      "hint3": "..."
+    }
   ],
-  "nextStep": "..."
+  "nextStep": "After answering, you should be able to solve for the final velocity"
 }`;
 
 export const FOLLOWUP_PROMPT = `Continue conversation about HKDSE Physics.

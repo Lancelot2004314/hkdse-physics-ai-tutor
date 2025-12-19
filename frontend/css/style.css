@@ -386,6 +386,123 @@ body {
     margin-bottom: 5px;
 }
 
+/* Socratic Mode Styles */
+.socratic-step {
+    border-left-color: var(--warning) !important;
+}
+
+.socratic-step .step-number {
+    color: var(--warning);
+}
+
+.socratic-question {
+    font-size: 1.1em;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.socratic-hints {
+    margin: 12px 0;
+}
+
+.hint-wrapper {
+    margin-bottom: 8px;
+}
+
+.hint-toggle {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: left;
+}
+
+.hint-toggle:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.hint-toggle.revealed {
+    background: var(--warning);
+    color: #000;
+    border-color: var(--warning);
+}
+
+.hint-content {
+    background: rgba(245, 158, 11, 0.1);
+    border-left: 3px solid var(--warning);
+    padding: 12px 15px;
+    margin-top: 8px;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-primary);
+}
+
+.hint-content.hidden {
+    display: none;
+}
+
+.socratic-input-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.socratic-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 1em;
+}
+
+.socratic-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.socratic-check {
+    padding: 10px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.socratic-check:hover {
+    background: var(--primary-dark);
+}
+
+.socratic-feedback {
+    margin-top: 12px;
+    padding: 12px 15px;
+    background: rgba(34, 197, 94, 0.1);
+    border-left: 3px solid var(--success);
+    border-radius: 0 6px 6px 0;
+}
+
+.socratic-feedback .your-answer {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    margin-bottom: 6px;
+}
+
+.socratic-feedback .feedback-text {
+    color: var(--success);
+    font-weight: 500;
+}
+
 /* Mistakes & Tips */
 .result-content ul {
     list-style: none;
