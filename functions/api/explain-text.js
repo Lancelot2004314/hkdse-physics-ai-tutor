@@ -151,7 +151,7 @@ async function callDeepSeek(apiKey, systemPrompt, userPrompt) {
       },
       { role: 'user', content: userPrompt },
     ],
-    temperature: 0.3,
+    temperature: 0.1,  // Low temperature for consistent responses
     max_tokens: 4096,
     response_format: { type: 'json_object' },
   };

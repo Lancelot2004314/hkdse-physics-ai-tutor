@@ -129,7 +129,7 @@ async function callDeepSeek(apiKey, systemPrompt, userQuestion, chatHistory) {
   const requestBody = {
     model: 'deepseek-chat',
     messages,
-    temperature: 0.5,
+    temperature: 0.1,  // Low temperature for consistent responses
     max_tokens: 1024,
     response_format: { type: 'json_object' },
   };
@@ -204,7 +204,7 @@ async function callOpenAIVision(apiKey, imageBase64, systemPrompt, userQuestion)
         ]
       }
     ],
-    temperature: 0.5,
+    temperature: 0.1,  // Low temperature for consistent responses
     max_tokens: 1024,
     response_format: { type: 'json_object' }
   };

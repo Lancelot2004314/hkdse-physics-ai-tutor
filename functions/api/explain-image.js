@@ -31,11 +31,11 @@ export async function onRequestPost(context) {
   try {
     // Parse request body
     const body = await request.json();
-    const { 
-      image, 
-      question, 
-      studentLevel = 'standard', 
-      mode = 'direct', 
+    const {
+      image,
+      question,
+      studentLevel = 'standard',
+      mode = 'direct',
       studentAttempt,
       visionModel = 'auto'  // 'auto', 'gpt4o', 'gpt4o-mini', 'qwen-vl', 'gemini'
     } = body;
@@ -96,7 +96,7 @@ export async function onRequestPost(context) {
 
     for (const modelName of modelsToTry) {
       console.log(`Trying vision model: ${modelName}`);
-      
+
       const result = await callVisionModel(
         env,
         modelName,
@@ -151,22 +151,10 @@ export async function onRequestPost(context) {
       };
     }
 
-    // Optionally verify the solution with DeepSeek
-    let verificationResult = null;
-    if (parsedResponse.answer?.steps?.length > 0 && env.DEEPSEEK_API_KEY) {
-      verificationResult = await verifySolution(env.DEEPSEEK_API_KEY, JSON.stringify(parsedResponse));
-      if (verificationResult?.usage && env.DB) {
-        await saveTokenUsage(env.DB, user?.id || null, 'deepseek', verificationResult.usage, 'explain-image-verify');
-      }
-    }
-
-    // Combine results
+    // Final result - no messy verification append
     const finalResult = {
       ...parsedResponse,
       _model: usedModel, // Include which model was used (for debugging)
-      verification: verificationResult?.suggestions?.length
-        ? parsedResponse.verification + ' | ' + verificationResult.suggestions.join(', ')
-        : parsedResponse.verification,
     };
 
     return new Response(JSON.stringify(finalResult), {
@@ -241,7 +229,7 @@ async function callOpenAI(apiKey, model, base64Data, mimeType, systemPrompt, use
         ]
       }
     ],
-    temperature: 0.3,
+    temperature: 0.1,  // Low temperature for consistent responses
     max_tokens: 4096,
     response_format: { type: 'json_object' }
   };
@@ -309,7 +297,7 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
       ]
     },
     parameters: {
-      temperature: 0.3,
+      temperature: 0.1,  // Low temperature for consistent responses
       max_tokens: 4096
     }
   };
@@ -376,7 +364,7 @@ async function callGemini(apiKey, base64Data, mimeType, systemPrompt, userPrompt
       }
     ],
     generationConfig: {
-      temperature: 0.3,
+      temperature: 0.1,  // Low temperature for consistent responses
       maxOutputTokens: 4096,
       responseMimeType: 'application/json'
     }
@@ -405,7 +393,7 @@ async function callGemini(apiKey, base64Data, mimeType, systemPrompt, userPrompt
 
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
+
     // Gemini doesn't return token count in same format
     const usage = {
       prompt_tokens: data.usageMetadata?.promptTokenCount || 0,
