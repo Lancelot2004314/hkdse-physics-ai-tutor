@@ -207,6 +207,12 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAuth();
             initEventListeners();
+            
+            // Check for login redirect
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('login') === 'true' && !currentUser) {
+                document.getElementById('loginModal').hidden = false;
+            }
         });
 
         async function checkAuth() {
@@ -264,7 +270,7 @@
             if (!currentUser) return;
 
             const activityList = document.getElementById('activityList');
-            
+
             try {
                 const response = await fetch(`${API_BASE}/quiz/history?limit=5`, { credentials: 'include' });
                 if (response.ok) {
@@ -295,7 +301,7 @@
             const date = new Date(dateStr);
             const now = new Date();
             const diff = now - date;
-            
+
             if (diff < 60000) return 'Just now';
             if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
             if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;

@@ -31,7 +31,8 @@
                 <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
                 <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> History</a></li>
                 <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
-                <li class="nav-item active"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+                <li class="nav-item active"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a>
+                </li>
                 <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
             </ul>
             <div class="sidebar-footer">
@@ -93,7 +94,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAuth();
-            
+
             // Tab switching
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -106,7 +107,7 @@
 
             // Load initial leaderboard
             loadLeaderboard('global');
-            
+
             // Logout
             document.getElementById('logoutBtn').addEventListener('click', async () => {
                 await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });

@@ -236,10 +236,13 @@
                     document.getElementById('userName').textContent = currentUser.name || currentUser.email?.split('@')[0] || 'User';
                     document.getElementById('userEmail').textContent = currentUser.email || '';
                 } else {
+                    // Not logged in - redirect to dashboard with login prompt
                     window.location.href = '/?login=true';
                 }
             } catch (err) {
                 console.error('Auth check failed:', err);
+                // On network error, still show page but user may need to login
+                document.getElementById('userName').textContent = 'Guest';
             }
         }
 

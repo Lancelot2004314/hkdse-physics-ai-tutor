@@ -303,24 +303,24 @@
         text-align: center;
         gap: 15px;
     }
-    
+
     .feature-cards {
         grid-template-columns: 1fr;
     }
-    
+
     .feature-card {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .feature-card .card-icon {
         margin: 0 auto;
     }
-    
+
     .feature-card .card-features li {
         text-align: left;
     }
-    
+
     .feature-card .card-arrow {
         display: none;
     }
