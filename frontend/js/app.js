@@ -567,6 +567,7 @@ function displayResults(data) {
 // ==================== Practice Section ====================
 let currentPracticeId = null;
 let selectedAnswer = null;
+let currentCorrectAnswer = null; // Store correct answer for non-DB verification
 
 async function initPracticeSection(data) {
     const practiceSection = document.getElementById('practiceSection');
@@ -580,6 +581,7 @@ async function initPracticeSection(data) {
     // Reset state
     currentPracticeId = null;
     selectedAnswer = null;
+    currentCorrectAnswer = null;
     practiceResult.hidden = true;
     submitPractice.disabled = true;
     nextPractice.hidden = true;
@@ -612,6 +614,7 @@ async function initPracticeSection(data) {
 
         const practiceData = await response.json();
         currentPracticeId = practiceData.id;
+        currentCorrectAnswer = practiceData.correctAnswer || null; // Store for fallback verification
 
         // Display question
         practiceQuestion.innerHTML = `<p class="question-text">${formatMathSafe(practiceData.question)}</p>`;
@@ -666,11 +669,13 @@ async function submitPracticeAnswer() {
             body: JSON.stringify({
                 practiceId: currentPracticeId,
                 userAnswer: selectedAnswer,
+                correctAnswer: currentCorrectAnswer, // Fallback for non-DB verification
             }),
         });
 
         if (!response.ok) {
-            throw new Error('Failed to submit answer');
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Failed to submit answer');
         }
 
         const result = await response.json();
@@ -678,7 +683,7 @@ async function submitPracticeAnswer() {
         // Show result
         practiceResult.hidden = false;
         practiceResult.className = `practice-result ${result.isCorrect ? 'correct' : 'incorrect'}`;
-        
+
         let bonusText = '';
         if (result.streakBonus > 0) {
             bonusText = ` (+${result.streakBonus} 連續獎勵)`;
@@ -728,6 +733,7 @@ function skipPracticeQuestion() {
     practiceSection.hidden = true;
     currentPracticeId = null;
     selectedAnswer = null;
+    currentCorrectAnswer = null;
 }
 
 async function loadNextPractice() {
@@ -771,7 +777,7 @@ async function loadUserStats() {
             // Update stats display
             const streakEl = document.getElementById('currentStreak');
             const pointsEl = document.getElementById('totalPoints');
-            
+
             if (streakEl) streakEl.textContent = data.stats.currentStreak;
             if (pointsEl) pointsEl.textContent = data.stats.totalPoints;
 

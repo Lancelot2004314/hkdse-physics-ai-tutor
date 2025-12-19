@@ -126,7 +126,7 @@
                 // Show user rank if logged in
                 if (data.userRank) {
                     userCard.hidden = false;
-                    document.getElementById('userRankBadge').textContent = 
+                    document.getElementById('userRankBadge').textContent =
                         typeof data.userRank.rank === 'number' ? `#${data.userRank.rank}` : data.userRank.rank;
                     document.getElementById('userRankName').textContent = data.userRank.name;
                     document.getElementById('userRankPoints').textContent = data.userRank.points.toLocaleString();

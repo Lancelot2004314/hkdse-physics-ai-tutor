@@ -29,16 +29,37 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { practiceId, userAnswer } = body;
+    const { practiceId, userAnswer, correctAnswer: clientCorrectAnswer } = body;
 
     if (!practiceId || !userAnswer) {
       return errorResponse(400, 'Practice ID and answer are required');
     }
 
     // Get user
-    const user = await getUserFromSession(request, env);
+    let user = null;
+    try {
+      user = await getUserFromSession(request, env);
+    } catch (authErr) {
+      console.warn('Auth check failed:', authErr);
+    }
+
+    // If user not logged in but has client-side correct answer, do simple check
+    if (!user && clientCorrectAnswer) {
+      const isCorrect = userAnswer.trim().toUpperCase() === clientCorrectAnswer.trim().toUpperCase();
+      return new Response(JSON.stringify({
+        isCorrect,
+        correctAnswer: clientCorrectAnswer,
+        pointsEarned: 0,
+        newStreak: 0,
+        totalPoints: 0,
+        message: 'Login to earn points and track progress!',
+      }), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+
     if (!user) {
-      return errorResponse(401, 'Please login to submit answers');
+      return errorResponse(401, 'Please login to submit answers and earn points');
     }
 
     if (!env.DB) {
@@ -51,6 +72,20 @@ export async function onRequestPost(context) {
     `).bind(practiceId, user.id).first();
 
     if (!practice) {
+      // If practice not found in DB, but we have client answer, use that
+      if (clientCorrectAnswer) {
+        const isCorrect = userAnswer.trim().toUpperCase() === clientCorrectAnswer.trim().toUpperCase();
+        return new Response(JSON.stringify({
+          isCorrect,
+          correctAnswer: clientCorrectAnswer,
+          pointsEarned: 0,
+          newStreak: 0,
+          totalPoints: 0,
+          message: 'Question not tracked - try generating a new one',
+        }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        });
+      }
       return errorResponse(404, 'Practice question not found');
     }
 
@@ -59,7 +94,7 @@ export async function onRequestPost(context) {
     }
 
     // Check if answer is correct (case-insensitive comparison)
-    const isCorrect = userAnswer.trim().toLowerCase() === practice.correct_answer.trim().toLowerCase();
+    const isCorrect = userAnswer.trim().toUpperCase() === practice.correct_answer.trim().toUpperCase();
 
     // Get current user scores
     let userScores = await env.DB.prepare(`
@@ -72,7 +107,7 @@ export async function onRequestPost(context) {
         INSERT INTO user_scores (user_id, total_points, correct_count, total_attempts, current_streak, best_streak, last_practice_date)
         VALUES (?, 0, 0, 0, 0, 0, NULL)
       `).bind(user.id).run();
-      
+
       userScores = {
         total_points: 0,
         correct_count: 0,

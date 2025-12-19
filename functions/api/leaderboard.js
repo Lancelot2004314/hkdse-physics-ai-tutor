@@ -52,7 +52,7 @@ export async function onRequestGet(context) {
         LIMIT ?
       `;
       const results = await env.DB.prepare(leaderboardQuery).bind(today, limit).all();
-      
+
       return buildResponse(results.results, user, env, type);
     } else if (type === 'weekly') {
       // Get start of current week (Monday)
@@ -78,7 +78,7 @@ export async function onRequestGet(context) {
         LIMIT ?
       `;
       const results = await env.DB.prepare(leaderboardQuery).bind(weekStart, limit).all();
-      
+
       return buildResponse(results.results, user, env, type);
     } else {
       // Global - use total points from user_scores
@@ -96,7 +96,7 @@ export async function onRequestGet(context) {
         LIMIT ?
       `;
       const results = await env.DB.prepare(leaderboardQuery).bind(limit).all();
-      
+
       return buildResponse(results.results, user, env, type);
     }
 

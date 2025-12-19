@@ -26,64 +26,83 @@ export async function onRequestPost(context) {
     const body = await request.json();
     const { originalQuestion, topic, originalAnswer } = body;
 
-    if (!originalQuestion || originalQuestion.trim().length === 0) {
-      return errorResponse(400, 'Original question is required');
-    }
+    console.log('Practice generate request:', { originalQuestion: originalQuestion?.substring(0, 50), topic });
+
+    // Use a default question if none provided
+    const questionToUse = originalQuestion?.trim() || 'A physics problem about mechanics';
 
     // Check API key
     const apiKey = env.DEEPSEEK_API_KEY;
     if (!apiKey) {
+      console.error('DEEPSEEK_API_KEY not configured');
       return errorResponse(500, 'Service not configured');
     }
 
-    // Get user from session
-    const user = await getUserFromSession(request, env);
+    // Get user from session (optional - practice works without login)
+    let user = null;
+    try {
+      user = await getUserFromSession(request, env);
+    } catch (authErr) {
+      console.warn('Auth check failed:', authErr);
+    }
 
     // Build prompt
-    const userPrompt = `Original Question: ${originalQuestion}
+    const userPrompt = `Original Question: ${questionToUse}
 ${originalAnswer ? `Original Answer: ${originalAnswer}` : ''}
 ${topic ? `Topic: ${topic}` : ''}
 
-Generate a similar practice question with different numerical values.`;
+Generate a similar HKDSE Physics practice question with different numerical values. Make it a multiple choice question.`;
 
     // Call DeepSeek
+    console.log('Calling DeepSeek for practice question...');
     const result = await callDeepSeek(apiKey, PRACTICE_QUESTION_PROMPT, userPrompt);
 
     if (!result.success) {
+      console.error('DeepSeek call failed:', result.error);
       return errorResponse(500, result.error || 'Failed to generate question');
     }
 
-    // Track token usage
+    console.log('DeepSeek response received, length:', result.text?.length);
+
+    // Track token usage (non-blocking)
     if (result.usage && env.DB) {
-      await saveTokenUsage(env.DB, user?.id || null, 'deepseek', result.usage, 'practice-generate');
+      saveTokenUsage(env.DB, user?.id || null, 'deepseek', result.usage, 'practice-generate')
+        .catch(err => console.warn('Token tracking failed:', err));
     }
 
     // Parse response
     let parsedResponse;
     try {
       let textToParse = result.text;
-      
+
       // Strip markdown code blocks
       const codeBlockMatch = textToParse.match(/```(?:json)?\s*([\s\S]*?)```/);
       if (codeBlockMatch) {
         textToParse = codeBlockMatch[1];
       }
-      
+
       const jsonMatch = textToParse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         parsedResponse = JSON.parse(jsonMatch[0]);
       } else {
+        console.error('No JSON found in response:', textToParse.substring(0, 200));
         throw new Error('No JSON found');
       }
+
+      // Validate required fields
+      if (!parsedResponse.question || !parsedResponse.options || !parsedResponse.correctAnswer) {
+        console.error('Missing required fields:', Object.keys(parsedResponse));
+        throw new Error('Missing required fields');
+      }
     } catch (parseErr) {
-      console.error('Failed to parse practice question:', parseErr);
+      console.error('Failed to parse practice question:', parseErr, result.text?.substring(0, 300));
       return errorResponse(500, 'Failed to parse generated question');
     }
 
     // Generate unique ID for this practice question
     const practiceId = crypto.randomUUID();
 
-    // Store in database for later verification
+    // Store in database for later verification (only if user is logged in)
     if (env.DB && user?.id) {
       try {
         await env.DB.prepare(`
@@ -92,14 +111,16 @@ Generate a similar practice question with different numerical values.`;
         `).bind(
           practiceId,
           user.id,
-          originalQuestion,
+          questionToUse,
           parsedResponse.question,
           JSON.stringify(parsedResponse.options || []),
           parsedResponse.correctAnswer,
-          topic || null
+          topic || parsedResponse.topic || null
         ).run();
+        console.log('Practice question saved to DB:', practiceId);
       } catch (dbErr) {
         console.error('Failed to save practice question:', dbErr);
+        // Don't fail the request, just log the error
       }
     }
 
@@ -107,6 +128,7 @@ Generate a similar practice question with different numerical values.`;
       id: practiceId,
       question: parsedResponse.question,
       options: parsedResponse.options,
+      correctAnswer: user?.id ? undefined : parsedResponse.correctAnswer, // Only hide if logged in (for DB verification)
       topic: topic || parsedResponse.topic,
     }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders },

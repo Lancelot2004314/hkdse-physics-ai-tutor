@@ -60,8 +60,8 @@ export async function onRequestGet(context) {
     }
 
     // Calculate accuracy
-    const accuracy = stats.total_attempts > 0 
-      ? Math.round((stats.correct_count / stats.total_attempts) * 100) 
+    const accuracy = stats.total_attempts > 0
+      ? Math.round((stats.correct_count / stats.total_attempts) * 100)
       : 0;
 
     // Get user's global rank
