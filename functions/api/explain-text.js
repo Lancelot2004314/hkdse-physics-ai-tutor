@@ -7,6 +7,7 @@
 import { TEACHER_EXPLAINER_PROMPT, SOCRATIC_TUTOR_PROMPT } from '../../shared/prompts.js';
 import { getUserFromSession } from '../../shared/auth.js';
 import { saveTokenUsage } from '../../shared/tokenUsage.js';
+import { searchKnowledgeBase, formatKnowledgeContext } from '../../shared/embedding.js';
 
 const REQUEST_TIMEOUT = 60000; // 60 seconds
 
@@ -49,6 +50,23 @@ export async function onRequestPost(context) {
       systemPrompt += '\n\nAdjust for BASIC level: Use simpler terms, more detailed steps, explain every concept thoroughly.';
     } else if (studentLevel === 'advanced') {
       systemPrompt += '\n\nAdjust for ADVANCED level: Be concise, focus on exam strategy and common pitfalls.';
+    }
+
+    // RAG: Search knowledge base for relevant DSE content
+    let knowledgeContext = '';
+    if (env.VECTORIZE && env.OPENAI_API_KEY) {
+      try {
+        const ragResults = await searchKnowledgeBase(problemText, env, {
+          topK: 3,
+          minScore: 0.75,
+        });
+        if (ragResults.length > 0) {
+          knowledgeContext = formatKnowledgeContext(ragResults);
+          systemPrompt += `\n\n## 相关 DSE 历届试题参考 (Related DSE Past Paper Reference):\n${knowledgeContext}\n\n请参考以上历届试题的风格和评分标准来回答学生的问题。`;
+        }
+      } catch (err) {
+        console.warn('RAG search failed, continuing without context:', err.message);
+      }
     }
 
     // Build user prompt - language neutral to allow detection

@@ -7,6 +7,7 @@
 import { TEACHER_EXPLAINER_PROMPT, SOLUTION_VERIFIER_PROMPT } from '../../shared/prompts.js';
 import { getUserFromSession } from '../../shared/auth.js';
 import { saveTokenUsage } from '../../shared/tokenUsage.js';
+import { searchKnowledgeBase, formatKnowledgeContext } from '../../shared/embedding.js';
 
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 const REQUEST_TIMEOUT = 90000; // 90 seconds for vision model
@@ -61,6 +62,24 @@ export async function onRequestPost(context) {
       systemPrompt += '\n\nAdjust for BASIC level: Use simpler terms, more detailed steps.';
     } else if (studentLevel === 'advanced') {
       systemPrompt += '\n\nAdjust for ADVANCED level: Be concise, focus on exam strategy.';
+    }
+
+    // RAG: Search knowledge base for relevant DSE content
+    // Use the student's question or attempt as search query
+    const searchQuery = question || studentAttempt || 'HKDSE Physics problem';
+    if (env.VECTORIZE && env.OPENAI_API_KEY && searchQuery.length > 10) {
+      try {
+        const ragResults = await searchKnowledgeBase(searchQuery, env, {
+          topK: 3,
+          minScore: 0.7,
+        });
+        if (ragResults.length > 0) {
+          const knowledgeContext = formatKnowledgeContext(ragResults);
+          systemPrompt += `\n\n## 相关 DSE 历届试题参考 (Related DSE Past Paper Reference):\n${knowledgeContext}\n\n请参考以上历届试题的风格和评分标准来回答学生的问题。`;
+        }
+      } catch (err) {
+        console.warn('RAG search failed, continuing without context:', err.message);
+      }
     }
 
     // User prompt - let model detect the language from the image and question
