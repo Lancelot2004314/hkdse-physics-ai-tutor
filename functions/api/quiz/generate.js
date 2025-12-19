@@ -143,7 +143,7 @@ export async function onRequestPost(context) {
 
     // Create session in database
     const sessionId = crypto.randomUUID();
-    
+
     if (env.DB) {
       await env.DB.prepare(`
         INSERT INTO quiz_sessions (

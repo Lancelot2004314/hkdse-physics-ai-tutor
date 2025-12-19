@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tutor - HKDSE Physics</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/thinka.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- MathJax Configuration and Loading -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* AI Tutor specific layout adjustments */
+        .ai-tutor-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .ai-tutor-content .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .ai-tutor-content .header h1 {
+            font-size: 1.8em;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .ai-tutor-content .header p {
+            color: var(--text-secondary);
+        }
+        
+        .ai-tutor-content .auth-section {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .ai-tutor-content {
+                padding: 20px;
+            }
+            .ai-tutor-content .auth-section {
+                position: static;
+                text-align: center;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-atom"></i>
+                </div>
+                <div class="user-info" id="sidebarUserInfo">
+                    <div class="user-name" id="sidebarUserName">Guest</div>
+                    <div class="user-email" id="sidebarUserEmail"></div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+                <li class="nav-item active">
+                    <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/practice-history.html"><i class="fas fa-history"></i> History</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/profile.html"><i class="fas fa-user"></i> Profile</a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="sidebarLogoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="ai-tutor-content">
+                <!-- Header -->
+                <header class="header">
+                    <h1><i class="fas fa-robot"></i> AI Tutor</h1>
+                    <p>上傳題目照片，獲得 DSE 風格分步講解</p>
+
+                    <!-- Auth Section -->
+                    <div class="auth-section" id="authSection">
+                        <!-- Logged out state -->
+                        <div class="auth-logged-out" id="authLoggedOut">
+                            <button class="btn-auth" id="showLoginBtn">
+                                <i class="fas fa-sign-in-alt"></i> 登入同步歷史
+                            </button>
+                        </div>
+                        <!-- Logged in state -->
+                        <div class="auth-logged-in" id="authLoggedIn" hidden>
+                            <span class="user-email" id="userEmail"></span>
+                            <button class="btn-auth btn-logout" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt"></i> 登出
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Login Modal -->
+                <div class="modal" id="loginModal" hidden>
+                    <div class="modal-content">
+                        <button class="modal-close" id="closeLoginModal">&times;</button>
+                        <h2><i class="fas fa-user-circle"></i> 登入帳戶</h2>
+                        <p>登入後可同步歷史記錄到雲端，跨設備使用</p>
+                        <button class="btn-google" id="googleLoginBtn">
+                            <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="#4285F4"
+                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                <path fill="#34A853"
+                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                <path fill="#FBBC05"
+                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                <path fill="#EA4335"
+                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                            </svg>
+                            用 Google 帳號登入
+                        </button>
+                        <div class="login-status" id="loginStatus" hidden></div>
+                    </div>
+                </div>
+
+                <!-- History Section -->
+                <section class="history-section" id="historySection" hidden>
+                    <div class="history-header">
+                        <h2><i class="fas fa-history"></i> 歷史記錄</h2>
+                        <button class="btn-small" id="refreshHistoryBtn">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <p class="history-empty">暫無歷史記錄</p>
+                    </div>
+                </section>
+
+                <!-- Upload Section -->
+                <section class="upload-section" id="uploadSection">
+                    <!-- Input Mode Toggle -->
+                    <div class="input-mode-toggle">
+                        <button type="button" class="mode-btn active" id="modeImage" data-mode="image">
+                            <i class="fas fa-image"></i> 圖片題
+                        </button>
+                        <button type="button" class="mode-btn" id="modeText" data-mode="text">
+                            <i class="fas fa-keyboard"></i> 文字題
+                        </button>
+                    </div>
+
+                    <!-- Image Upload Area -->
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="imageInput" accept="image/*" capture="environment" hidden>
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>點擊或拖放上傳題目照片</p>
+                            <span>支援 JPG, PNG, WebP（最大 3MB）</span>
+                        </div>
+                        <div class="image-preview" id="imagePreview" hidden>
+                            <img id="previewImg" src="" alt="Preview">
+                            <button class="btn-remove" id="removeImage">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Text Input Area (for text mode) -->
+                    <div class="input-group text-input-area" id="textInputArea" hidden>
+                        <label for="problemText">題目內容（純文字）</label>
+                        <textarea id="problemText" rows="6"
+                            placeholder="在此輸入或貼上題目內容...&#10;&#10;例如：&#10;一個質量為 2 kg 的物體從 10 m 高處自由下落，求落地時的速度。（設 g = 10 m/s²）"></textarea>
+                    </div>
+
+                    <!-- Question Input -->
+                    <div class="input-group">
+                        <label for="questionInput">你的問題（可選但建議填寫）</label>
+                        <textarea id="questionInput" placeholder="例如：點解要用 F=ma？我唔明白第二步..."></textarea>
+                    </div>
+
+                    <!-- Options -->
+                    <div class="options-row">
+                        <div class="option-group">
+                            <label for="levelSelect">程度</label>
+                            <select id="levelSelect">
+                                <option value="basic">基礎</option>
+                                <option value="standard" selected>標準 DSE</option>
+                                <option value="advanced">進階/衝星</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <label for="modeSelect">模式</label>
+                            <select id="modeSelect">
+                                <option value="direct" selected>直接講解</option>
+                                <option value="socratic">蘇格拉底引導</option>
+                            </select>
+                        </div>
+                        <div class="option-group" id="visionModelGroup">
+                            <label for="visionModelSelect">AI 模型</label>
+                            <select id="visionModelSelect">
+                                <option value="auto" selected>自動 (失敗自動切換)</option>
+                                <option value="gpt4o">GPT-4o (最強)</option>
+                                <option value="gpt4o-mini">GPT-4o-mini (快速)</option>
+                                <option value="qwen-vl">通義千問 VL</option>
+                                <option value="gemini">Gemini 1.5 Flash</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Student Attempt (Optional) -->
+                    <div class="input-group collapsible">
+                        <button class="collapse-toggle" id="toggleAttempt">
+                            <i class="fas fa-chevron-down"></i> 填寫你的答案/思路（可選）
+                        </button>
+                        <textarea id="studentAttempt" placeholder="你的答案或卡住的地方..." hidden></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button class="btn-primary" id="submitBtn" disabled>
+                        <i class="fas fa-paper-plane"></i> 獲取講解
+                    </button>
+                </section>
+
+                <!-- Loading -->
+                <div class="loading" id="loading" hidden>
+                    <div class="spinner"></div>
+                    <p>AI 正在分析題目...</p>
+                </div>
+
+                <!-- Results Section -->
+                <section class="results-section" id="resultsSection" hidden>
+                    <div class="result-card">
+                        <h2><i class="fas fa-lightbulb"></i> 題目摘要</h2>
+                        <div id="problemSummary" class="result-content"></div>
+                    </div>
+
+                    <div class="result-card">
+                        <h2><i class="fas fa-list-ol"></i> 分步講解</h2>
+                        <div id="stepsContent" class="result-content steps-list"></div>
+                    </div>
+
+                    <div class="result-card">
+                        <h2><i class="fas fa-exclamation-triangle"></i> 常見錯誤</h2>
+                        <div id="mistakesContent" class="result-content"></div>
+                    </div>
+
+                    <div class="result-card">
+                        <h2><i class="fas fa-star"></i> Exam Tips</h2>
+                        <div id="tipsContent" class="result-content"></div>
+                    </div>
+
+                    <div class="result-card">
+                        <h2><i class="fas fa-check-circle"></i> 驗算檢查</h2>
+                        <div id="verificationContent" class="result-content"></div>
+                    </div>
+
+                    <div class="result-card collapsible">
+                        <button class="collapse-toggle" id="toggleAnswer">
+                            <i class="fas fa-eye"></i> 顯示最終答案
+                        </button>
+                        <div id="finalAnswer" class="result-content final-answer" hidden></div>
+                    </div>
+
+                    <div class="result-card">
+                        <h2><i class="fas fa-book"></i> 術語對照</h2>
+                        <div id="glossaryContent" class="result-content glossary"></div>
+                    </div>
+
+                    <!-- Practice Section -->
+                    <div class="result-card practice-card" id="practiceSection" hidden>
+                        <h2><i class="fas fa-dumbbell"></i> 練習時間 Practice Time!</h2>
+                        <div class="practice-content">
+                            <div class="practice-question" id="practiceQuestion">
+                                <p class="practice-loading">
+                                    <i class="fas fa-spinner fa-spin"></i> 正在生成練習題...
+                                </p>
+                            </div>
+                            <div class="practice-options" id="practiceOptions"></div>
+                            <div class="practice-actions">
+                                <button class="btn-primary" id="submitPractice" disabled>
+                                    <i class="fas fa-check"></i> 提交答案 Submit
+                                </button>
+                                <button class="btn-secondary" id="skipPractice">
+                                    <i class="fas fa-forward"></i> 跳過 Skip
+                                </button>
+                                <button class="btn-secondary" id="nextPractice" hidden>
+                                    <i class="fas fa-redo"></i> 再來一題 Next
+                                </button>
+                            </div>
+                            <div class="practice-result" id="practiceResult" hidden></div>
+                            <div class="practice-stats" id="practiceStats">
+                                <span class="stat-item">🔥 連續: <span id="currentStreak">0</span></span>
+                                <span class="stat-item">🎯 積分: <span id="totalPoints">0</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Chat Box -->
+                <section class="chat-section" id="chatSection" hidden>
+                    <h2><i class="fas fa-comments"></i> 繼續追問</h2>
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input-area">
+                        <div class="chat-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="needsVision">
+                                <span>需要看圖</span>
+                            </label>
+                        </div>
+                        <div class="chat-input-row">
+                            <textarea id="chatInput" placeholder="繼續問關於這道題的問題..."></textarea>
+                            <button class="btn-send" id="sendChat">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- New Question Button -->
+                <button class="btn-secondary" id="newQuestionBtn" hidden>
+                    <i class="fas fa-plus"></i> 問新題目
+                </button>
+
+                <!-- Debug Log Panel -->
+                <section class="debug-section" id="debugSection">
+                    <button class="collapse-toggle" id="toggleDebug">
+                        <i class="fas fa-bug"></i> Debug Log
+                    </button>
+                    <div class="debug-content" id="debugContent" hidden>
+                        <div class="debug-actions">
+                            <button class="btn-small" id="clearDebug">清空</button>
+                            <button class="btn-small" id="copyDebug">複製</button>
+                        </div>
+                        <pre id="debugLog"></pre>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer class="footer">
+                    <p>HKDSE Physics AI Tutor | 僅作學習輔助，不保證滿分</p>
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Update sidebar user info on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/auth/me', { credentials: 'include' });
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('sidebarUserName').textContent = user.name || user.email?.split('@')[0] || 'User';
+                    document.getElementById('sidebarUserEmail').textContent = user.email || '';
+                }
+            } catch (err) {
+                console.error('Failed to load user info:', err);
+            }
+
+            // Sidebar logout button
+            document.getElementById('sidebarLogoutBtn')?.addEventListener('click', async () => {
+                await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+                window.location.href = '/';
+            });
+        });
+    </script>
+</body>
+
+</html>

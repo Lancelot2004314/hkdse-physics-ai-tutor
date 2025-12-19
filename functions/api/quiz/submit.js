@@ -79,7 +79,7 @@ export async function onRequestPost(context) {
             question.markingScheme || question.parts?.map(p => `${p.marks} marks: ${p.question}`),
             question.score || question.parts?.reduce((s, p) => s + p.marks, 0) || 5
           );
-          
+
           if (gradeResult.success) {
             score = gradeResult.score;
             feedback = gradeResult.feedback;

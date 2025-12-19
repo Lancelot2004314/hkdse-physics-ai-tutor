@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="css/thinka.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <div class="app-layout">
         <!-- Sidebar -->
@@ -20,12 +22,14 @@
                 </div>
             </div>
             <ul class="nav-menu">
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
                 <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
                 <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
-                <li class="nav-item active"><a href="/practice-history.html"><i class="fas fa-history"></i> Practice History</a></li>
+                <li class="nav-item active"><a href="/practice-history.html"><i class="fas fa-history"></i> History</a></li>
                 <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
                 <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
-                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> AI Tutor</a></li>
             </ul>
             <div class="sidebar-footer">
                 <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
@@ -78,7 +82,8 @@
             </div>
 
             <!-- Pagination -->
-            <div class="pagination" id="pagination" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+            <div class="pagination" id="pagination"
+                style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
             </div>
         </main>
     </div>
@@ -111,19 +116,19 @@
 
         async function loadHistory() {
             const search = document.getElementById('searchInput').value;
-            
+
             try {
                 const response = await fetch(
                     `${API_BASE}/quiz/history?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(search)}`,
                     { credentials: 'include' }
                 );
-                
+
                 if (!response.ok) throw new Error('Failed to load history');
-                
+
                 const data = await response.json();
                 renderHistory(data.sessions);
                 renderPagination(data.pagination);
-                
+
             } catch (err) {
                 console.error('Failed to load history:', err);
                 document.getElementById('historyBody').innerHTML = `
@@ -136,7 +141,7 @@
 
         function renderHistory(sessions) {
             const tbody = document.getElementById('historyBody');
-            
+
             if (sessions.length === 0) {
                 tbody.innerHTML = `
                     <tr><td colspan="7" style="text-align: center; padding: 40px;">
@@ -145,7 +150,7 @@
                 `;
                 return;
             }
-            
+
             tbody.innerHTML = sessions.map(s => `
                 <tr onclick="viewSession('${s.id}')" style="cursor: pointer;">
                     <td>${formatDate(s.createdAt)}</td>
@@ -164,12 +169,12 @@
         function renderPagination(pagination) {
             const container = document.getElementById('pagination');
             const totalPages = pagination.totalPages;
-            
+
             if (totalPages <= 1) {
                 container.innerHTML = '';
                 return;
             }
-            
+
             let html = '';
             for (let i = 1; i <= totalPages; i++) {
                 html += `<button class="period-btn ${i === currentPage ? 'active' : ''}" 
@@ -206,11 +211,12 @@
 
         function debounce(func, wait) {
             let timeout;
-            return function(...args) {
+            return function (...args) {
                 clearTimeout(timeout);
                 timeout = setTimeout(() => func.apply(this, args), wait);
             };
         }
     </script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="css/thinka.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <div class="app-layout">
         <!-- Sidebar -->
@@ -22,6 +24,12 @@
                 </div>
             </div>
             <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+                </li>
                 <li class="nav-item active">
                     <a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a>
                 </li>
@@ -29,16 +37,16 @@
                     <a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/practice-history.html"><i class="fas fa-history"></i> Practice History</a>
+                    <a href="/practice-history.html"><i class="fas fa-history"></i> History</a>
                 </li>
                 <li class="nav-item">
                     <a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/profile.html"><i class="fas fa-user"></i> Profile</a>
+                    <a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/"><i class="fas fa-home"></i> AI Tutor</a>
+                    <a href="/profile.html"><i class="fas fa-user"></i> Profile</a>
                 </li>
             </ul>
             <div class="sidebar-footer">
@@ -330,7 +338,7 @@
                 }
 
                 const data = await response.json();
-                
+
                 // Store session data and redirect to working page
                 sessionStorage.setItem('quizSession', JSON.stringify(data));
                 window.location.href = `/working.html?session=${data.sessionId}`;
@@ -344,4 +352,5 @@
         }
     </script>
 </body>
+
 </html>

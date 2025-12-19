@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 </head>
+
 <body>
     <div class="app-layout">
         <!-- Sidebar -->
@@ -24,12 +26,14 @@
                 </div>
             </div>
             <ul class="nav-menu">
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
                 <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
                 <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
-                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> Practice History</a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> History</a></li>
                 <li class="nav-item active"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
                 <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
-                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> AI Tutor</a></li>
             </ul>
             <div class="sidebar-footer">
                 <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
@@ -70,12 +74,14 @@
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 20px;
         }
+
         .bookmark-card {
             background: var(--bg-secondary);
             border-radius: 12px;
             padding: 20px;
             position: relative;
         }
+
         .bookmark-card .bookmark-type {
             display: inline-block;
             padding: 4px 10px;
@@ -85,18 +91,21 @@
             font-size: 0.8em;
             margin-bottom: 10px;
         }
+
         .bookmark-card .question-preview {
             color: var(--text-primary);
             margin-bottom: 15px;
             max-height: 150px;
             overflow: hidden;
         }
+
         .bookmark-card .bookmark-meta {
             display: flex;
             justify-content: space-between;
             color: var(--text-secondary);
             font-size: 0.85em;
         }
+
         .bookmark-card .delete-btn {
             position: absolute;
             top: 15px;
@@ -106,14 +115,17 @@
             color: var(--text-secondary);
             cursor: pointer;
         }
+
         .bookmark-card .delete-btn:hover {
             color: var(--danger);
         }
+
         .empty-state {
             text-align: center;
             padding: 60px;
             color: var(--text-secondary);
         }
+
         .empty-state i {
             font-size: 3em;
             margin-bottom: 15px;
@@ -146,17 +158,17 @@
 
         async function loadBookmarks() {
             const type = document.getElementById('typeFilter').value;
-            
+
             try {
                 let url = `${API_BASE}/bookmarks`;
                 if (type) url += `?type=${type}`;
-                
+
                 const response = await fetch(url, { credentials: 'include' });
                 if (!response.ok) throw new Error('Failed to load bookmarks');
-                
+
                 const data = await response.json();
                 renderBookmarks(data.bookmarks);
-                
+
             } catch (err) {
                 console.error('Failed to load bookmarks:', err);
             }
@@ -164,7 +176,7 @@
 
         function renderBookmarks(bookmarks) {
             const grid = document.getElementById('bookmarksGrid');
-            
+
             if (bookmarks.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state" style="grid-column: 1/-1;">
@@ -175,7 +187,7 @@
                 `;
                 return;
             }
-            
+
             grid.innerHTML = bookmarks.map(b => `
                 <div class="bookmark-card">
                     <button class="delete-btn" onclick="deleteBookmark('${b.id}')">
@@ -189,13 +201,13 @@
                     </div>
                 </div>
             `).join('');
-            
+
             if (window.MathJax) MathJax.typesetPromise();
         }
 
         async function deleteBookmark(id) {
             if (!confirm('Delete this bookmark?')) return;
-            
+
             try {
                 await fetch(`${API_BASE}/bookmarks?id=${id}`, {
                     method: 'DELETE',
@@ -220,4 +232,5 @@
         }
     </script>
 </body>
+
 </html>

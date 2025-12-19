@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="css/thinka.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <div class="app-layout">
         <!-- Sidebar -->
@@ -20,12 +22,14 @@
                 </div>
             </div>
             <ul class="nav-menu">
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
                 <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
                 <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
-                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> Practice History</a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> History</a></li>
                 <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
                 <li class="nav-item active"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
-                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> AI Tutor</a></li>
             </ul>
             <div class="sidebar-footer">
                 <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
@@ -121,9 +125,11 @@
             padding: 30px;
             margin-bottom: 30px;
         }
+
         .profile-avatar {
             text-align: center;
         }
+
         .avatar-image {
             width: 120px;
             height: 120px;
@@ -136,6 +142,7 @@
             color: white;
             margin-bottom: 10px;
         }
+
         .avatar-edit {
             padding: 6px 16px;
             background: var(--bg-card);
@@ -144,22 +151,27 @@
             color: var(--text-secondary);
             cursor: pointer;
         }
+
         .profile-form {
             flex: 1;
         }
+
         .profile-form h2 {
             color: var(--text-primary);
             margin-bottom: 20px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
             color: var(--text-secondary);
             margin-bottom: 6px;
             font-size: 0.9em;
         }
+
         .form-group input,
         .form-group select {
             width: 100%;
@@ -169,30 +181,36 @@
             border-radius: 6px;
             color: var(--text-primary);
         }
+
         .payment-section {
             background: var(--bg-secondary);
             border-radius: 12px;
             padding: 30px;
         }
+
         .payment-section h2 {
             color: var(--text-primary);
             margin-bottom: 20px;
         }
+
         .plans-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
         }
+
         .plan-card {
             background: var(--bg-card);
             border-radius: 12px;
             padding: 25px;
             position: relative;
         }
+
         .plan-card.premium {
             background: linear-gradient(135deg, #06b6d4, #0891b2);
             color: white;
         }
+
         .plan-badge {
             position: absolute;
             top: -10px;
@@ -205,35 +223,43 @@
             font-size: 0.75em;
             white-space: nowrap;
         }
+
         .plan-card h3 {
             font-size: 1.3em;
             margin-bottom: 10px;
         }
+
         .plan-price {
             font-size: 2em;
             font-weight: 700;
             margin-bottom: 20px;
         }
+
         .plan-price span {
             font-size: 0.5em;
             font-weight: 400;
         }
+
         .plan-price .original {
             text-decoration: line-through;
             opacity: 0.6;
             font-size: 0.6em;
         }
+
         .plan-features {
             list-style: none;
             margin-bottom: 20px;
         }
+
         .plan-features li {
             padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .plan-card.free .plan-features li {
             border-color: var(--border);
         }
+
         .plan-card button {
             width: 100%;
         }
@@ -253,7 +279,7 @@
                 const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
                 if (response.ok) {
                     currentUser = await response.json();
-                    
+
                     document.getElementById('sideUserName').textContent = currentUser.name || currentUser.email?.split('@')[0];
                     document.getElementById('sideUserEmail').textContent = currentUser.email || '';
                     document.getElementById('profileName').value = currentUser.name || '';
@@ -280,7 +306,7 @@
             const name = document.getElementById('profileName').value;
             const language = document.getElementById('profileLanguage').value;
             const role = document.getElementById('profileRole').value;
-            
+
             try {
                 // Note: Profile update API would need to be implemented
                 alert('Profile saved! (API not yet implemented)');
@@ -290,4 +316,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <div class="app-layout">
         <!-- Sidebar -->
@@ -21,12 +23,14 @@
                 </div>
             </div>
             <ul class="nav-menu">
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
                 <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
                 <li class="nav-item active"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
-                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> Practice History</a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> History</a></li>
                 <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
                 <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
-                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> AI Tutor</a></li>
             </ul>
             <div class="sidebar-footer">
                 <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
@@ -157,11 +161,11 @@
                 const response = await fetch(`${API_BASE}/stats?period=${currentPeriod}`, {
                     credentials: 'include'
                 });
-                
+
                 if (!response.ok) throw new Error('Failed to load stats');
-                
+
                 const data = await response.json();
-                
+
                 // Update overview cards
                 document.getElementById('practicesDone').textContent = data.overview.practicesDone;
                 document.getElementById('questionsDone').textContent = data.overview.questionsDone;
@@ -169,19 +173,19 @@
                 document.getElementById('avgScore').textContent = data.overview.avgScore + '%';
                 document.getElementById('globalRanking').textContent = '#' + data.overview.globalRanking;
                 document.getElementById('expectedGrade').textContent = data.overview.expectedGrade;
-                
+
                 // Update grade color
                 const gradeEl = document.getElementById('expectedGrade');
                 if (data.overview.expectedGrade === 'U') {
                     gradeEl.classList.add('grade-u');
                 }
-                
+
                 // Update chart
                 updateChart(data.trend);
-                
+
                 // Update chapter table
                 updateChapterTable(data.byChapter);
-                
+
             } catch (err) {
                 console.error('Failed to load stats:', err);
             }
@@ -189,11 +193,11 @@
 
         function updateChart(trendData) {
             const ctx = document.getElementById('scoreChart').getContext('2d');
-            
+
             if (scoreChart) {
                 scoreChart.destroy();
             }
-            
+
             scoreChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -255,7 +259,7 @@
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    
+
                     document.getElementById('overviewTab').hidden = btn.dataset.tab !== 'overview';
                     document.getElementById('chapterTab').hidden = btn.dataset.tab !== 'chapter';
                 });
@@ -269,4 +273,5 @@
         }
     </script>
 </body>
+
 </html>

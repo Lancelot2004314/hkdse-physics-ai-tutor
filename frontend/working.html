@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +19,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 </head>
+
 <body>
     <!-- Header with Timer -->
     <header class="working-header">
@@ -27,7 +29,7 @@
         <h1>Working</h1>
         <div class="timer-display" id="timerDisplay">Time Left: --:--:--</div>
     </header>
-    
+
     <!-- Progress Bar -->
     <div class="progress-bar" id="progressBar" style="width: 100%"></div>
 
@@ -153,7 +155,7 @@
         function initQuiz() {
             answers = new Array(quizData.questions.length).fill('');
             timeRemaining = (quizData.timeLimit || 60) * 60;
-            
+
             renderNavigation();
             displayQuestion(0);
             startTimer();
@@ -166,7 +168,7 @@
                 timeRemaining--;
                 updateTimerDisplay();
                 updateProgressBar();
-                
+
                 if (timeRemaining <= 0) {
                     clearInterval(timerInterval);
                     alert('Time is up!');
@@ -179,7 +181,7 @@
             const hours = Math.floor(timeRemaining / 3600);
             const minutes = Math.floor((timeRemaining % 3600) / 60);
             const seconds = timeRemaining % 60;
-            document.getElementById('timerDisplay').textContent = 
+            document.getElementById('timerDisplay').textContent =
                 `Time Left: ${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
@@ -187,7 +189,7 @@
             const totalTime = (quizData.timeLimit || 60) * 60;
             const percentage = (timeRemaining / totalTime) * 100;
             document.getElementById('progressBar').style.width = percentage + '%';
-            
+
             if (percentage < 20) {
                 document.getElementById('progressBar').style.background = 'var(--danger)';
             } else if (percentage < 50) {
@@ -323,7 +325,7 @@
             document.getElementById('submitBtn').addEventListener('click', () => {
                 saveCurrentAnswer();
                 const answeredCount = answers.filter(a => a).length;
-                document.getElementById('submitMessage').textContent = 
+                document.getElementById('submitMessage').textContent =
                     `You have answered ${answeredCount} of ${quizData.questions.length} questions.`;
                 document.getElementById('submitModal').hidden = false;
             });
@@ -414,7 +416,7 @@
                 </div>
             `;
             document.getElementById('resultsModal').hidden = false;
-            
+
             // Store results for review
             sessionStorage.setItem('quizResults', JSON.stringify(results));
         }
@@ -431,4 +433,5 @@
         }
     </script>
 </body>
+
 </html>

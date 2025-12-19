@@ -4,69 +4,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>排行榜 Leaderboard - HKDSE Physics AI Tutor</title>
+    <title>Leaderboard - HKDSE Physics AI Tutor</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/thinka.css">
     <link rel="stylesheet" href="css/leaderboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <h1><i class="fas fa-trophy"></i> 排行榜 Leaderboard</h1>
-            <p>看看誰是物理高手！</p>
-            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> 返回主頁</a>
-        </header>
-
-        <!-- Tabs -->
-        <div class="leaderboard-tabs">
-            <button class="tab-btn active" data-tab="global">
-                <i class="fas fa-globe"></i> 總榜
-            </button>
-            <button class="tab-btn" data-tab="weekly">
-                <i class="fas fa-calendar-week"></i> 本週
-            </button>
-            <button class="tab-btn" data-tab="daily">
-                <i class="fas fa-calendar-day"></i> 今日
-            </button>
-        </div>
-
-        <!-- User Rank Card -->
-        <div class="user-rank-card" id="userRankCard" hidden>
-            <div class="user-rank-info">
-                <span class="rank-badge" id="userRankBadge">#--</span>
-                <span class="user-name" id="userRankName">--</span>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-atom"></i>
+                </div>
+                <div class="user-info" id="userInfo">
+                    <div class="user-name" id="userName">Guest</div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
             </div>
-            <div class="user-rank-stats">
-                <span class="stat"><i class="fas fa-star"></i> <span id="userRankPoints">0</span> pts</span>
-                <span class="stat"><i class="fas fa-fire"></i> <span id="userRankStreak">0</span> streak</span>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
+                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
+                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> History</a></li>
+                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item active"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+                <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
             </div>
-        </div>
+        </nav>
 
-        <!-- Leaderboard List -->
-        <div class="leaderboard-container">
-            <div class="leaderboard-loading" id="leaderboardLoading">
-                <i class="fas fa-spinner fa-spin"></i> 載入中...
-            </div>
-            <div class="leaderboard-list" id="leaderboardList"></div>
-            <div class="leaderboard-empty" id="leaderboardEmpty" hidden>
-                <i class="fas fa-users"></i>
-                <p>暫無數據，成為第一個上榜的人！</p>
-            </div>
-        </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1><i class="fas fa-trophy" style="color: var(--warning);"></i> Leaderboard</h1>
+                <p>看看誰是物理高手！</p>
+            </header>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <p>HKDSE Physics AI Tutor | 練習更多，排名更高！</p>
-        </footer>
+            <!-- Tabs -->
+            <div class="leaderboard-tabs">
+                <button class="tab-btn active" data-tab="global">
+                    <i class="fas fa-globe"></i> 總榜
+                </button>
+                <button class="tab-btn" data-tab="weekly">
+                    <i class="fas fa-calendar-week"></i> 本週
+                </button>
+                <button class="tab-btn" data-tab="daily">
+                    <i class="fas fa-calendar-day"></i> 今日
+                </button>
+            </div>
+
+            <!-- User Rank Card -->
+            <div class="user-rank-card" id="userRankCard" hidden>
+                <div class="user-rank-info">
+                    <span class="rank-badge" id="userRankBadge">#--</span>
+                    <span class="user-name" id="userRankName">--</span>
+                </div>
+                <div class="user-rank-stats">
+                    <span class="stat"><i class="fas fa-star"></i> <span id="userRankPoints">0</span> pts</span>
+                    <span class="stat"><i class="fas fa-fire"></i> <span id="userRankStreak">0</span> streak</span>
+                </div>
+            </div>
+
+            <!-- Leaderboard List -->
+            <div class="leaderboard-container">
+                <div class="leaderboard-loading" id="leaderboardLoading">
+                    <i class="fas fa-spinner fa-spin"></i> 載入中...
+                </div>
+                <div class="leaderboard-list" id="leaderboardList"></div>
+                <div class="leaderboard-empty" id="leaderboardEmpty" hidden>
+                    <i class="fas fa-users"></i>
+                    <p>暫無數據，成為第一個上榜的人！</p>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
         const API_BASE = '/api';
         let currentTab = 'global';
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            
             // Tab switching
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -79,7 +106,26 @@
 
             // Load initial leaderboard
             loadLeaderboard('global');
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+                window.location.href = '/';
+            });
         });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('userName').textContent = user.name || user.email?.split('@')[0] || 'User';
+                    document.getElementById('userEmail').textContent = user.email || '';
+                }
+            } catch (err) {
+                console.error('Auth check failed:', err);
+            }
+        }
 
         async function loadLeaderboard(type) {
             const list = document.getElementById('leaderboardList');

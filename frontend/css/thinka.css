@@ -753,47 +753,78 @@
     font-size: 0.9em;
 }
 
-.grade-badge.grade-5ss { background: #fef3c7; color: #d97706; }
-.grade-badge.grade-5s { background: #dcfce7; color: #16a34a; }
-.grade-badge.grade-5 { background: #dbeafe; color: #2563eb; }
-.grade-badge.grade-4 { background: #e0e7ff; color: #4f46e5; }
-.grade-badge.grade-3 { background: #f3e8ff; color: #9333ea; }
-.grade-badge.grade-2 { background: #fce7f3; color: #db2777; }
-.grade-badge.grade-1 { background: #fee2e2; color: #dc2626; }
-.grade-badge.grade-u { background: #fee2e2; color: #dc2626; }
+.grade-badge.grade-5ss {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.grade-badge.grade-5s {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.grade-badge.grade-5 {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.grade-badge.grade-4 {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+
+.grade-badge.grade-3 {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.grade-badge.grade-2 {
+    background: #fce7f3;
+    color: #db2777;
+}
+
+.grade-badge.grade-1 {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.grade-badge.grade-u {
+    background: #fee2e2;
+    color: #dc2626;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
     .sidebar {
         width: 60px;
     }
-    
+
     .sidebar-header .logo {
         width: 40px;
         height: 40px;
         font-size: 1.2em;
     }
-    
+
     .user-info,
     .nav-item span,
     .btn-logout span {
         display: none;
     }
-    
+
     .nav-item a {
         justify-content: center;
         padding: 15px;
     }
-    
+
     .main-content {
         margin-left: 60px;
         padding: 20px;
     }
-    
+
     .mc-options {
         grid-template-columns: 1fr;
     }
-    
+
     .question-nav {
         display: none;
     }
