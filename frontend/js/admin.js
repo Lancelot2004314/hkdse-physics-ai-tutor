@@ -243,7 +243,7 @@ function renderPagination(container, pagination, loadFn) {
 }
 
 // Global function for pagination buttons
-window.loadPage = function(page, fnName) {
+window.loadPage = function (page, fnName) {
     if (fnName === 'loadUsers') loadUsers(page);
     else if (fnName === 'loadHistory') loadHistory(page);
 };
@@ -298,13 +298,13 @@ function setupEventListeners() {
 }
 
 // Delete functions
-window.confirmDeleteUser = function(userId, email) {
+window.confirmDeleteUser = function (userId, email) {
     deleteTarget = { type: 'user', id: userId };
     deleteMessageEl.textContent = `確定要刪除用戶 ${email} 嗎？該用戶的所有數據都會被刪除。`;
     deleteModal.hidden = false;
 };
 
-window.confirmDeleteHistory = function(historyId) {
+window.confirmDeleteHistory = function (historyId) {
     deleteTarget = { type: 'history', id: historyId };
     deleteMessageEl.textContent = '確定要刪除這條歷史記錄嗎？';
     deleteModal.hidden = false;
@@ -348,7 +348,7 @@ async function executeDelete() {
 }
 
 // View history detail
-window.viewHistory = async function(historyId) {
+window.viewHistory = async function (historyId) {
     detailContent.innerHTML = '<p>載入中...</p>';
     detailModal.hidden = false;
 

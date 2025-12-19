@@ -34,14 +34,14 @@ export async function onRequestGet(context) {
     // Parse JSON fields
     let request_data = null;
     let response_data = null;
-    
+
     try {
       request_data = JSON.parse(record.request_json);
-    } catch (e) {}
-    
+    } catch (e) { }
+
     try {
       response_data = JSON.parse(record.response_json);
-    } catch (e) {}
+    } catch (e) { }
 
     return jsonResponse({
       history: {
@@ -68,7 +68,7 @@ export async function onRequestDelete(context) {
   try {
     // Check if record exists
     const record = await env.DB.prepare('SELECT id FROM history WHERE id = ?').bind(historyId).first();
-    
+
     if (!record) {
       return errorResponse(404, '記錄不存在');
     }

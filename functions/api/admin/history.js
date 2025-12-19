@@ -32,9 +32,9 @@ export async function onRequestGet(context) {
       FROM history h
       LEFT JOIN users u ON h.user_id = u.id
     `;
-    
+
     const params = [];
-    
+
     if (userId) {
       countQuery += ' WHERE user_id = ?';
       dataQuery += ' WHERE h.user_id = ?';
@@ -44,7 +44,7 @@ export async function onRequestGet(context) {
     dataQuery += ' ORDER BY h.created_at DESC LIMIT ? OFFSET ?';
 
     // Get total count
-    const countStmt = userId 
+    const countStmt = userId
       ? env.DB.prepare(countQuery).bind(userId)
       : env.DB.prepare(countQuery);
     const countResult = await countStmt.first();

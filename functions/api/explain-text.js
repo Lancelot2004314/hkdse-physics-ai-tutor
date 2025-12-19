@@ -31,7 +31,7 @@ export async function onRequestPost(context) {
 
     // Validate problemText
     if (!problemText || problemText.trim().length === 0) {
-      return errorResponse(400, '請輸入題目內容');
+      return errorResponse(400, 'Please enter the problem content / 請輸入題目內容');
     }
 
     // Check DeepSeek API key
@@ -51,14 +51,14 @@ export async function onRequestPost(context) {
       systemPrompt += '\n\nAdjust for ADVANCED level: Be concise, focus on exam strategy and common pitfalls.';
     }
 
-    // Build user prompt
-    let userPrompt = `請分析以下 HKDSE 物理題目並提供詳細講解。\n\n題目：\n${problemText.trim()}`;
+    // Build user prompt - language neutral to allow detection
+    let userPrompt = `Analyze the following HKDSE Physics problem and provide a detailed explanation. Detect the language of the problem and respond in the same language.\n\nProblem:\n${problemText.trim()}`;
 
     if (question) {
-      userPrompt += `\n\n學生問題：${question}`;
+      userPrompt += `\n\nStudent's question: ${question}`;
     }
     if (studentAttempt) {
-      userPrompt += `\n\n學生答案/思路：${studentAttempt}`;
+      userPrompt += `\n\nStudent's attempt/thoughts: ${studentAttempt}`;
     }
 
     // Get user from session (if logged in)
@@ -68,7 +68,7 @@ export async function onRequestPost(context) {
     const result = await callDeepSeek(deepseekApiKey, systemPrompt, userPrompt);
 
     if (!result.success) {
-      return errorResponse(500, result.error || 'AI 分析失敗');
+      return errorResponse(500, result.error || 'AI analysis failed / AI 分析失敗');
     }
 
     // Track DeepSeek token usage
@@ -90,14 +90,14 @@ export async function onRequestPost(context) {
       console.error('Failed to parse DeepSeek response:', parseErr);
       // Return a structured fallback
       parsedResponse = {
-        problemSummary: '題目分析',
+        problemSummary: 'Problem Analysis / 題目分析',
         answer: {
           steps: [result.text],
           commonMistakes: [],
           examTips: [],
-          finalAnswer: '請參考上方解答',
+          finalAnswer: 'See explanation above / 請參考上方解答',
         },
-        verification: '驗算完成',
+        verification: 'Verification complete / 驗算完成',
         glossary: {},
       };
     }
@@ -106,22 +106,22 @@ export async function onRequestPost(context) {
     if (mode === 'socratic' && parsedResponse.guidingQuestions) {
       // Convert Socratic output to standard format
       const steps = parsedResponse.guidingQuestions.map((q, i) => {
-        let stepContent = `問題 ${i + 1}：${q.question}`;
-        if (q.hint1) stepContent += `\n💡 提示 1：${q.hint1}`;
-        if (q.hint2) stepContent += `\n💡 提示 2：${q.hint2}`;
-        if (q.hint3) stepContent += `\n💡 提示 3：${q.hint3}`;
+        let stepContent = `Question ${i + 1} / 問題 ${i + 1}：${q.question}`;
+        if (q.hint1) stepContent += `\n💡 Hint 1 / 提示 1：${q.hint1}`;
+        if (q.hint2) stepContent += `\n💡 Hint 2 / 提示 2：${q.hint2}`;
+        if (q.hint3) stepContent += `\n💡 Hint 3 / 提示 3：${q.hint3}`;
         return stepContent;
       });
 
       parsedResponse = {
-        problemSummary: '蘇格拉底引導模式 - 透過問題引導思考',
+        problemSummary: 'Socratic Mode - Guided learning through questions / 蘇格拉底引導模式 - 透過問題引導思考',
         answer: {
           steps: steps,
           commonMistakes: [],
           examTips: parsedResponse.nextStep ? [`${parsedResponse.nextStep}`] : [],
-          finalAnswer: '請先思考以上問題，再揭示答案',
+          finalAnswer: 'Think about the questions above first / 請先思考以上問題，再揭示答案',
         },
-        verification: '引導模式 - 無需驗算',
+        verification: 'Guided mode - no verification needed / 引導模式 - 無需驗算',
         glossary: parsedResponse.glossary || {},
       };
     }
@@ -135,7 +135,7 @@ export async function onRequestPost(context) {
 
   } catch (err) {
     console.error('Error in explain-text:', err);
-    return errorResponse(500, '處理失敗，請重試');
+    return errorResponse(500, 'Processing failed, please retry / 處理失敗，請重試');
   }
 }
 
@@ -175,7 +175,7 @@ async function callDeepSeek(apiKey, systemPrompt, userPrompt) {
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
       console.error('DeepSeek API error:', response.status, errorText);
-      return { success: false, error: `AI 服務錯誤 (${response.status})` };
+      return { success: false, error: `AI service error (${response.status}) / AI 服務錯誤` };
     }
 
     const data = await response.json();
@@ -184,17 +184,17 @@ async function callDeepSeek(apiKey, systemPrompt, userPrompt) {
 
     if (!text) {
       console.error('DeepSeek response:', JSON.stringify(data));
-      return { success: false, error: '無法解析 AI 回覆' };
+      return { success: false, error: 'Unable to parse AI response / 無法解析 AI 回覆' };
     }
 
     return { success: true, text, usage };
 
   } catch (err) {
     if (err.name === 'AbortError') {
-      return { success: false, error: '請求超時，請重試' };
+      return { success: false, error: 'Request timeout, please retry / 請求超時，請重試' };
     }
     console.error('DeepSeek API call failed:', err);
-    return { success: false, error: 'AI 服務連接失敗' };
+    return { success: false, error: 'AI service connection failed / AI 服務連接失敗' };
   }
 }
 

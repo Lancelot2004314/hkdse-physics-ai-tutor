@@ -20,7 +20,7 @@ export async function onRequestDelete(context) {
   try {
     // Check if user exists
     const user = await env.DB.prepare('SELECT id, email FROM users WHERE id = ?').bind(userId).first();
-    
+
     if (!user) {
       return errorResponse(404, '用戶不存在');
     }
