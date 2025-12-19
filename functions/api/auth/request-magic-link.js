@@ -153,7 +153,7 @@ async function sendMagicLinkEmail(apiKey, toEmail, magicLink) {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        from: 'HKDSE Physics AI Tutor <noreply@hkdse-physics-ai-tutor.pages.dev>',
+        from: 'HKDSE Physics AI Tutor <onboarding@resend.dev>',
         to: [toEmail],
         subject: '登入 HKDSE Physics AI Tutor',
         html: `
