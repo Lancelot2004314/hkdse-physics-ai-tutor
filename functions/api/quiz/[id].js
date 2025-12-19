@@ -39,13 +39,13 @@ export async function onRequestGet(context) {
 
     let questions = [];
     let answers = [];
-    
+
     try {
       questions = JSON.parse(session.questions || '[]');
     } catch (e) {
       console.error('Error parsing questions:', e);
     }
-    
+
     try {
       answers = JSON.parse(session.answers || '[]');
     } catch (e) {

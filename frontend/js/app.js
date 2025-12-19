@@ -82,7 +82,7 @@ const modeTextBtn = document.getElementById('modeText');
 const textInputArea = document.getElementById('textInputArea');
 const problemTextInput = document.getElementById('problemText');
 
-// Auth elements
+// Auth elements (may not exist if on AI Tutor page with new sidebar layout)
 const authLoggedOut = document.getElementById('authLoggedOut');
 const authLoggedIn = document.getElementById('authLoggedIn');
 const userEmailEl = document.getElementById('userEmail');
@@ -93,10 +93,15 @@ const closeLoginModal = document.getElementById('closeLoginModal');
 const googleLoginBtn = document.getElementById('googleLoginBtn');
 const loginStatus = document.getElementById('loginStatus');
 
-// History elements
+// History elements (may not exist on new layout)
 const historySection = document.getElementById('historySection');
 const historyList = document.getElementById('historyList');
 const refreshHistoryBtn = document.getElementById('refreshHistoryBtn');
+
+// Sidebar elements
+const sidebarUserName = document.getElementById('sidebarUserName');
+const sidebarUserEmail = document.getElementById('sidebarUserEmail');
+const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
 
 // API Base URL (same origin for Cloudflare Pages Functions)
 const API_BASE = '/api';
@@ -1083,33 +1088,53 @@ function loadChatHistory() {
 // ============ Auth Functions ============
 
 function initializeAuthListeners() {
-    // Show login modal
-    showLoginBtn.addEventListener('click', () => {
-        loginModal.hidden = false;
-    });
+    // Show login modal (if exists, for backward compatibility)
+    if (showLoginBtn && loginModal) {
+        showLoginBtn.addEventListener('click', () => {
+            loginModal.hidden = false;
+        });
+    }
 
-    // Close login modal
-    closeLoginModal.addEventListener('click', () => {
-        loginModal.hidden = true;
-        loginStatus.hidden = true;
-    });
-
-    // Close modal on background click
-    loginModal.addEventListener('click', (e) => {
-        if (e.target === loginModal) {
+    // Close login modal (if exists)
+    if (closeLoginModal && loginModal) {
+        closeLoginModal.addEventListener('click', () => {
             loginModal.hidden = true;
-            loginStatus.hidden = true;
-        }
-    });
+            if (loginStatus) loginStatus.hidden = true;
+        });
+    }
 
-    // Google login
-    googleLoginBtn.addEventListener('click', loginWithGoogle);
+    // Close modal on background click (if exists)
+    if (loginModal) {
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.hidden = true;
+                if (loginStatus) loginStatus.hidden = true;
+            }
+        });
+    }
 
-    // Logout
-    logoutBtn.addEventListener('click', handleLogout);
+    // Google login (if exists)
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', loginWithGoogle);
+    }
 
-    // Refresh history
-    refreshHistoryBtn.addEventListener('click', loadHistory);
+    // Logout button (if exists)
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+
+    // Sidebar logout button
+    if (sidebarLogoutBtn) {
+        sidebarLogoutBtn.addEventListener('click', async () => {
+            await handleLogout();
+            window.location.href = '/';
+        });
+    }
+
+    // Refresh history (if exists)
+    if (refreshHistoryBtn) {
+        refreshHistoryBtn.addEventListener('click', loadHistory);
+    }
 }
 
 async function handleGoogleOAuthCallback() {
@@ -1176,20 +1201,40 @@ async function checkAuthState() {
 }
 
 function updateAuthUI() {
-    if (currentUser) {
-        authLoggedOut.hidden = true;
-        authLoggedIn.hidden = false;
-        userEmailEl.textContent = currentUser.email;
-        historySection.hidden = false;
-        // Always hide login modal when logged in
+    // Update sidebar user info (new layout)
+    if (sidebarUserName) {
+        sidebarUserName.textContent = currentUser
+            ? (currentUser.name || currentUser.email?.split('@')[0] || 'User')
+            : 'Guest';
+    }
+    if (sidebarUserEmail) {
+        sidebarUserEmail.textContent = currentUser?.email || '';
+    }
+    if (sidebarLogoutBtn) {
+        sidebarLogoutBtn.style.display = currentUser ? '' : 'none';
+    }
+
+    // Update old layout elements (if they exist)
+    if (authLoggedOut) {
+        authLoggedOut.hidden = !!currentUser;
+    }
+    if (authLoggedIn) {
+        authLoggedIn.hidden = !currentUser;
+    }
+    if (userEmailEl) {
+        userEmailEl.textContent = currentUser?.email || '';
+    }
+    if (historySection) {
+        historySection.hidden = !currentUser;
+        if (currentUser) loadHistory();
+    }
+
+    // Always hide login modal when logged in
+    if (loginModal && currentUser) {
         loginModal.hidden = true;
+    }
+    if (loginStatus && currentUser) {
         loginStatus.hidden = true;
-        loadHistory();
-    } else {
-        authLoggedOut.hidden = false;
-        authLoggedIn.hidden = true;
-        userEmailEl.textContent = '';
-        historySection.hidden = true;
     }
 }
 
@@ -1221,9 +1266,13 @@ async function loginWithGoogle() {
 }
 
 function showLoginStatus(message, type) {
-    loginStatus.textContent = message;
-    loginStatus.className = `login-status ${type}`;
-    loginStatus.hidden = false;
+    if (loginStatus) {
+        loginStatus.textContent = message;
+        loginStatus.className = `login-status ${type}`;
+        loginStatus.hidden = false;
+    } else {
+        console.log(`Login status (${type}): ${message}`);
+    }
 }
 
 async function handleLogout() {
@@ -1434,9 +1483,18 @@ function showSuccess(message) {
     successDiv.className = 'success-message';
     successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${escapeHtml(message)}`;
 
-    const header = document.querySelector('.header');
-    header.insertAdjacentElement('afterend', successDiv);
+    const header = document.querySelector('.header') || document.querySelector('.ai-tutor-content');
+    if (header) {
+        header.insertAdjacentElement('afterend', successDiv);
+    } else {
+        document.body.insertAdjacentElement('afterbegin', successDiv);
+    }
 
     // Auto remove after 5 seconds
     setTimeout(() => successDiv.remove(), 5000);
+}
+
+// Redirect to dashboard for login
+function redirectToLogin() {
+    window.location.href = '/?login=true';
 }

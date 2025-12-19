@@ -69,7 +69,7 @@ export async function onRequestGet(context) {
       } catch (e) {
         console.error('Error parsing topics:', e);
       }
-      
+
       return {
         id: s.id,
         topics: parsedTopics,

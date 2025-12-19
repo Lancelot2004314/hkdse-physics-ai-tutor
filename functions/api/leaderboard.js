@@ -35,7 +35,7 @@ export async function onRequestGet(context) {
 
     if (type === 'daily') {
       const today = new Date().toISOString().split('T')[0];
-      
+
       // For daily, sum scores from quiz_sessions completed today
       results = await env.DB.prepare(`
         SELECT 
@@ -128,7 +128,7 @@ async function buildResponse(results, user, env, type) {
           const rankResult = await env.DB.prepare(`
             SELECT COUNT(*) + 1 as rank FROM user_scores WHERE total_points > ?
           `).bind(userScores.total_points || 0).first();
-          
+
           userRank = {
             rank: rankResult?.rank || 1,
             name: maskEmail(user.email),
@@ -140,7 +140,7 @@ async function buildResponse(results, user, env, type) {
           // For daily/weekly, find user in results by matching masked email
           const userMaskedEmail = maskEmail(user.email);
           const userInList = leaderboard.find(l => l.name === userMaskedEmail);
-          
+
           if (userInList) {
             userRank = { ...userInList, isCurrentUser: true };
           } else {
@@ -183,7 +183,7 @@ function maskEmail(email) {
   if (!email) return 'Anonymous';
   const parts = email.split('@');
   if (parts.length !== 2) return 'Anonymous';
-  
+
   const [local, domain] = parts;
   if (local.length <= 2) {
     return `${local}***@${domain}`;

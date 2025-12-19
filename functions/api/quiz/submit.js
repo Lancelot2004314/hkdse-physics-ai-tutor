@@ -209,7 +209,7 @@ async function gradeShortAnswer(apiKey, studentAnswer, modelAnswer, markingSchem
 async function updateUserScores(db, userId, points, questionsCount, isPass) {
   try {
     const today = new Date().toISOString().split('T')[0];
-    
+
     // Check if user has scores record
     const existing = await db.prepare(`
       SELECT * FROM user_scores WHERE user_id = ?
@@ -220,12 +220,12 @@ async function updateUserScores(db, userId, points, questionsCount, isPass) {
       let newStreak = existing.current_streak || 0;
       let bestStreak = existing.best_streak || 0;
       const lastPracticeDate = existing.last_practice_date;
-      
+
       if (lastPracticeDate) {
         const lastDate = new Date(lastPracticeDate);
         const todayDate = new Date(today);
         const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays === 0) {
           // Same day - streak stays the same
         } else if (diffDays === 1) {
@@ -239,7 +239,7 @@ async function updateUserScores(db, userId, points, questionsCount, isPass) {
         // First practice ever
         newStreak = 1;
       }
-      
+
       // Update best streak if needed
       if (newStreak > bestStreak) {
         bestStreak = newStreak;

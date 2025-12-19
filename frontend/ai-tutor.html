@@ -120,60 +120,7 @@
                 <header class="header">
                     <h1><i class="fas fa-robot"></i> AI Tutor</h1>
                     <p>上傳題目照片，獲得 DSE 風格分步講解</p>
-
-                    <!-- Auth Section -->
-                    <div class="auth-section" id="authSection">
-                        <!-- Logged out state -->
-                        <div class="auth-logged-out" id="authLoggedOut">
-                            <button class="btn-auth" id="showLoginBtn">
-                                <i class="fas fa-sign-in-alt"></i> 登入同步歷史
-                            </button>
-                        </div>
-                        <!-- Logged in state -->
-                        <div class="auth-logged-in" id="authLoggedIn" hidden>
-                            <span class="user-email" id="userEmail"></span>
-                            <button class="btn-auth btn-logout" id="logoutBtn">
-                                <i class="fas fa-sign-out-alt"></i> 登出
-                            </button>
-                        </div>
-                    </div>
                 </header>
-
-                <!-- Login Modal -->
-                <div class="modal" id="loginModal" hidden>
-                    <div class="modal-content">
-                        <button class="modal-close" id="closeLoginModal">&times;</button>
-                        <h2><i class="fas fa-user-circle"></i> 登入帳戶</h2>
-                        <p>登入後可同步歷史記錄到雲端，跨設備使用</p>
-                        <button class="btn-google" id="googleLoginBtn">
-                            <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
-                                <path fill="#4285F4"
-                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                                <path fill="#34A853"
-                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                                <path fill="#FBBC05"
-                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                                <path fill="#EA4335"
-                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                            </svg>
-                            用 Google 帳號登入
-                        </button>
-                        <div class="login-status" id="loginStatus" hidden></div>
-                    </div>
-                </div>
-
-                <!-- History Section -->
-                <section class="history-section" id="historySection" hidden>
-                    <div class="history-header">
-                        <h2><i class="fas fa-history"></i> 歷史記錄</h2>
-                        <button class="btn-small" id="refreshHistoryBtn">
-                            <i class="fas fa-sync-alt"></i> 刷新
-                        </button>
-                    </div>
-                    <div class="history-list" id="historyList">
-                        <p class="history-empty">暫無歷史記錄</p>
-                    </div>
-                </section>
 
                 <!-- Upload Section -->
                 <section class="upload-section" id="uploadSection">
@@ -382,27 +329,6 @@
     </div>
 
     <script src="js/app.js"></script>
-    <script>
-        // Update sidebar user info on load
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const response = await fetch('/api/auth/me', { credentials: 'include' });
-                if (response.ok) {
-                    const user = await response.json();
-                    document.getElementById('sidebarUserName').textContent = user.name || user.email?.split('@')[0] || 'User';
-                    document.getElementById('sidebarUserEmail').textContent = user.email || '';
-                }
-            } catch (err) {
-                console.error('Failed to load user info:', err);
-            }
-
-            // Sidebar logout button
-            document.getElementById('sidebarLogoutBtn')?.addEventListener('click', async () => {
-                await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-                window.location.href = '/';
-            });
-        });
-    </script>
 </body>
 
 </html>
