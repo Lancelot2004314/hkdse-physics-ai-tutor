@@ -9,7 +9,7 @@ compatibility_date = "2024-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "hkdse-physics-tutor-db"
-database_id = "YOUR_D1_DATABASE_ID"  # Replace after running: wrangler d1 create hkdse-physics-tutor-db
+database_id = "4fac0ca6-eefc-4c5c-878c-6633e0058afd"
 
 # Required environment variables (set in Cloudflare Dashboard):
 # - QWEN_API_KEY: 通义千问 API key
