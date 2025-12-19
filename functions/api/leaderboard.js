@@ -1,6 +1,7 @@
 /**
  * HKDSE Physics AI Tutor - Leaderboard API
  * Returns top users by points (global, weekly, daily)
+ * Fixed: daily/weekly queries now properly filter and aggregate
  */
 
 import { getUserFromSession } from '../../shared/auth.js';
@@ -30,30 +31,28 @@ export async function onRequestGet(context) {
     // Get current user for their rank
     const user = await getUserFromSession(request, env);
 
-    let leaderboardQuery;
-    let dateFilter = '';
+    let results;
 
-    // Build query based on type
     if (type === 'daily') {
       const today = new Date().toISOString().split('T')[0];
-      // For daily, we sum points earned today from practice_history
-      leaderboardQuery = `
+      
+      // For daily, sum scores from quiz_sessions completed today
+      results = await env.DB.prepare(`
         SELECT 
+          u.id as user_id,
           u.email,
-          COALESCE(SUM(ph.points_earned), 0) as points,
-          us.current_streak as streak,
-          COUNT(CASE WHEN ph.is_correct = 1 THEN 1 END) as correct_today
+          COALESCE(SUM(qs.score), 0) as points,
+          COALESCE(us.current_streak, 0) as streak
         FROM users u
+        INNER JOIN quiz_sessions qs ON u.id = qs.user_id
         LEFT JOIN user_scores us ON u.id = us.user_id
-        LEFT JOIN practice_history ph ON u.id = ph.user_id AND date(ph.created_at) = ?
+        WHERE qs.status = 'completed' AND date(qs.completed_at) = ?
         GROUP BY u.id
         HAVING points > 0
         ORDER BY points DESC
         LIMIT ?
-      `;
-      const results = await env.DB.prepare(leaderboardQuery).bind(today, limit).all();
+      `).bind(today, limit).all();
 
-      return buildResponse(results.results, user, env, type);
     } else if (type === 'weekly') {
       // Get start of current week (Monday)
       const now = new Date();
@@ -61,32 +60,33 @@ export async function onRequestGet(context) {
       const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
       const monday = new Date(now);
       monday.setDate(now.getDate() + mondayOffset);
+      monday.setHours(0, 0, 0, 0);
       const weekStart = monday.toISOString().split('T')[0];
 
-      leaderboardQuery = `
+      results = await env.DB.prepare(`
         SELECT 
+          u.id as user_id,
           u.email,
-          COALESCE(SUM(ph.points_earned), 0) as points,
-          us.current_streak as streak,
-          COUNT(CASE WHEN ph.is_correct = 1 THEN 1 END) as correct_this_week
+          COALESCE(SUM(qs.score), 0) as points,
+          COALESCE(us.current_streak, 0) as streak
         FROM users u
+        INNER JOIN quiz_sessions qs ON u.id = qs.user_id
         LEFT JOIN user_scores us ON u.id = us.user_id
-        LEFT JOIN practice_history ph ON u.id = ph.user_id AND date(ph.created_at) >= ?
+        WHERE qs.status = 'completed' AND date(qs.completed_at) >= ?
         GROUP BY u.id
         HAVING points > 0
         ORDER BY points DESC
         LIMIT ?
-      `;
-      const results = await env.DB.prepare(leaderboardQuery).bind(weekStart, limit).all();
+      `).bind(weekStart, limit).all();
 
-      return buildResponse(results.results, user, env, type);
     } else {
       // Global - use total points from user_scores
-      leaderboardQuery = `
+      results = await env.DB.prepare(`
         SELECT 
+          u.id as user_id,
           u.email,
-          us.total_points as points,
-          us.current_streak as streak,
+          COALESCE(us.total_points, 0) as points,
+          COALESCE(us.current_streak, 0) as streak,
           us.correct_count,
           us.best_streak
         FROM users u
@@ -94,11 +94,10 @@ export async function onRequestGet(context) {
         WHERE us.total_points > 0
         ORDER BY us.total_points DESC
         LIMIT ?
-      `;
-      const results = await env.DB.prepare(leaderboardQuery).bind(limit).all();
-
-      return buildResponse(results.results, user, env, type);
+      `).bind(limit).all();
     }
+
+    return buildResponse(results?.results || [], user, env, type);
 
   } catch (err) {
     console.error('Error in leaderboard:', err);
@@ -118,40 +117,54 @@ async function buildResponse(results, user, env, type) {
   // Get current user's rank if logged in
   let userRank = null;
   if (user) {
-    const userScores = await env.DB.prepare(`
-      SELECT total_points, current_streak, correct_count FROM user_scores WHERE user_id = ?
-    `).bind(user.id).first();
+    try {
+      const userScores = await env.DB.prepare(`
+        SELECT total_points, current_streak, correct_count FROM user_scores WHERE user_id = ?
+      `).bind(user.id).first();
 
-    if (userScores) {
-      // Calculate user's rank
-      let rankQuery;
-      if (type === 'global') {
-        rankQuery = `
-          SELECT COUNT(*) + 1 as rank FROM user_scores WHERE total_points > ?
-        `;
-        const rankResult = await env.DB.prepare(rankQuery).bind(userScores.total_points).first();
-        userRank = {
-          rank: rankResult?.rank || 1,
-          name: maskEmail(user.email),
-          points: userScores.total_points,
-          streak: userScores.current_streak,
-          isCurrentUser: true,
-        };
-      } else {
-        // For daily/weekly, find user in results
-        const userInList = leaderboard.find(l => l.name === maskEmail(user.email));
-        if (userInList) {
-          userRank = { ...userInList, isCurrentUser: true };
-        } else {
+      if (userScores) {
+        if (type === 'global') {
+          // Calculate user's global rank
+          const rankResult = await env.DB.prepare(`
+            SELECT COUNT(*) + 1 as rank FROM user_scores WHERE total_points > ?
+          `).bind(userScores.total_points || 0).first();
+          
           userRank = {
-            rank: '-',
+            rank: rankResult?.rank || 1,
             name: maskEmail(user.email),
-            points: 0,
-            streak: userScores.current_streak,
+            points: userScores.total_points || 0,
+            streak: userScores.current_streak || 0,
             isCurrentUser: true,
           };
+        } else {
+          // For daily/weekly, find user in results by matching masked email
+          const userMaskedEmail = maskEmail(user.email);
+          const userInList = leaderboard.find(l => l.name === userMaskedEmail);
+          
+          if (userInList) {
+            userRank = { ...userInList, isCurrentUser: true };
+          } else {
+            userRank = {
+              rank: '-',
+              name: userMaskedEmail,
+              points: 0,
+              streak: userScores.current_streak || 0,
+              isCurrentUser: true,
+            };
+          }
         }
+      } else {
+        // User has no scores yet
+        userRank = {
+          rank: '-',
+          name: maskEmail(user.email),
+          points: 0,
+          streak: 0,
+          isCurrentUser: true,
+        };
       }
+    } catch (err) {
+      console.error('Error getting user rank:', err);
     }
   }
 
@@ -168,7 +181,10 @@ async function buildResponse(results, user, env, type) {
 // Mask email for privacy (show first 2 chars + *** + @domain)
 function maskEmail(email) {
   if (!email) return 'Anonymous';
-  const [local, domain] = email.split('@');
+  const parts = email.split('@');
+  if (parts.length !== 2) return 'Anonymous';
+  
+  const [local, domain] = parts;
   if (local.length <= 2) {
     return `${local}***@${domain}`;
   }

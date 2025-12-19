@@ -61,25 +61,34 @@ export async function onRequestGet(context) {
       LIMIT ? OFFSET ?
     `).bind(...params, limit, offset).all();
 
-    // Format results
-    const sessions = history.results.map(s => ({
-      id: s.id,
-      topics: JSON.parse(s.topics || '[]'),
-      questionCount: s.mc_count + s.short_count + s.long_count,
-      mcCount: s.mc_count,
-      shortCount: s.short_count,
-      longCount: s.long_count,
-      difficulty: s.difficulty,
-      timeLimit: s.time_limit,
-      score: s.score,
-      maxScore: s.max_score,
-      percentage: s.max_score > 0 ? Math.round((s.score / s.max_score) * 100) : 0,
-      grade: s.grade,
-      timeSpent: s.time_spent,
-      status: s.status,
-      createdAt: s.created_at,
-      completedAt: s.completed_at,
-    }));
+    // Format results with null check
+    const sessions = (history.results || []).map(s => {
+      let parsedTopics = [];
+      try {
+        parsedTopics = JSON.parse(s.topics || '[]');
+      } catch (e) {
+        console.error('Error parsing topics:', e);
+      }
+      
+      return {
+        id: s.id,
+        topics: parsedTopics,
+        questionCount: (s.mc_count || 0) + (s.short_count || 0) + (s.long_count || 0),
+        mcCount: s.mc_count || 0,
+        shortCount: s.short_count || 0,
+        longCount: s.long_count || 0,
+        difficulty: s.difficulty || 3,
+        timeLimit: s.time_limit || 60,
+        score: s.score || 0,
+        maxScore: s.max_score || 0,
+        percentage: s.max_score > 0 ? Math.round((s.score / s.max_score) * 100) : 0,
+        grade: s.grade || 'U',
+        timeSpent: s.time_spent || 0,
+        status: s.status || 'completed',
+        createdAt: s.created_at,
+        completedAt: s.completed_at,
+      };
+    });
 
     return new Response(JSON.stringify({
       sessions,

@@ -37,15 +37,27 @@ export async function onRequestGet(context) {
       return errorResponse(404, 'Quiz session not found');
     }
 
-    const questions = JSON.parse(session.questions || '[]');
-    const answers = JSON.parse(session.answers || '[]');
+    let questions = [];
+    let answers = [];
+    
+    try {
+      questions = JSON.parse(session.questions || '[]');
+    } catch (e) {
+      console.error('Error parsing questions:', e);
+    }
+    
+    try {
+      answers = JSON.parse(session.answers || '[]');
+    } catch (e) {
+      console.error('Error parsing answers:', e);
+    }
 
     // For completed sessions, include answers and explanations
     let questionsWithAnswers = questions;
     if (session.status === 'completed') {
       questionsWithAnswers = questions.map((q, i) => ({
         ...q,
-        userAnswer: answers[i] || null,
+        userAnswer: i < answers.length ? answers[i] : null,
       }));
     } else {
       // For in-progress, hide correct answers

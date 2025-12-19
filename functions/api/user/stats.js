@@ -96,27 +96,40 @@ export async function onRequestGet(context) {
       LIMIT 10
     `).bind(user.id).all();
 
+    // Return with both camelCase and snake_case for compatibility
+    const statsData = {
+      // camelCase (preferred)
+      totalPoints: stats.total_points || 0,
+      correctCount: stats.correct_count || 0,
+      totalAttempts: stats.total_attempts || 0,
+      accuracy,
+      currentStreak: stats.current_streak || 0,
+      bestStreak: stats.best_streak || 0,
+      lastPracticeDate: stats.last_practice_date,
+      globalRank: rankResult?.rank || 1,
+      // snake_case (for compatibility)
+      total_points: stats.total_points || 0,
+      correct_count: stats.correct_count || 0,
+      total_attempts: stats.total_attempts || 0,
+      current_streak: stats.current_streak || 0,
+      best_streak: stats.best_streak || 0,
+      rank: rankResult?.rank || 1,
+    };
+
     return new Response(JSON.stringify({
       loggedIn: true,
-      stats: {
-        totalPoints: stats.total_points,
-        correctCount: stats.correct_count,
-        totalAttempts: stats.total_attempts,
-        accuracy,
-        currentStreak: stats.current_streak,
-        bestStreak: stats.best_streak,
-        lastPracticeDate: stats.last_practice_date,
-        globalRank: rankResult?.rank || 1,
-      },
+      stats: statsData,
+      // Also include at top level for easier access
+      ...statsData,
       today: {
         attempts: todayStats?.attempts || 0,
         correct: todayStats?.correct || 0,
         points: todayStats?.points || 0,
       },
-      recentHistory: recentHistory.results.map(h => ({
-        question: h.generated_question?.substring(0, 100) + '...',
+      recentHistory: (recentHistory.results || []).map(h => ({
+        question: h.generated_question ? h.generated_question.substring(0, 100) + '...' : '',
         isCorrect: h.is_correct === 1,
-        pointsEarned: h.points_earned,
+        pointsEarned: h.points_earned || 0,
         topic: h.topic,
         date: h.created_at,
       })),

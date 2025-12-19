@@ -208,25 +208,78 @@ async function gradeShortAnswer(apiKey, studentAnswer, modelAnswer, markingSchem
 
 async function updateUserScores(db, userId, points, questionsCount, isPass) {
   try {
+    const today = new Date().toISOString().split('T')[0];
+    
     // Check if user has scores record
     const existing = await db.prepare(`
       SELECT * FROM user_scores WHERE user_id = ?
     `).bind(userId).first();
 
     if (existing) {
+      // Calculate streak
+      let newStreak = existing.current_streak || 0;
+      let bestStreak = existing.best_streak || 0;
+      const lastPracticeDate = existing.last_practice_date;
+      
+      if (lastPracticeDate) {
+        const lastDate = new Date(lastPracticeDate);
+        const todayDate = new Date(today);
+        const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 0) {
+          // Same day - streak stays the same
+        } else if (diffDays === 1) {
+          // Consecutive day - increase streak
+          newStreak += 1;
+        } else {
+          // Streak broken - reset to 1
+          newStreak = 1;
+        }
+      } else {
+        // First practice ever
+        newStreak = 1;
+      }
+      
+      // Update best streak if needed
+      if (newStreak > bestStreak) {
+        bestStreak = newStreak;
+      }
+
       await db.prepare(`
         UPDATE user_scores SET
           total_points = total_points + ?,
           correct_count = correct_count + ?,
           total_attempts = total_attempts + ?,
+          current_streak = ?,
+          best_streak = ?,
+          last_practice_date = ?,
           updated_at = datetime('now')
         WHERE user_id = ?
-      `).bind(points, isPass ? 1 : 0, questionsCount, userId).run();
+      `).bind(
+        points,
+        isPass ? 1 : 0,
+        1, // Increment by 1 practice session, not by question count
+        newStreak,
+        bestStreak,
+        today,
+        userId
+      ).run();
     } else {
+      // New user - create record with streak = 1
       await db.prepare(`
-        INSERT INTO user_scores (user_id, total_points, correct_count, total_attempts)
-        VALUES (?, ?, ?, ?)
-      `).bind(userId, points, isPass ? 1 : 0, questionsCount).run();
+        INSERT INTO user_scores (
+          user_id, total_points, correct_count, total_attempts,
+          current_streak, best_streak, last_practice_date
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        userId,
+        points,
+        isPass ? 1 : 0,
+        1, // First practice session
+        1, // First day streak
+        1, // Best streak starts at 1
+        today
+      ).run();
     }
   } catch (err) {
     console.error('Failed to update user scores:', err);
