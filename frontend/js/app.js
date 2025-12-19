@@ -791,6 +791,9 @@ function updateAuthUI() {
         authLoggedIn.hidden = false;
         userEmailEl.textContent = currentUser.email;
         historySection.hidden = false;
+        // Always hide login modal when logged in
+        loginModal.hidden = true;
+        loginStatus.hidden = true;
         loadHistory();
     } else {
         authLoggedOut.hidden = false;
