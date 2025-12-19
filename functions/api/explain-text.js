@@ -88,16 +88,16 @@ export async function onRequestPost(context) {
       }
     } catch (parseErr) {
       console.error('Failed to parse DeepSeek response:', parseErr);
-      // Return a structured fallback
+      // Fallback: show raw response in a clean format
       parsedResponse = {
-        problemSummary: 'Problem Analysis / 題目分析',
+        problemSummary: 'Analysis Result',
         answer: {
           steps: [result.text],
           commonMistakes: [],
           examTips: [],
-          finalAnswer: 'See explanation above / 請參考上方解答',
+          finalAnswer: 'See explanation above',
         },
-        verification: 'Verification complete / 驗算完成',
+        verification: 'Complete',
         glossary: {},
       };
     }
@@ -106,22 +106,22 @@ export async function onRequestPost(context) {
     if (mode === 'socratic' && parsedResponse.guidingQuestions) {
       // Convert Socratic output to standard format
       const steps = parsedResponse.guidingQuestions.map((q, i) => {
-        let stepContent = `Question ${i + 1} / 問題 ${i + 1}：${q.question}`;
-        if (q.hint1) stepContent += `\n💡 Hint 1 / 提示 1：${q.hint1}`;
-        if (q.hint2) stepContent += `\n💡 Hint 2 / 提示 2：${q.hint2}`;
-        if (q.hint3) stepContent += `\n💡 Hint 3 / 提示 3：${q.hint3}`;
+        let stepContent = `${q.question}`;
+        if (q.hint1) stepContent += `\n💡 ${q.hint1}`;
+        if (q.hint2) stepContent += `\n💡 ${q.hint2}`;
+        if (q.hint3) stepContent += `\n💡 ${q.hint3}`;
         return stepContent;
       });
 
       parsedResponse = {
-        problemSummary: 'Socratic Mode - Guided learning through questions / 蘇格拉底引導模式 - 透過問題引導思考',
+        problemSummary: 'Socratic Mode - Think through guided questions',
         answer: {
           steps: steps,
           commonMistakes: [],
-          examTips: parsedResponse.nextStep ? [`${parsedResponse.nextStep}`] : [],
-          finalAnswer: 'Think about the questions above first / 請先思考以上問題，再揭示答案',
+          examTips: parsedResponse.nextStep ? [parsedResponse.nextStep] : [],
+          finalAnswer: 'Think about the questions above first',
         },
-        verification: 'Guided mode - no verification needed / 引導模式 - 無需驗算',
+        verification: 'Guided mode',
         glossary: parsedResponse.glossary || {},
       };
     }

@@ -138,15 +138,16 @@ export async function onRequestPost(context) {
       }
     } catch (parseErr) {
       console.error('Failed to parse vision response:', parseErr);
+      // Fallback: show raw response in a clean format
       parsedResponse = {
-        problemSummary: 'Problem Analysis / 題目分析',
+        problemSummary: 'Analysis Result',
         answer: {
           steps: [visionResult.text],
           commonMistakes: [],
           examTips: [],
-          finalAnswer: 'See explanation above / 請參考上方解答',
+          finalAnswer: 'See explanation above',
         },
-        verification: 'Verification complete / 驗算完成',
+        verification: 'Complete',
         glossary: {},
       };
     }

@@ -444,75 +444,75 @@ async function handleSubmit() {
 function displayResults(data) {
     resultsSection.hidden = false;
 
-    // Problem Summary
-    document.getElementById('problemSummary').innerHTML = escapeHtml(data.problemSummary || '');
+    // Problem Summary - use formatMathSafe to handle LaTeX
+    document.getElementById('problemSummary').innerHTML = formatMathSafe(data.problemSummary || '');
 
-    // Steps
+    // Steps - use formatMathSafe for LaTeX support
     const stepsContent = document.getElementById('stepsContent');
     if (data.answer?.steps?.length) {
         stepsContent.innerHTML = data.answer.steps.map((step, i) => `
             <div class="step">
-                <div class="step-number">Step ${i + 1}</div>
-                <div class="step-content">${formatMath(escapeHtml(step))}</div>
+                <div class="step-number">${i + 1}</div>
+                <div class="step-content">${formatMathSafe(step)}</div>
             </div>
         `).join('');
     } else {
-        stepsContent.innerHTML = '<p>暫無分步講解</p>';
+        stepsContent.innerHTML = '<p class="empty-hint">No steps available</p>';
     }
 
-    // Common Mistakes
+    // Common Mistakes - use formatMathSafe for LaTeX support
     const mistakesContent = document.getElementById('mistakesContent');
     if (data.answer?.commonMistakes?.length) {
         mistakesContent.innerHTML = '<ul>' + data.answer.commonMistakes.map(m =>
-            `<li>${escapeHtml(m)}</li>`
+            `<li>${formatMathSafe(m)}</li>`
         ).join('') + '</ul>';
     } else {
-        mistakesContent.innerHTML = '<p>暫無常見錯誤提示</p>';
+        mistakesContent.innerHTML = '<p class="empty-hint">No common mistakes listed</p>';
     }
 
-    // Exam Tips
+    // Exam Tips - use formatMathSafe for LaTeX support
     const tipsContent = document.getElementById('tipsContent');
     if (data.answer?.examTips?.length) {
         tipsContent.innerHTML = '<ul>' + data.answer.examTips.map(t =>
-            `<li>${escapeHtml(t)}</li>`
+            `<li>${formatMathSafe(t)}</li>`
         ).join('') + '</ul>';
     } else {
-        tipsContent.innerHTML = '<p>暫無考試提示</p>';
+        tipsContent.innerHTML = '<p class="empty-hint">No exam tips available</p>';
     }
 
-    // Verification
+    // Verification - use formatMathSafe for LaTeX support
     const verificationContent = document.getElementById('verificationContent');
     if (data.verification) {
-        verificationContent.innerHTML = `<p>${escapeHtml(data.verification)}</p>`;
+        verificationContent.innerHTML = `<p>${formatMathSafe(data.verification)}</p>`;
     } else {
-        verificationContent.innerHTML = '<p>驗算檢查完成</p>';
+        verificationContent.innerHTML = '<p class="empty-hint">Verification complete</p>';
     }
 
-    // Final Answer (hidden by default)
+    // Final Answer (hidden by default) - use formatMathSafe for LaTeX support
     const finalAnswerContent = document.getElementById('finalAnswer');
     if (data.answer?.finalAnswer) {
-        finalAnswerContent.innerHTML = formatMath(escapeHtml(data.answer.finalAnswer));
+        finalAnswerContent.innerHTML = formatMathSafe(data.answer.finalAnswer);
     } else {
-        finalAnswerContent.innerHTML = '<p>請參考分步講解</p>';
+        finalAnswerContent.innerHTML = '<p class="empty-hint">See steps above</p>';
     }
     finalAnswerContent.hidden = true;
 
     // Glossary
     const glossaryContent = document.getElementById('glossaryContent');
     if (data.glossary && Object.keys(data.glossary).length) {
-        glossaryContent.innerHTML = Object.entries(data.glossary).map(([en, zh]) => `
+        glossaryContent.innerHTML = Object.entries(data.glossary).map(([term, translation]) => `
             <div class="term">
-                <div class="term-en">${escapeHtml(en)}</div>
-                <div class="term-zh">${escapeHtml(zh)}</div>
+                <div class="term-original">${escapeHtml(term)}</div>
+                <div class="term-translation">${escapeHtml(translation)}</div>
             </div>
         `).join('');
     } else {
-        glossaryContent.innerHTML = '<p>暫無術語對照</p>';
+        glossaryContent.innerHTML = '<p class="empty-hint">No glossary terms</p>';
     }
 
-    // Re-render MathJax
-    if (window.MathJax) {
-        MathJax.typesetPromise();
+    // Re-render MathJax after DOM update
+    if (window.MathJax && window.MathJax.typesetPromise) {
+        MathJax.typesetPromise().catch(err => console.warn('MathJax error:', err));
     }
 }
 
@@ -648,12 +648,48 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+/**
+ * Process text with LaTeX formulas
+ * Protects LaTeX from HTML escaping while escaping other content
+ */
+function formatMathSafe(text) {
+    if (!text) return '';
+    
+    // Placeholder for LaTeX blocks
+    const latexBlocks = [];
+    let processed = text;
+    
+    // Extract and protect display math ($$...$$) first
+    processed = processed.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
+        const idx = latexBlocks.length;
+        latexBlocks.push(`\\[${latex}\\]`);
+        return `%%LATEX_BLOCK_${idx}%%`;
+    });
+    
+    // Extract and protect inline math ($...$)
+    processed = processed.replace(/\$([^$]+)\$/g, (match, latex) => {
+        const idx = latexBlocks.length;
+        latexBlocks.push(`\\(${latex}\\)`);
+        return `%%LATEX_BLOCK_${idx}%%`;
+    });
+    
+    // Now escape HTML in the non-LaTeX parts
+    processed = escapeHtml(processed);
+    
+    // Convert newlines to <br>
+    processed = processed.replace(/\n/g, '<br>');
+    
+    // Restore LaTeX blocks
+    latexBlocks.forEach((latex, idx) => {
+        processed = processed.replace(`%%LATEX_BLOCK_${idx}%%`, latex);
+    });
+    
+    return processed;
+}
+
+// Legacy function for backward compatibility
 function formatMath(text) {
-    // Convert common physics notation to LaTeX
-    // This is a simple implementation; can be enhanced
-    return text
-        .replace(/\$([^$]+)\$/g, '\\($1\\)') // Inline math
-        .replace(/\n/g, '<br>');
+    return formatMathSafe(text);
 }
 
 // Chat history persistence
