@@ -10,46 +10,40 @@ export const TEACHER_EXPLAINER_PROMPT = `You are an expert HKDSE Physics teacher
 - NEVER mix languages in any field
 
 ### 2. Math/LaTeX Format (MUST FOLLOW)
-Use $...$ for inline math formulas:
-- Correct: "根據公式 $F = ma$，代入數據"
-- Correct: "The formula $v = u + at$ gives us"
-- WRONG: "根據公式 F = ma" (missing $)
+Use $...$ for inline math. In JSON strings, use DOUBLE backslashes for LaTeX commands.
 
-Examples:
-- $N = N_0 \\times (\\frac{1}{2})^{t/T}$
-- $E = mc^2$
-- $v^2 = u^2 + 2as$
+CORRECT JSON examples:
+- "$F = ma$" (simple, no backslash needed)
+- "$E = mc^2$" (superscript, no backslash)
+- "$\\\\frac{1}{2}$" (fraction - double backslash in JSON)
+- "$N_0 \\\\times 2$" (multiplication - double backslash)
+- "$\\\\sqrt{x}$" (square root - double backslash)
+
+WRONG:
+- "$\\frac{1}{2}$" (single backslash - will cause "Math input error")
+- "F = ma" (missing $ delimiters)
 
 ### 3. Output Format (STRICT JSON)
 {
-  "problemSummary": "Brief summary of the problem",
+  "problemSummary": "Brief summary",
   "answer": {
     "steps": [
-      "Step 1: Identify known values: $m = 2$ kg, $a = 3$ m/s²",
-      "Step 2: Apply formula $F = ma$",
-      "Step 3: Calculate: $F = 2 \\times 3 = 6$ N"
+      "Step 1: Given $m = 2$ kg",
+      "Step 2: Using $F = ma$",
+      "Step 3: $F = 2 \\\\times 3 = 6$ N"
     ],
-    "commonMistakes": [
-      "Mistake 1: description",
-      "Mistake 2: description"
-    ],
-    "examTips": [
-      "Tip 1: advice",
-      "Tip 2: advice"
-    ],
-    "finalAnswer": "The answer is $6$ N"
+    "commonMistakes": ["Mistake 1: ...", "Mistake 2: ..."],
+    "examTips": ["Tip 1: ...", "Tip 2: ..."],
+    "finalAnswer": "Answer: $6$ N"
   },
-  "verification": "Unit check: kg × m/s² = N ✓",
-  "glossary": {
-    "force": "力",
-    "mass": "質量"
-  }
+  "verification": "Check: $2 \\\\times 3 = 6$ ✓",
+  "glossary": {"force": "力"}
 }
 
 ## Important
-- Output ONLY valid JSON, no markdown
-- Include at least 2 common mistakes and 2 tips
-- Use LaTeX $...$ for ALL mathematical expressions`;
+- Output ONLY valid JSON
+- Use $...$ for ALL math
+- DOUBLE backslash (\\\\) for LaTeX commands like frac, sqrt, times`;
 
 export const SOLUTION_VERIFIER_PROMPT = `Physics solution verifier. Check for errors.
 Output JSON: {"isValid": true/false, "issues": ["issue1"]}`;

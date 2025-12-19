@@ -654,36 +654,36 @@ function escapeHtml(text) {
  */
 function formatMathSafe(text) {
     if (!text) return '';
-    
+
     // Placeholder for LaTeX blocks
     const latexBlocks = [];
     let processed = text;
-    
+
     // Extract and protect display math ($$...$$) first
     processed = processed.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
         const idx = latexBlocks.length;
         latexBlocks.push(`\\[${latex}\\]`);
         return `%%LATEX_BLOCK_${idx}%%`;
     });
-    
+
     // Extract and protect inline math ($...$)
     processed = processed.replace(/\$([^$]+)\$/g, (match, latex) => {
         const idx = latexBlocks.length;
         latexBlocks.push(`\\(${latex}\\)`);
         return `%%LATEX_BLOCK_${idx}%%`;
     });
-    
+
     // Now escape HTML in the non-LaTeX parts
     processed = escapeHtml(processed);
-    
+
     // Convert newlines to <br>
     processed = processed.replace(/\n/g, '<br>');
-    
+
     // Restore LaTeX blocks
     latexBlocks.forEach((latex, idx) => {
         processed = processed.replace(`%%LATEX_BLOCK_${idx}%%`, latex);
     });
-    
+
     return processed;
 }
 
