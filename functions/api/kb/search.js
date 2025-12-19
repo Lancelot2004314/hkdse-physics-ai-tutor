@@ -3,7 +3,7 @@
  * Semantic search for relevant content
  */
 
-import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
+import { getUserFromSession } from '../../../shared/auth.js';
 import { searchKnowledgeBase, formatKnowledgeContext } from '../../../shared/embedding.js';
 
 const corsHeaders = {

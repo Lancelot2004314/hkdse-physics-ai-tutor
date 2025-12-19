@@ -131,6 +131,17 @@ export async function getUserFromSession(request, env) {
   }
 }
 
+// Check if user is admin
+export function isAdmin(email, env) {
+  if (!email) return false;
+
+  // Get admin emails from environment variable
+  const adminEmails = env.ADMIN_EMAILS || '';
+  const adminList = adminEmails.split(',').map(e => e.trim().toLowerCase());
+
+  return adminList.includes(email.toLowerCase());
+}
+
 // CORS headers
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
