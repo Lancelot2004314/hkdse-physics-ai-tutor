@@ -116,7 +116,7 @@ export async function onRequestPost(context) {
     // Combine results
     const finalResult = {
       ...parsedResponse,
-      verification: verificationResult?.suggestions?.length 
+      verification: verificationResult?.suggestions?.length
         ? parsedResponse.verification + ' | ' + verificationResult.suggestions.join(', ')
         : parsedResponse.verification,
     };
@@ -232,7 +232,7 @@ async function verifySolution(apiKey, solutionJson) {
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content;
-    
+
     if (text) {
       return JSON.parse(text);
     }

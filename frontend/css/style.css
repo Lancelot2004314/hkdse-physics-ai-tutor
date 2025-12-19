@@ -549,3 +549,83 @@ body {
     border-radius: 8px;
     margin-bottom: 15px;
 }
+
+/* Debug Section */
+.debug-section {
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    padding: 15px;
+    margin-top: 20px;
+    border: 1px solid var(--warning);
+}
+
+.debug-section .collapse-toggle {
+    background: transparent;
+    border: none;
+    color: var(--warning);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px;
+}
+
+.debug-content {
+    margin-top: 15px;
+}
+
+.debug-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-small {
+    padding: 5px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.btn-small:hover {
+    background: var(--border);
+}
+
+#debugLog {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 0.75rem;
+    color: #58a6ff;
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+#debugLog .log-time {
+    color: #8b949e;
+}
+
+#debugLog .log-info {
+    color: #58a6ff;
+}
+
+#debugLog .log-success {
+    color: #3fb950;
+}
+
+#debugLog .log-error {
+    color: #f85149;
+}
+
+#debugLog .log-data {
+    color: #d2a8ff;
+}

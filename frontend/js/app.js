@@ -7,6 +7,47 @@ let problemSummary = null;
 let previousAnswer = null;
 let chatHistory = [];
 
+// Debug Logger
+const debugLog = {
+    logs: [],
+    add(type, message, data = null) {
+        const time = new Date().toLocaleTimeString();
+        const entry = { time, type, message, data };
+        this.logs.push(entry);
+        this.render();
+        console.log(`[${time}] ${type}: ${message}`, data || '');
+    },
+    info(msg, data) { this.add('info', msg, data); },
+    success(msg, data) { this.add('success', msg, data); },
+    error(msg, data) { this.add('error', msg, data); },
+    clear() {
+        this.logs = [];
+        this.render();
+    },
+    render() {
+        const el = document.getElementById('debugLog');
+        if (!el) return;
+        el.innerHTML = this.logs.map(log => {
+            let dataStr = '';
+            if (log.data) {
+                try {
+                    dataStr = '\n' + JSON.stringify(log.data, null, 2);
+                } catch {
+                    dataStr = '\n' + String(log.data);
+                }
+            }
+            return `<span class="log-time">[${log.time}]</span> <span class="log-${log.type}">${log.message}</span>${dataStr ? `<span class="log-data">${dataStr}</span>` : ''}`;
+        }).join('\n\n');
+        el.scrollTop = el.scrollHeight;
+    },
+    getText() {
+        return this.logs.map(log => {
+            let dataStr = log.data ? '\n' + JSON.stringify(log.data, null, 2) : '';
+            return `[${log.time}] ${log.type}: ${log.message}${dataStr}`;
+        }).join('\n\n');
+    }
+};
+
 // DOM Elements
 const uploadArea = document.getElementById('uploadArea');
 const imageInput = document.getElementById('imageInput');
@@ -38,7 +79,34 @@ const API_BASE = '/api';
 document.addEventListener('DOMContentLoaded', () => {
     initializeEventListeners();
     loadChatHistory();
+    initializeDebugPanel();
+    debugLog.info('App initialized');
 });
+
+function initializeDebugPanel() {
+    const toggleDebug = document.getElementById('toggleDebug');
+    const debugContent = document.getElementById('debugContent');
+    const clearDebug = document.getElementById('clearDebug');
+    const copyDebug = document.getElementById('copyDebug');
+
+    if (toggleDebug) {
+        toggleDebug.addEventListener('click', () => {
+            debugContent.hidden = !debugContent.hidden;
+        });
+    }
+
+    if (clearDebug) {
+        clearDebug.addEventListener('click', () => debugLog.clear());
+    }
+
+    if (copyDebug) {
+        copyDebug.addEventListener('click', () => {
+            navigator.clipboard.writeText(debugLog.getText())
+                .then(() => alert('已複製到剪貼板'))
+                .catch(() => alert('複製失敗'));
+        });
+    }
+}
 
 function initializeEventListeners() {
     // Upload area click
@@ -205,7 +273,23 @@ async function handleSubmit() {
     resultsSection.hidden = true;
     chatSection.hidden = true;
 
+    const requestBody = {
+        image: currentImageBase64.substring(0, 100) + '...[truncated]',
+        question: questionInput.value.trim(),
+        studentLevel: levelSelect.value,
+        mode: modeSelect.value,
+        studentAttempt: studentAttempt.value.trim() || undefined,
+    };
+
+    debugLog.info('Sending request to /api/explain-image', {
+        imageSize: currentImageBase64.length,
+        question: requestBody.question,
+        level: requestBody.studentLevel,
+        mode: requestBody.mode
+    });
+
     try {
+        const startTime = Date.now();
         const response = await fetch(`${API_BASE}/explain-image`, {
             method: 'POST',
             headers: {
@@ -220,23 +304,35 @@ async function handleSubmit() {
             }),
         });
 
+        const duration = Date.now() - startTime;
+        debugLog.info(`Response received in ${duration}ms`, { status: response.status });
+
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
+            const errorText = await response.text();
+            debugLog.error('API Error Response', { status: response.status, body: errorText });
+            let errorData;
+            try {
+                errorData = JSON.parse(errorText);
+            } catch {
+                errorData = { error: errorText };
+            }
             throw new Error(errorData.error || `請求失敗 (${response.status})`);
         }
 
         const data = await response.json();
+        debugLog.success('API Success', data);
         displayResults(data);
-        
+
         // Save for chat context
         problemSummary = data.problemSummary;
         previousAnswer = data.answer;
-        
+
         // Show chat section
         chatSection.hidden = false;
         newQuestionBtn.hidden = false;
 
     } catch (err) {
+        debugLog.error('Request failed', { message: err.message, stack: err.stack });
         showError(err.message || '處理失敗，請重試');
         console.error(err);
     } finally {
@@ -332,7 +428,14 @@ async function handleChatSend() {
     chatHistory.push({ role: 'user', content: message });
     saveChatHistory();
 
+    debugLog.info('Sending followup request', {
+        question: message,
+        needsVision: needsVision.checked,
+        historyLength: chatHistory.length
+    });
+
     try {
+        const startTime = Date.now();
         const response = await fetch(`${API_BASE}/followup`, {
             method: 'POST',
             headers: {
@@ -348,17 +451,28 @@ async function handleChatSend() {
             }),
         });
 
+        const duration = Date.now() - startTime;
+        debugLog.info(`Followup response in ${duration}ms`, { status: response.status });
+
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
+            const errorText = await response.text();
+            debugLog.error('Followup API Error', { status: response.status, body: errorText });
+            let errorData;
+            try {
+                errorData = JSON.parse(errorText);
+            } catch {
+                errorData = { error: errorText };
+            }
             throw new Error(errorData.error || `請求失敗 (${response.status})`);
         }
 
         const data = await response.json();
-        
+        debugLog.success('Followup success', data);
+
         // Add assistant reply to chat
         const replyText = formatChatReply(data.reply);
         addChatMessage(replyText, 'assistant');
-        
+
         // Add to history
         chatHistory.push({ role: 'assistant', content: replyText });
         saveChatHistory();
@@ -369,6 +483,7 @@ async function handleChatSend() {
         }
 
     } catch (err) {
+        debugLog.error('Followup failed', { message: err.message });
         addChatMessage(`錯誤：${err.message}`, 'assistant');
         console.error(err);
     }
