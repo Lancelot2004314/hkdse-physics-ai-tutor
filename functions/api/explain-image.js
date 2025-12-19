@@ -87,7 +87,7 @@ export async function onRequestPost(context) {
 
     // Track OpenAI token usage
     if (visionResult.usage && env.DB) {
-      await saveTokenUsage(env.DB, user?.id || null, 'openai-gpt4o', visionResult.usage, 'explain-image');
+      await saveTokenUsage(env.DB, user?.id || null, 'openai-gpt4o-mini', visionResult.usage, 'explain-image');
     }
 
     // Parse OpenAI response
@@ -154,7 +154,7 @@ async function callOpenAIVision(apiKey, base64Data, mimeType, systemPrompt, user
   const url = 'https://api.openai.com/v1/chat/completions';
 
   const requestBody = {
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',  // Using mini for better availability
     messages: [
       {
         role: 'system',

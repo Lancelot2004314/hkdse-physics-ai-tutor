@@ -62,7 +62,7 @@ export async function onRequestPost(context) {
         return errorResponse(500, 'OpenAI API not configured');
       }
       result = await callOpenAIVision(env.OPENAI_API_KEY, image, prompt, followupQuestion);
-      modelUsed = 'openai-gpt4o';
+      modelUsed = 'openai-gpt4o-mini';
     } else {
       // Use DeepSeek for text-only followups (cheaper)
       if (!env.DEEPSEEK_API_KEY) {
@@ -181,7 +181,7 @@ async function callOpenAIVision(apiKey, imageBase64, systemPrompt, userQuestion)
   const mimeType = imageBase64.match(/^data:(image\/\w+);base64,/)?.[1] || 'image/jpeg';
 
   const requestBody = {
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',  // Using mini for better availability
     messages: [
       {
         role: 'system',
