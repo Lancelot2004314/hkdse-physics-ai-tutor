@@ -4,6 +4,8 @@
  */
 
 import { TEACHER_EXPLAINER_PROMPT, SOLUTION_VERIFIER_PROMPT } from '../../shared/prompts.js';
+import { getUserFromSession } from '../../shared/auth.js';
+import { saveTokenUsage } from '../../shared/tokenUsage.js';
 
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 const REQUEST_TIMEOUT = 60000; // 60 seconds
@@ -65,6 +67,9 @@ export async function onRequestPost(context) {
       userPrompt += `\n\n學生答案/思路：${studentAttempt}`;
     }
 
+    // Get user from session (if logged in)
+    const user = await getUserFromSession(request, env);
+
     // Call Qwen Vision
     const visionResult = await callQwenVision(
       qwenApiKey,
@@ -76,6 +81,11 @@ export async function onRequestPost(context) {
 
     if (!visionResult.success) {
       return errorResponse(500, visionResult.error || 'AI 分析失敗');
+    }
+
+    // Track Qwen token usage
+    if (visionResult.usage && env.DB) {
+      await saveTokenUsage(env.DB, user?.id || null, 'qwen-vl', visionResult.usage, 'explain-image');
     }
 
     // Parse Qwen response
@@ -111,6 +121,10 @@ export async function onRequestPost(context) {
         env.DEEPSEEK_API_KEY,
         JSON.stringify(parsedResponse)
       );
+      // Track DeepSeek verification token usage
+      if (verificationResult?.usage && env.DB) {
+        await saveTokenUsage(env.DB, user?.id || null, 'deepseek', verificationResult.usage, 'explain-image-verify');
+      }
     }
 
     // Combine results
@@ -191,7 +205,10 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
       return { success: false, error: '無法解析 AI 回覆' };
     }
 
-    return { success: true, text };
+    // Extract usage info from Qwen response
+    const usage = data.usage || null;
+
+    return { success: true, text, usage };
 
   } catch (err) {
     if (err.name === 'AbortError') {
@@ -232,9 +249,11 @@ async function verifySolution(apiKey, solutionJson) {
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content;
+    const usage = data.usage || null;
 
     if (text) {
-      return JSON.parse(text);
+      const parsed = JSON.parse(text);
+      return { ...parsed, usage };
     }
   } catch (err) {
     console.error('Verification failed:', err);

@@ -4,6 +4,8 @@
  */
 
 import { FOLLOWUP_PROMPT } from '../../shared/prompts.js';
+import { getUserFromSession } from '../../shared/auth.js';
+import { saveTokenUsage } from '../../shared/tokenUsage.js';
 
 const REQUEST_TIMEOUT = 30000; // 30 seconds
 
@@ -41,6 +43,9 @@ export async function onRequestPost(context) {
       return errorResponse(400, '缺少題目上下文');
     }
 
+    // Get user from session (if logged in)
+    const user = await getUserFromSession(request, env);
+
     // Build prompt
     const prompt = FOLLOWUP_PROMPT
       .replace('{problemSummary}', problemSummary || 'N/A')
@@ -49,16 +54,24 @@ export async function onRequestPost(context) {
 
     // Choose API based on needsVision
     let result;
+    let modelUsed;
     if (needsVision && image) {
       // Use Qwen Vision for image-related followups
       result = await callQwenVision(env.QWEN_API_KEY, image, prompt, followupQuestion);
+      modelUsed = 'qwen-vl';
     } else {
       // Use DeepSeek for text-only followups (cheaper)
       result = await callDeepSeek(env.DEEPSEEK_API_KEY, prompt, followupQuestion, chatHistory);
+      modelUsed = 'deepseek';
     }
 
     if (!result.success) {
       return errorResponse(500, result.error || 'AI 回覆失敗');
+    }
+
+    // Track token usage
+    if (result.usage && env.DB) {
+      await saveTokenUsage(env.DB, user?.id || null, modelUsed, result.usage, 'followup');
     }
 
     // Parse response
@@ -141,12 +154,13 @@ async function callDeepSeek(apiKey, systemPrompt, userQuestion, chatHistory) {
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content;
+    const usage = data.usage || null;
 
     if (!text) {
       return { success: false, error: '無法解析 AI 回覆' };
     }
 
-    return { success: true, text };
+    return { success: true, text, usage };
 
   } catch (err) {
     if (err.name === 'AbortError') {
@@ -211,12 +225,13 @@ async function callQwenVision(apiKey, imageBase64, systemPrompt, userQuestion) {
 
     const data = await response.json();
     const text = data.output?.choices?.[0]?.message?.content?.[0]?.text;
+    const usage = data.usage || null;
 
     if (!text) {
       return { success: false, error: '無法解析 AI 回覆' };
     }
 
-    return { success: true, text };
+    return { success: true, text, usage };
 
   } catch (err) {
     if (err.name === 'AbortError') {

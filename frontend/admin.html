@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <header class="admin-header">
+            <h1><i class="fas fa-cog"></i> Admin Panel</h1>
+            <div class="admin-user">
+                <span id="adminEmail">Loading...</span>
+                <a href="/" class="btn-back"><i class="fas fa-arrow-left"></i> 返回主頁</a>
+            </div>
+        </header>
+
+        <!-- Loading State -->
+        <div class="loading-state" id="loadingState">
+            <div class="spinner"></div>
+            <p>載入中...</p>
+        </div>
+
+        <!-- Error State -->
+        <div class="error-state" id="errorState" hidden>
+            <i class="fas fa-exclamation-triangle"></i>
+            <p id="errorMessage">無權限訪問</p>
+            <a href="/" class="btn-primary">返回主頁</a>
+        </div>
+
+        <!-- Main Content -->
+        <main class="admin-main" id="adminMain" hidden>
+            <!-- Stats Cards -->
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-content">
+                        <h3>總用戶數</h3>
+                        <p class="stat-value" id="totalUsers">-</p>
+                        <span class="stat-sub">今日新增: <span id="todayUsers">-</span></span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-history"></i></div>
+                    <div class="stat-content">
+                        <h3>歷史記錄</h3>
+                        <p class="stat-value" id="totalHistory">-</p>
+                        <span class="stat-sub">今日使用: <span id="todayHistory">-</span></span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon deepseek"><i class="fas fa-robot"></i></div>
+                    <div class="stat-content">
+                        <h3>DeepSeek Tokens</h3>
+                        <p class="stat-value" id="deepseekTokens">-</p>
+                        <span class="stat-sub">今日: <span id="todayDeepseek">-</span></span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon qwen"><i class="fas fa-eye"></i></div>
+                    <div class="stat-content">
+                        <h3>Qwen-VL Tokens</h3>
+                        <p class="stat-value" id="qwenTokens">-</p>
+                        <span class="stat-sub">今日: <span id="todayQwen">-</span></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="users">
+                    <i class="fas fa-users"></i> 用戶列表
+                </button>
+                <button class="tab-btn" data-tab="history">
+                    <i class="fas fa-history"></i> 歷史記錄
+                </button>
+            </div>
+
+            <!-- Users Tab -->
+            <section class="tab-content active" id="usersTab">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>郵箱</th>
+                                <th>註冊時間</th>
+                                <th>使用次數</th>
+                                <th>Token 用量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr><td colspan="5" class="loading-cell">載入中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="usersPagination"></div>
+            </section>
+
+            <!-- History Tab -->
+            <section class="tab-content" id="historyTab" hidden>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>題目摘要</th>
+                                <th>用戶</th>
+                                <th>類型</th>
+                                <th>時間</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="5" class="loading-cell">載入中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="historyPagination"></div>
+            </section>
+        </main>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal" id="deleteModal" hidden>
+            <div class="modal-content">
+                <h2><i class="fas fa-exclamation-triangle"></i> 確認刪除</h2>
+                <p id="deleteMessage">確定要刪除嗎？此操作無法撤銷。</p>
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="cancelDelete">取消</button>
+                    <button class="btn-danger" id="confirmDelete">確認刪除</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Modal -->
+        <div class="modal" id="detailModal" hidden>
+            <div class="modal-content modal-large">
+                <button class="modal-close" id="closeDetail">&times;</button>
+                <h2><i class="fas fa-info-circle"></i> 詳細信息</h2>
+                <div id="detailContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

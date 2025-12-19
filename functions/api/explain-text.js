@@ -5,6 +5,8 @@
  */
 
 import { TEACHER_EXPLAINER_PROMPT, SOCRATIC_TUTOR_PROMPT } from '../../shared/prompts.js';
+import { getUserFromSession } from '../../shared/auth.js';
+import { saveTokenUsage } from '../../shared/tokenUsage.js';
 
 const REQUEST_TIMEOUT = 60000; // 60 seconds
 
@@ -59,11 +61,19 @@ export async function onRequestPost(context) {
       userPrompt += `\n\n學生答案/思路：${studentAttempt}`;
     }
 
+    // Get user from session (if logged in)
+    const user = await getUserFromSession(request, env);
+
     // Call DeepSeek API
     const result = await callDeepSeek(deepseekApiKey, systemPrompt, userPrompt);
 
     if (!result.success) {
       return errorResponse(500, result.error || 'AI 分析失敗');
+    }
+
+    // Track DeepSeek token usage
+    if (result.usage && env.DB) {
+      await saveTokenUsage(env.DB, user?.id || null, 'deepseek', result.usage, 'explain-text');
     }
 
     // Parse DeepSeek response
@@ -170,13 +180,14 @@ async function callDeepSeek(apiKey, systemPrompt, userPrompt) {
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content;
+    const usage = data.usage || null;
 
     if (!text) {
       console.error('DeepSeek response:', JSON.stringify(data));
       return { success: false, error: '無法解析 AI 回覆' };
     }
 
-    return { success: true, text };
+    return { success: true, text, usage };
 
   } catch (err) {
     if (err.name === 'AbortError') {
