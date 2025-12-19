@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,16 +11,74 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
         <header class="header">
             <h1><i class="fas fa-atom"></i> HKDSE Physics AI Tutor</h1>
             <p>上傳題目照片，獲得 DSE 風格分步講解</p>
+
+            <!-- Auth Section -->
+            <div class="auth-section" id="authSection">
+                <!-- Logged out state -->
+                <div class="auth-logged-out" id="authLoggedOut">
+                    <button class="btn-auth" id="showLoginBtn">
+                        <i class="fas fa-sign-in-alt"></i> 登入同步歷史
+                    </button>
+                </div>
+                <!-- Logged in state -->
+                <div class="auth-logged-in" id="authLoggedIn" hidden>
+                    <span class="user-email" id="userEmail"></span>
+                    <button class="btn-auth btn-logout" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> 登出
+                    </button>
+                </div>
+            </div>
         </header>
+
+        <!-- Login Modal -->
+        <div class="modal" id="loginModal" hidden>
+            <div class="modal-content">
+                <button class="modal-close" id="closeLoginModal">&times;</button>
+                <h2><i class="fas fa-envelope"></i> 電郵登入</h2>
+                <p>輸入電郵地址，我們會發送登入連結給你</p>
+                <div class="input-group">
+                    <input type="email" id="loginEmail" placeholder="your@email.com">
+                </div>
+                <button class="btn-primary" id="sendMagicLinkBtn">
+                    <i class="fas fa-paper-plane"></i> 發送登入連結
+                </button>
+                <div class="login-status" id="loginStatus" hidden></div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <section class="history-section" id="historySection" hidden>
+            <div class="history-header">
+                <h2><i class="fas fa-history"></i> 歷史記錄</h2>
+                <button class="btn-small" id="refreshHistoryBtn">
+                    <i class="fas fa-sync-alt"></i> 刷新
+                </button>
+            </div>
+            <div class="history-list" id="historyList">
+                <p class="history-empty">暫無歷史記錄</p>
+            </div>
+        </section>
 
         <!-- Upload Section -->
         <section class="upload-section" id="uploadSection">
+            <!-- Input Mode Toggle -->
+            <div class="input-mode-toggle">
+                <button type="button" class="mode-btn active" id="modeImage" data-mode="image">
+                    <i class="fas fa-image"></i> 圖片題
+                </button>
+                <button type="button" class="mode-btn" id="modeText" data-mode="text">
+                    <i class="fas fa-keyboard"></i> 文字題
+                </button>
+            </div>
+
+            <!-- Image Upload Area -->
             <div class="upload-area" id="uploadArea">
                 <input type="file" id="imageInput" accept="image/*" capture="environment" hidden>
                 <div class="upload-placeholder" id="uploadPlaceholder">
@@ -33,6 +92,13 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
+            </div>
+
+            <!-- Text Input Area (for text mode) -->
+            <div class="input-group text-input-area" id="textInputArea" hidden>
+                <label for="problemText">題目內容（純文字）</label>
+                <textarea id="problemText" rows="6"
+                    placeholder="在此輸入或貼上題目內容...&#10;&#10;例如：&#10;一個質量為 2 kg 的物體從 10 m 高處自由下落，求落地時的速度。（設 g = 10 m/s²）"></textarea>
             </div>
 
             <!-- Question Input -->
@@ -167,4 +233,5 @@
 
     <script src="js/app.js"></script>
 </body>
+
 </html>
