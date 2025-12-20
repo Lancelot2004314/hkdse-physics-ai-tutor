@@ -210,128 +210,154 @@ export async function onRequestPost(context) {
 }
 
 /**
- * Extract text from PDF using GPT-4o Vision
- * Converts PDF pages to images and uses OCR
+ * Extract text from PDF using Gemini 3 Pro
+ * Uses Google's latest model for superior document understanding
  */
 async function extractTextFromPDF(file, env) {
+  if (!env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY not configured');
+  }
+
   // Read file as base64
   const arrayBuffer = await file.arrayBuffer();
-  const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+  const uint8Array = new Uint8Array(arrayBuffer);
+  let base64 = '';
+  const chunkSize = 8192;
+  for (let i = 0; i < uint8Array.length; i += chunkSize) {
+    const chunk = uint8Array.slice(i, i + chunkSize);
+    base64 += String.fromCharCode.apply(null, chunk);
+  }
+  base64 = btoa(base64);
 
-  // For PDF, we'll send it to GPT-4o and ask it to extract all text
-  // Note: GPT-4o can process PDF directly in some cases, but for better results
-  // we describe it as a document extraction task
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${env.GEMINI_API_KEY}`;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
-      messages: [
+      contents: [
         {
-          role: 'system',
-          content: `You are a document text extractor. Extract ALL text content from the provided document image(s).
-          
+          parts: [
+            {
+              text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this document.
+
 Important instructions:
 - Extract every question, answer, and explanation exactly as written
-- Preserve question numbers (Q1, Q2, etc.)
-- Preserve mathematical formulas and equations
-- Preserve the structure (MC options A/B/C/D, long questions, etc.)
+- Preserve question numbers (Q1, Q2, Q.1, etc.)
+- Preserve mathematical formulas and equations (use LaTeX format like $F=ma$)
+- Preserve the structure (MC options A/B/C/D, long questions, marking schemes)
 - Output ONLY the extracted text, no commentary
-- If there are multiple pages, extract text from all pages in order`
-        },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:application/pdf;base64,${base64}`,
-                detail: 'high'
-              }
+- If there are multiple pages, extract text from all pages in order
+- For Chinese text, preserve the original Chinese characters`
             },
             {
-              type: 'text',
-              text: 'Extract all text content from this HKDSE Physics document. Include all questions, answers, and marking schemes.'
+              inline_data: {
+                mime_type: 'application/pdf',
+                data: base64
+              }
             }
           ]
         }
       ],
-      max_tokens: 16000,
-      temperature: 0.1,
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 32000,
+      }
     }),
   });
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('GPT-4o OCR error:', error);
-    throw new Error('Failed to extract text from PDF');
+    console.error('Gemini 3 Pro OCR error:', error);
+    throw new Error('Failed to extract text from PDF: ' + response.status);
   }
 
   const data = await response.json();
-  return data.choices?.[0]?.message?.content || '';
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+  if (!text) {
+    console.error('Empty response from Gemini 3 Pro:', JSON.stringify(data));
+    throw new Error('Empty response from Gemini 3 Pro');
+  }
+
+  return text;
 }
 
 /**
- * Extract text from image using GPT-4o Vision
+ * Extract text from image using Gemini 3 Pro
  */
 async function extractTextFromImage(file, env) {
+  if (!env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY not configured');
+  }
+
   const arrayBuffer = await file.arrayBuffer();
-  const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+  const uint8Array = new Uint8Array(arrayBuffer);
+  let base64 = '';
+  const chunkSize = 8192;
+  for (let i = 0; i < uint8Array.length; i += chunkSize) {
+    const chunk = uint8Array.slice(i, i + chunkSize);
+    base64 += String.fromCharCode.apply(null, chunk);
+  }
+  base64 = btoa(base64);
+
   const mimeType = file.type;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${env.GEMINI_API_KEY}`;
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
-      messages: [
+      contents: [
         {
-          role: 'system',
-          content: `You are a document text extractor. Extract ALL text content from the image.
-          
+          parts: [
+            {
+              text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this image.
+
 Important instructions:
 - Extract every question, answer, and explanation exactly as written
-- Preserve question numbers (Q1, Q2, etc.)
-- Preserve mathematical formulas and equations
-- Output ONLY the extracted text, no commentary`
-        },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${mimeType};base64,${base64}`,
-                detail: 'high'
-              }
+- Preserve question numbers (Q1, Q2, Q.1, etc.)
+- Preserve mathematical formulas and equations (use LaTeX format like $F=ma$)
+- Preserve the structure (MC options A/B/C/D, long questions, marking schemes)
+- Output ONLY the extracted text, no commentary
+- For Chinese text, preserve the original Chinese characters`
             },
             {
-              type: 'text',
-              text: 'Extract all text content from this HKDSE Physics document image.'
+              inline_data: {
+                mime_type: mimeType,
+                data: base64
+              }
             }
           ]
         }
       ],
-      max_tokens: 8000,
-      temperature: 0.1,
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 16000,
+      }
     }),
   });
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('GPT-4o OCR error:', error);
-    throw new Error('Failed to extract text from image');
+    console.error('Gemini 3 Pro OCR error:', error);
+    throw new Error('Failed to extract text from image: ' + response.status);
   }
 
   const data = await response.json();
-  return data.choices?.[0]?.message?.content || '';
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+  if (!text) {
+    console.error('Empty response from Gemini 3 Pro:', JSON.stringify(data));
+    throw new Error('Empty response from Gemini 3 Pro');
+  }
+
+  return text;
 }
 
 async function updateDocumentStatus(db, docId, status) {
