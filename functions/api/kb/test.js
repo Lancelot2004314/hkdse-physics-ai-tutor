@@ -62,7 +62,7 @@ export async function onRequestGet(context) {
  */
 async function testD1(env) {
   const start = Date.now();
-  
+
   if (!env.DB) {
     return {
       status: 'error',
@@ -75,7 +75,7 @@ async function testD1(env) {
     // Test with a simple query
     const result = await env.DB.prepare('SELECT COUNT(*) as count FROM kb_documents').first();
     const latency = Date.now() - start;
-    
+
     return {
       status: 'ok',
       message: `Connected (${result?.count || 0} documents)`,
@@ -114,7 +114,7 @@ async function testVectorize(env) {
     // Vectorize doesn't have a describe method, so we'll try a dummy query
     const dummyVector = new Array(1536).fill(0);
     const result = await env.VECTORIZE.query(dummyVector, { topK: 1 });
-    
+
     return {
       status: 'ok',
       message: `Index ready (${result.matches?.length || 0} test matches)`,
@@ -215,8 +215,8 @@ async function testGemini(env) {
 
   try {
     // Test with a simple text generation request
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
-    
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${env.GEMINI_API_KEY}`;
+
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -271,7 +271,7 @@ async function testR2(env) {
   try {
     // Try to list objects (limit 1)
     const list = await env.R2_BUCKET.list({ limit: 1 });
-    
+
     return {
       status: 'ok',
       message: `Bucket accessible (${list.objects?.length || 0}+ files)`,

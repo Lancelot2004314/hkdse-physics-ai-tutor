@@ -435,8 +435,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
 
         .connection-icon {
@@ -517,7 +524,7 @@
         }
 
         .hint-card code {
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 12px;
@@ -1243,7 +1250,7 @@
             const badge = document.getElementById(`badge-${service}`);
 
             card.className = `connection-card ${result.status}`;
-            
+
             let statusText = result.message;
             if (result.latency) {
                 statusText += ` (${result.latency})`;
