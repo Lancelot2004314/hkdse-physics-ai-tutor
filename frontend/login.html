@@ -407,11 +407,15 @@
             try {
                 const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
                 if (response.ok) {
-                    // Already logged in, redirect to dashboard
-                    showSuccess();
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 1000);
+                    const data = await response.json();
+                    // Check if user is actually logged in (not null)
+                    if (data.user && data.user.email) {
+                        // Already logged in, redirect to dashboard
+                        showSuccess();
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 1000);
+                    }
                 }
             } catch (err) {
                 console.error('Auth check error:', err);
