@@ -39,9 +39,9 @@ export async function onRequestPost(context) {
       return errorResponse(500, '服務配置錯誤');
     }
 
-    // Get redirect URI (same as used in authorization)
+    // Get redirect URI (same as used in authorization) - must match url.js
     const url = new URL(request.url);
-    const redirectUri = `${url.origin}/`;
+    const redirectUri = `${url.origin}/login.html`;
 
     // Exchange code for access token
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {

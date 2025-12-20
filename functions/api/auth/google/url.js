@@ -19,9 +19,9 @@ export async function onRequestGet(context) {
       return errorResponse(500, '服務配置錯誤');
     }
 
-    // Get the origin for redirect URI
+    // Get the origin for redirect URI - use login.html for OAuth callback
     const url = new URL(request.url);
-    const redirectUri = `${url.origin}/`;
+    const redirectUri = `${url.origin}/login.html`;
 
     // Build Google OAuth URL
     const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');

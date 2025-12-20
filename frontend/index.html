@@ -208,10 +208,10 @@
             await checkAuth();
             initEventListeners();
 
-            // Check for login redirect
+            // Check for login redirect - go to login page
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('login') === 'true' && !currentUser) {
-                document.getElementById('loginModal').hidden = false;
+                window.location.href = '/login.html';
             }
         });
 
@@ -309,20 +309,34 @@
         }
 
         function initEventListeners() {
-            // Login button
+            // Login button - redirect to dedicated login page
             document.getElementById('loginBtn').addEventListener('click', () => {
-                document.getElementById('loginModal').hidden = false;
+                window.location.href = '/login.html';
             });
 
-            // Close modal
-            document.getElementById('closeLoginModal').addEventListener('click', () => {
-                document.getElementById('loginModal').hidden = true;
-            });
+            // Close modal (keep for backwards compatibility)
+            const closeBtn = document.getElementById('closeLoginModal');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    document.getElementById('loginModal').hidden = true;
+                });
+            }
 
-            // Google login
-            document.getElementById('googleLoginBtn').addEventListener('click', () => {
-                window.location.href = `${API_BASE}/auth/google`;
-            });
+            // Google login in modal (if exists)
+            const googleBtn = document.getElementById('googleLoginBtn');
+            if (googleBtn) {
+                googleBtn.addEventListener('click', async () => {
+                    try {
+                        const response = await fetch(`${API_BASE}/auth/google/url`);
+                        const data = await response.json();
+                        if (response.ok && data.url) {
+                            window.location.href = data.url;
+                        }
+                    } catch (err) {
+                        console.error('OAuth error:', err);
+                    }
+                });
+            }
 
             // Logout
             document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -331,11 +345,14 @@
             });
 
             // Click outside modal to close
-            document.getElementById('loginModal').addEventListener('click', (e) => {
-                if (e.target.id === 'loginModal') {
-                    document.getElementById('loginModal').hidden = true;
-                }
-            });
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) {
+                loginModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'loginModal') {
+                        loginModal.hidden = true;
+                    }
+                });
+            }
         }
     </script>
 </body>
