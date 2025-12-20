@@ -219,10 +219,16 @@
             try {
                 const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
                 if (response.ok) {
-                    currentUser = await response.json();
-                    updateUIForLoggedInUser();
-                    loadUserStats();
-                    loadRecentActivity();
+                    const data = await response.json();
+                    // Extract user from response - API returns { user: {...} }
+                    currentUser = data.user;
+                    if (currentUser && currentUser.email) {
+                        updateUIForLoggedInUser();
+                        loadUserStats();
+                        loadRecentActivity();
+                    } else {
+                        updateUIForGuest();
+                    }
                 } else {
                     updateUIForGuest();
                 }
