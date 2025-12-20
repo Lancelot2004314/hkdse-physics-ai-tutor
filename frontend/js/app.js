@@ -1261,8 +1261,9 @@ async function checkAdminAccess() {
     } catch (err) {
         // Not admin or error, keep hidden
     }
+}
 
-    async function loginWithGoogle() {
+async function loginWithGoogle() {
         googleLoginBtn.disabled = true;
         googleLoginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 跳轉中...';
 

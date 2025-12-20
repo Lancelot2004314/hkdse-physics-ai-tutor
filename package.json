@@ -8,7 +8,14 @@
     "deploy": "wrangler pages deploy frontend --project-name hkdse-physics-ai-tutor",
     "tail": "wrangler pages deployment tail --project-name hkdse-physics-ai-tutor"
   },
-  "keywords": ["hkdse", "physics", "ai", "tutor", "cloudflare", "education"],
+  "keywords": [
+    "hkdse",
+    "physics",
+    "ai",
+    "tutor",
+    "cloudflare",
+    "education"
+  ],
   "author": "Lancelot",
   "license": "MIT",
   "devDependencies": {
