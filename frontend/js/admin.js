@@ -8,39 +8,46 @@ let usersPage = 1;
 let historyPage = 1;
 let deleteTarget = null;
 
-// DOM Elements
-const loadingState = document.getElementById('loadingState');
-const errorState = document.getElementById('errorState');
-const errorMessage = document.getElementById('errorMessage');
-const adminMain = document.getElementById('adminMain');
-const adminEmail = document.getElementById('adminEmail');
-
-// Stats elements
-const totalUsers = document.getElementById('totalUsers');
-const todayUsers = document.getElementById('todayUsers');
-const totalHistory = document.getElementById('totalHistory');
-const todayHistory = document.getElementById('todayHistory');
-const deepseekTokens = document.getElementById('deepseekTokens');
-const todayDeepseek = document.getElementById('todayDeepseek');
-const qwenTokens = document.getElementById('qwenTokens');
-const todayQwen = document.getElementById('todayQwen');
-
-// Table elements
-const usersTableBody = document.getElementById('usersTableBody');
-const historyTableBody = document.getElementById('historyTableBody');
-const usersPagination = document.getElementById('usersPagination');
-const historyPagination = document.getElementById('historyPagination');
-
-// Modals
-const deleteModal = document.getElementById('deleteModal');
-const deleteMessageEl = document.getElementById('deleteMessage');
-const detailModal = document.getElementById('detailModal');
-const detailContent = document.getElementById('detailContent');
+// DOM Elements - initialized after DOMContentLoaded
+let loadingState, errorState, errorMessage, adminMain, adminEmail;
+let totalUsers, todayUsers, totalHistory, todayHistory;
+let deepseekTokens, todayDeepseek, qwenTokens, todayQwen;
+let usersTableBody, historyTableBody, usersPagination, historyPagination;
+let deleteModal, deleteMessageEl, detailModal, detailContent;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
+    // Get DOM elements after page load
+    loadingState = document.getElementById('loadingState');
+    errorState = document.getElementById('errorState');
+    errorMessage = document.getElementById('errorMessage');
+    adminMain = document.getElementById('adminMain');
+    adminEmail = document.getElementById('adminEmail');
+
+    // Stats elements
+    totalUsers = document.getElementById('totalUsers');
+    todayUsers = document.getElementById('todayUsers');
+    totalHistory = document.getElementById('totalHistory');
+    todayHistory = document.getElementById('todayHistory');
+    deepseekTokens = document.getElementById('deepseekTokens');
+    todayDeepseek = document.getElementById('todayDeepseek');
+    qwenTokens = document.getElementById('qwenTokens');
+    todayQwen = document.getElementById('todayQwen');
+
+    // Table elements
+    usersTableBody = document.getElementById('usersTableBody');
+    historyTableBody = document.getElementById('historyTableBody');
+    usersPagination = document.getElementById('usersPagination');
+    historyPagination = document.getElementById('historyPagination');
+
+    // Modals
+    deleteModal = document.getElementById('deleteModal');
+    deleteMessageEl = document.getElementById('deleteMessage');
+    detailModal = document.getElementById('detailModal');
+    detailContent = document.getElementById('detailContent');
+
     // Check auth first
     const authResult = await checkAuth();
     if (!authResult) return;
