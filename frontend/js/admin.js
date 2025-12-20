@@ -70,6 +70,12 @@ async function checkAuth() {
         const data = await response.json();
         currentUser = data.user;
 
+        // Check if user is logged in
+        if (!currentUser || !currentUser.email) {
+            showError('請先登入');
+            return false;
+        }
+
         // Try to access admin stats (will fail if not admin)
         const statsResponse = await fetch('/api/admin/stats', {
             credentials: 'include'
