@@ -466,63 +466,142 @@
             <div class="card">
                 <h2><i class="fas fa-file-import"></i> Upload DSE Content</h2>
 
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    Paste the text content from DSE past papers. The system will automatically chunk and index the
-                    content.
+                <!-- Upload Mode Toggle -->
+                <div class="upload-mode-toggle" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-primary" id="modeFile" onclick="switchUploadMode('file')">
+                        <i class="fas fa-file-pdf"></i> Upload PDF/Image
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="modeText" onclick="switchUploadMode('text')">
+                        <i class="fas fa-keyboard"></i> Paste Text
+                    </button>
                 </div>
 
-                <form id="uploadForm">
-                    <div class="form-group">
-                        <label for="title">Title *</label>
-                        <input type="text" id="title" placeholder="e.g., 2023 DSE Physics Paper 1A" required>
+                <!-- File Upload Mode -->
+                <div id="fileUploadSection">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Upload PDF or image files. GPT-4o Vision will automatically extract text (OCR).
+                        <br><strong>Supported formats:</strong> PDF, PNG, JPG, WebP (max 10MB)
                     </div>
 
-                    <div class="form-row">
+                    <form id="fileUploadForm" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label for="year">Year</label>
-                            <select id="year">
-                                <option value="">Select Year</option>
-                                <script>
-                                    const currentYear = new Date().getFullYear();
-                                    for (let y = currentYear; y >= 2012; y--) {
-                                        document.write(`<option value="${y}">${y}</option>`);
-                                    }
-                                </script>
-                            </select>
+                            <label for="fileTitle">Title *</label>
+                            <input type="text" id="fileTitle" placeholder="e.g., 2023 DSE Physics Paper 1A" required>
                         </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fileYear">Year</label>
+                                <select id="fileYear">
+                                    <option value="">Select Year</option>
+                                    <script>
+                                        const currentYear = new Date().getFullYear();
+                                        for (let y = currentYear; y >= 2012; y--) {
+                                            document.write(`<option value="${y}">${y}</option>`);
+                                        }
+                                    </script>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="filePaper">Paper Type</label>
+                                <select id="filePaper">
+                                    <option value="">Select Paper</option>
+                                    <option value="Paper 1A">Paper 1A (MC)</option>
+                                    <option value="Paper 1B">Paper 1B (MC)</option>
+                                    <option value="Paper 2">Paper 2 (Structured)</option>
+                                    <option value="Mock">Mock Exam</option>
+                                    <option value="Notes">Study Notes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="fileSource">Source</label>
+                                <select id="fileSource">
+                                    <option value="DSE">DSE Official</option>
+                                    <option value="Mock">Mock Exam</option>
+                                    <option value="Textbook">Textbook</option>
+                                    <option value="Notes">Personal Notes</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="form-group">
-                            <label for="paper">Paper Type</label>
-                            <select id="paper">
-                                <option value="">Select Paper</option>
-                                <option value="Paper 1A">Paper 1A (MC)</option>
-                                <option value="Paper 1B">Paper 1B (MC)</option>
-                                <option value="Paper 2">Paper 2 (Structured)</option>
-                                <option value="Mock">Mock Exam</option>
-                                <option value="Notes">Study Notes</option>
-                            </select>
+                            <label>File *</label>
+                            <div class="file-drop-area" id="fileDropArea" style="border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s;">
+                                <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.webp" hidden>
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--primary); margin-bottom: 16px;"></i>
+                                <p style="margin: 0; color: var(--text-secondary);">
+                                    <strong>Click to upload</strong> or drag and drop<br>
+                                    PDF, PNG, JPG, WebP (max 10MB)
+                                </p>
+                                <div id="selectedFileName" style="margin-top: 12px; color: var(--primary); font-weight: 500;" hidden></div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="source">Source</label>
-                            <select id="source">
-                                <option value="DSE">DSE Official</option>
-                                <option value="Mock">Mock Exam</option>
-                                <option value="Textbook">Textbook</option>
-                                <option value="Notes">Personal Notes</option>
-                            </select>
-                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="fileUploadBtn" disabled>
+                            <i class="fas fa-upload"></i> Upload & Process with OCR
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Text Upload Mode -->
+                <div id="textUploadSection" hidden>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Paste the text content from DSE past papers. The system will automatically chunk and index.
                     </div>
 
-                    <div class="form-group">
-                        <label for="content">Content (Paste Text) *</label>
-                        <textarea id="content"
-                            placeholder="Paste the question and answer content here...&#10;&#10;Example:&#10;Q.1 A block of mass 2 kg is placed on a frictionless surface...&#10;&#10;Answer: B&#10;Explanation: Using F = ma..."></textarea>
-                    </div>
+                    <form id="uploadForm">
+                        <div class="form-group">
+                            <label for="title">Title *</label>
+                            <input type="text" id="title" placeholder="e.g., 2023 DSE Physics Paper 1A" required>
+                        </div>
 
-                    <button type="submit" class="btn btn-primary" id="uploadBtn">
-                        <i class="fas fa-upload"></i> Process & Upload
-                    </button>
-                </form>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="year">Year</label>
+                                <select id="year">
+                                    <option value="">Select Year</option>
+                                    <script>
+                                        for (let y = currentYear; y >= 2012; y--) {
+                                            document.write(`<option value="${y}">${y}</option>`);
+                                        }
+                                    </script>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="paper">Paper Type</label>
+                                <select id="paper">
+                                    <option value="">Select Paper</option>
+                                    <option value="Paper 1A">Paper 1A (MC)</option>
+                                    <option value="Paper 1B">Paper 1B (MC)</option>
+                                    <option value="Paper 2">Paper 2 (Structured)</option>
+                                    <option value="Mock">Mock Exam</option>
+                                    <option value="Notes">Study Notes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="source">Source</label>
+                                <select id="source">
+                                    <option value="DSE">DSE Official</option>
+                                    <option value="Mock">Mock Exam</option>
+                                    <option value="Textbook">Textbook</option>
+                                    <option value="Notes">Personal Notes</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="content">Content (Paste Text) *</label>
+                            <textarea id="content"
+                                placeholder="Paste the question and answer content here...&#10;&#10;Example:&#10;Q.1 A block of mass 2 kg is placed on a frictionless surface...&#10;&#10;Answer: B&#10;Explanation: Using F = ma..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="uploadBtn">
+                            <i class="fas fa-upload"></i> Process & Upload
+                        </button>
+                    </form>
+                </div>
 
                 <div id="uploadStatus" hidden></div>
             </div>
@@ -664,8 +743,137 @@
             document.getElementById('statYears').textContent = years.size;
         }
 
-        // Upload form
+        // Upload mode switching
+        let uploadMode = 'file';
+
+        function switchUploadMode(mode) {
+            uploadMode = mode;
+            document.getElementById('fileUploadSection').hidden = mode !== 'file';
+            document.getElementById('textUploadSection').hidden = mode !== 'text';
+            document.getElementById('modeFile').className = mode === 'file' ? 'btn btn-primary' : 'btn btn-secondary';
+            document.getElementById('modeText').className = mode === 'text' ? 'btn btn-primary' : 'btn btn-secondary';
+        }
+
+        // File upload handling
+        function initFileUpload() {
+            const dropArea = document.getElementById('fileDropArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileNameDisplay = document.getElementById('selectedFileName');
+            const uploadBtn = document.getElementById('fileUploadBtn');
+
+            // Click to upload
+            dropArea.addEventListener('click', () => fileInput.click());
+
+            // File selection
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    fileNameDisplay.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    fileNameDisplay.hidden = false;
+                    uploadBtn.disabled = false;
+                    dropArea.style.borderColor = 'var(--primary)';
+                    dropArea.style.background = 'rgba(79, 70, 229, 0.05)';
+                }
+            });
+
+            // Drag and drop
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.style.borderColor = 'var(--primary)';
+                dropArea.style.background = 'rgba(79, 70, 229, 0.1)';
+            });
+
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.style.borderColor = 'var(--border)';
+                dropArea.style.background = 'transparent';
+            });
+
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.style.borderColor = 'var(--border)';
+                dropArea.style.background = 'transparent';
+
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    // Check file type
+                    const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'];
+                    if (!validTypes.includes(file.type)) {
+                        showUploadStatus('Invalid file type. Please upload PDF or image.', 'error');
+                        return;
+                    }
+                    // Check file size (10MB)
+                    if (file.size > 10 * 1024 * 1024) {
+                        showUploadStatus('File too large. Maximum size is 10MB.', 'error');
+                        return;
+                    }
+
+                    // Create a new FileList-like object
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    fileInput.files = dataTransfer.files;
+
+                    fileNameDisplay.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    fileNameDisplay.hidden = false;
+                    uploadBtn.disabled = false;
+                    dropArea.style.borderColor = 'var(--primary)';
+                    dropArea.style.background = 'rgba(79, 70, 229, 0.05)';
+                }
+            });
+
+            // File upload form submission
+            document.getElementById('fileUploadForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const title = document.getElementById('fileTitle').value.trim();
+                const file = fileInput.files[0];
+
+                if (!title || !file) {
+                    showUploadStatus('Please fill in title and select a file', 'error');
+                    return;
+                }
+
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading & Processing OCR... (may take 30-60s)';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('title', title);
+                    formData.append('year', document.getElementById('fileYear').value);
+                    formData.append('paper', document.getElementById('filePaper').value);
+                    formData.append('source', document.getElementById('fileSource').value);
+
+                    const response = await fetch(`${API_BASE}/kb/upload`, {
+                        method: 'POST',
+                        credentials: 'include',
+                        body: formData,
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showUploadStatus(`Success! Extracted ${data.contentLength} characters, created ${data.chunkCount} chunks.`, 'success');
+                        document.getElementById('fileUploadForm').reset();
+                        fileNameDisplay.hidden = true;
+                        dropArea.style.borderColor = 'var(--border)';
+                        dropArea.style.background = 'transparent';
+                        await loadDocuments();
+                    } else {
+                        showUploadStatus(data.error || 'Upload failed', 'error');
+                    }
+                } catch (err) {
+                    showUploadStatus('Upload failed: ' + err.message, 'error');
+                }
+
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload & Process with OCR';
+            });
+        }
+
+        // Text upload form
         function initUploadForm() {
+            initFileUpload();
+
             document.getElementById('uploadForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
 
