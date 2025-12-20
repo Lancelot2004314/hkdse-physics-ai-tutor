@@ -48,6 +48,9 @@
                 <li class="nav-item">
                     <a href="/profile.html"><i class="fas fa-user"></i> Profile</a>
                 </li>
+                <li class="nav-item admin-only" id="adminNavItem" hidden>
+                    <a href="/admin.html"><i class="fas fa-cog"></i> Admin Panel</a>
+                </li>
             </ul>
             <div class="sidebar-footer">
                 <button class="btn-logout" id="logoutBtn">
@@ -235,6 +238,7 @@
                     currentUser = await response.json();
                     document.getElementById('userName').textContent = currentUser.name || currentUser.email?.split('@')[0] || 'User';
                     document.getElementById('userEmail').textContent = currentUser.email || '';
+                    checkAdminAccess();
                 } else {
                     // Not logged in - redirect to dashboard with login prompt
                     window.location.href = '/?login=true';
@@ -244,6 +248,16 @@
                 // On network error, still show page but user may need to login
                 document.getElementById('userName').textContent = 'Guest';
             }
+        }
+
+        async function checkAdminAccess() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`, { credentials: 'include' });
+                if (response.ok) {
+                    const adminNav = document.getElementById('adminNavItem');
+                    if (adminNav) adminNav.hidden = false;
+                }
+            } catch (err) { /* Not admin */ }
         }
 
         function renderTopics() {

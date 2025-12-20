@@ -1236,7 +1236,31 @@ function updateAuthUI() {
     if (loginStatus && currentUser) {
         loginStatus.hidden = true;
     }
+
+    // Check admin access for sidebar
+    if (currentUser) {
+        checkAdminAccess();
+    } else {
+        // Hide admin nav if not logged in
+        const adminNav = document.getElementById('adminNavItem');
+        if (adminNav) adminNav.hidden = true;
+    }
 }
+
+async function checkAdminAccess() {
+    try {
+        const response = await fetch(`${API_BASE}/admin/stats`, {
+            credentials: 'include',
+            method: 'GET'
+        });
+        if (response.ok) {
+            // User is admin, show admin nav
+            const adminNav = document.getElementById('adminNavItem');
+            if (adminNav) adminNav.hidden = false;
+        }
+    } catch (err) {
+        // Not admin or error, keep hidden
+    }
 
 async function loginWithGoogle() {
     googleLoginBtn.disabled = true;

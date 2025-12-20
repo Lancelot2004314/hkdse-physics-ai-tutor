@@ -49,6 +49,9 @@
                 <li class="nav-item">
                     <a href="/profile.html"><i class="fas fa-user"></i> Profile</a>
                 </li>
+                <li class="nav-item admin-only" id="adminNavItem" hidden>
+                    <a href="/admin.html"><i class="fas fa-cog"></i> Admin Panel</a>
+                </li>
             </ul>
             <div class="sidebar-footer">
                 <button class="btn-logout" id="logoutBtn">
@@ -245,6 +248,25 @@
             document.getElementById('welcomeName').textContent = name;
             document.getElementById('loginBtn').hidden = true;
             document.getElementById('logoutBtn').hidden = false;
+
+            // Check if user is admin (lightweight check)
+            checkAdminAccess();
+        }
+
+        async function checkAdminAccess() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`, {
+                    credentials: 'include',
+                    method: 'GET'
+                });
+                if (response.ok) {
+                    // User is admin, show admin nav
+                    const adminNav = document.getElementById('adminNavItem');
+                    if (adminNav) adminNav.hidden = false;
+                }
+            } catch (err) {
+                // Not admin or error, keep hidden
+            }
         }
 
         function updateUIForGuest() {

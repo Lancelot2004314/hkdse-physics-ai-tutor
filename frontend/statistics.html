@@ -32,6 +32,7 @@
                 <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
                 <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
                 <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i class="fas fa-cog"></i> Admin Panel</a></li>
             </ul>
             <div class="sidebar-footer">
                 <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
@@ -149,12 +150,23 @@
                     const user = await response.json();
                     document.getElementById('userName').textContent = user.name || user.email?.split('@')[0];
                     document.getElementById('userEmail').textContent = user.email || '';
+                    checkAdminAccess();
                 } else {
                     window.location.href = '/?login=true';
                 }
             } catch (err) {
                 console.error('Auth check failed:', err);
             }
+        }
+
+        async function checkAdminAccess() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`, { credentials: 'include' });
+                if (response.ok) {
+                    const adminNav = document.getElementById('adminNavItem');
+                    if (adminNav) adminNav.hidden = false;
+                }
+            } catch (err) { /* Not admin */ }
         }
 
         async function loadStats() {

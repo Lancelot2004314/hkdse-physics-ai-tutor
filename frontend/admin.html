@@ -30,7 +30,14 @@
         <div class="error-state" id="errorState" hidden>
             <i class="fas fa-exclamation-triangle"></i>
             <p id="errorMessage">無權限訪問</p>
-            <a href="/" class="btn-primary">返回主頁</a>
+            <div class="error-actions">
+                <a href="/login.html" class="btn-primary" id="loginBtn" hidden>
+                    <i class="fas fa-sign-in-alt"></i> 前往登入
+                </a>
+                <a href="/" class="btn-secondary" id="homeBtn">
+                    <i class="fas fa-home"></i> 返回主頁
+                </a>
+            </div>
         </div>
 
         <!-- Main Content -->

@@ -63,7 +63,7 @@ async function checkAuth() {
         });
 
         if (!response.ok) {
-            showError('請先登入');
+            showError('請先登入', true);
             return false;
         }
 
@@ -72,7 +72,7 @@ async function checkAuth() {
 
         // Check if user is logged in
         if (!currentUser || !currentUser.email) {
-            showError('請先登入');
+            showError('請先登入', true);
             return false;
         }
 
@@ -82,13 +82,20 @@ async function checkAuth() {
         });
 
         if (!statsResponse.ok) {
-            const error = await statsResponse.json();
-            showError(error.error || '無權限訪問');
+            let errorMsg = '無權限訪問';
+            try {
+                const error = await statsResponse.json();
+                errorMsg = error.error || errorMsg;
+            } catch (e) {
+                // JSON parse failed, use default message
+            }
+            showError(errorMsg);
             return false;
         }
 
-        // Success - show main content
+        // Success - show main content, clear any error state
         loadingState.hidden = true;
+        errorState.hidden = true;
         adminMain.hidden = false;
         adminEmail.textContent = currentUser.email;
         return true;
@@ -100,10 +107,22 @@ async function checkAuth() {
     }
 }
 
-function showError(message) {
+function showError(message, isLoginRequired = false) {
     loadingState.hidden = true;
+    adminMain.hidden = true;
     errorMessage.textContent = message;
     errorState.hidden = false;
+
+    // Show/hide appropriate buttons
+    const loginBtn = document.getElementById('loginBtn');
+    const homeBtn = document.getElementById('homeBtn');
+    if (loginBtn) {
+        loginBtn.hidden = !isLoginRequired;
+    }
+    if (homeBtn) {
+        // Always show home button
+        homeBtn.hidden = false;
+    }
 }
 
 async function loadStats() {

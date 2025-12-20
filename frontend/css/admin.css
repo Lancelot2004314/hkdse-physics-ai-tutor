@@ -117,6 +117,19 @@ body {
     color: var(--text-muted);
 }
 
+.error-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-actions a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
 /* Stats Section */
 .stats-section {
     display: grid;
