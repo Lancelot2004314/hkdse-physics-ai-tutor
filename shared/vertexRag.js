@@ -82,8 +82,13 @@ export async function ragImportDocument(env, gcsUri, docMetadata = {}, options =
 
   // Enable Document AI layout parser if specified
   if (options.useLayoutParser !== false) {
+    // Use Document AI Layout Parser processor
+    // Note: Processor is in US region, works cross-region with RAG corpus
+    const processorName = env.DOCAI_PROCESSOR_NAME || 'projects/592057617160/locations/us/processors/107fa4a0623d5caf';
     importConfig.ragFileParsingConfig = {
-      useAdvancedPdfParsing: true,
+      layoutParser: {
+        processorName: processorName,
+      },
     };
   }
 
