@@ -181,23 +181,22 @@ export async function ragRetrieve(env, query, filters = {}, topK = 5) {
   }
 
   const corpusName = `projects/${config.projectId}/locations/${config.location}/ragCorpora/${config.corpusId}`;
-  const url = `https://${config.location}-aiplatform.googleapis.com/v1beta1/${corpusName}:retrieveContexts`;
+  
+  // Use the location-level retrieveContexts endpoint (not corpus-level)
+  const url = `https://${config.location}-aiplatform.googleapis.com/v1beta1/projects/${config.projectId}/locations/${config.location}:retrieveContexts`;
 
-  // Build retrieval request
+  // Build retrieval request with proper structure
   const requestBody = {
-    query: {
-      text: query,
-      similarityTopK: topK,
-    },
     vertexRagStore: {
       ragCorpora: [corpusName],
     },
+    query: {
+      text: query,
+    },
   };
 
-  // Add vector distance threshold if specified
-  if (filters.minSimilarity) {
-    requestBody.query.vectorDistanceThreshold = 1 - filters.minSimilarity;
-  }
+  // Note: similarityTopK goes in ragRetrievalConfig, not query
+  // But the simple endpoint doesn't always support it, so we'll handle filtering in post-processing
 
   const response = await fetch(url, {
     method: 'POST',
@@ -218,12 +217,21 @@ export async function ragRetrieve(env, query, filters = {}, topK = 5) {
   // Parse contexts into unified format
   const contexts = result.contexts?.contexts || [];
 
-  return contexts.map(ctx => ({
-    text: ctx.text || '',
+  // Map to unified format and apply topK/minSimilarity filtering
+  let results = contexts.map(ctx => ({
+    text: ctx.text || ctx.chunk?.text || '',
     sourceUri: ctx.sourceUri || '',
-    score: ctx.score || 0,
+    score: ctx.score || ctx.distance || 0,
     metadata: parseGcsMetadata(ctx),
   }));
+
+  // Filter by min similarity score if specified
+  if (filters.minSimilarity) {
+    results = results.filter(r => r.score >= filters.minSimilarity);
+  }
+
+  // Limit to topK results
+  return results.slice(0, topK);
 }
 
 /**
