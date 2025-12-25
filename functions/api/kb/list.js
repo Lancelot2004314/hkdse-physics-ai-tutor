@@ -64,7 +64,8 @@ export async function onRequestGet(context) {
       SELECT 
         d.id, d.title, d.filename, d.year, d.paper, d.source,
         d.language, d.subject, d.doc_type,
-        d.chunk_count, d.status, d.error_message, d.r2_key,
+        d.chunk_count, d.status, d.error_message, 
+        d.r2_key, d.gcs_uri, d.ingest_job_id, d.rag_file_name,
         d.created_at, d.updated_at, d.processed_at,
         u.email as created_by_email
       FROM kb_documents d

@@ -1,10 +1,12 @@
 /**
  * Knowledge Base Search API
  * Semantic search for relevant content
+ * Uses Vertex AI RAG Engine if configured, falls back to Vectorize
  */
 
 import { getUserFromSession } from '../../../shared/auth.js';
 import { searchKnowledgeBase, formatKnowledgeContext } from '../../../shared/embedding.js';
+import { checkVertexConfig } from '../../../shared/vertexRag.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,7 +23,7 @@ export async function onRequestPost(context) {
 
   try {
     // This endpoint can be used by admin for testing
-    // or internally by the explain APIs
+    // or internally by the explain/quiz APIs
     const user = await getUserFromSession(request, env);
 
     // Parse request
@@ -32,6 +34,9 @@ export async function onRequestPost(context) {
       minScore = 0.7,
       year,
       topic,
+      language,
+      subject,
+      docType,
       includeFormatted = false,
     } = body;
 
@@ -39,12 +44,12 @@ export async function onRequestPost(context) {
       return errorResponse(400, 'Query is required');
     }
 
-    if (!env.VECTORIZE) {
-      return errorResponse(500, 'Vectorize not configured');
-    }
+    // Check backend configuration
+    const vertexConfig = checkVertexConfig(env);
+    const backend = vertexConfig.configured ? 'vertex_rag' : 'vectorize';
 
-    if (!env.OPENAI_API_KEY) {
-      return errorResponse(500, 'OpenAI API key not configured');
+    if (!vertexConfig.configured && !env.VECTORIZE) {
+      return errorResponse(500, 'No search backend configured (Vertex RAG or Vectorize)');
     }
 
     // Build filter
@@ -55,8 +60,17 @@ export async function onRequestPost(context) {
     if (topic) {
       filter.topic = topic;
     }
+    if (language) {
+      filter.language = language;
+    }
+    if (subject) {
+      filter.subject = subject;
+    }
+    if (docType) {
+      filter.doc_type = docType;
+    }
 
-    // Search knowledge base
+    // Search knowledge base (automatically uses Vertex or Vectorize)
     const results = await searchKnowledgeBase(query, env, {
       topK,
       minScore,
@@ -67,6 +81,7 @@ export async function onRequestPost(context) {
       results,
       count: results.length,
       query,
+      backend,
     };
 
     // Optionally include formatted context for prompts
@@ -90,5 +105,3 @@ function errorResponse(status, message) {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 }
-
-

@@ -1,7 +1,10 @@
 /**
  * Embedding generation utilities for RAG knowledge base
  * Uses Google Gemini text-embedding-004 model
+ * Supports Vertex AI RAG Engine or local Vectorize
  */
+
+import { ragRetrieve, formatRetrievedContext, checkVertexConfig } from './vertexRag.js';
 
 const EMBEDDING_MODEL = 'text-embedding-004';
 const EMBEDDING_DIMENSIONS = 768; // Gemini embedding dimensions
@@ -82,9 +85,10 @@ export async function generateEmbeddings(texts, env) {
 }
 
 /**
- * Search Vectorize for similar content
+ * Search knowledge base for similar content
+ * Uses Vertex AI RAG Engine if configured, otherwise falls back to Vectorize
  * @param {string} query - Search query
- * @param {object} env - Environment with GEMINI_API_KEY and VECTORIZE
+ * @param {object} env - Environment with GEMINI_API_KEY and VECTORIZE or Vertex config
  * @param {object} options - Search options
  * @returns {Promise<object[]>} - Array of matching results
  */
@@ -93,14 +97,43 @@ export async function searchKnowledgeBase(query, env, options = {}) {
     topK = 5,
     minScore = 0.7,
     filter = {},
+    useVertexOnly = false,
   } = options;
 
+  // Check if Vertex RAG is configured
+  const vertexConfig = checkVertexConfig(env);
+
+  if (vertexConfig.configured) {
+    // Use Vertex AI RAG Engine
+    try {
+      console.log('Using Vertex AI RAG Engine for search');
+      const results = await ragRetrieve(env, query, { minSimilarity: minScore, ...filter }, topK);
+
+      return results.map((r, i) => ({
+        id: `vertex_result_${i}`,
+        score: r.score,
+        content: r.text,
+        sourceUri: r.sourceUri,
+        ...r.metadata,
+        backend: 'vertex_rag',
+      }));
+    } catch (err) {
+      console.error('Vertex RAG search error:', err);
+      if (useVertexOnly) {
+        throw err;
+      }
+      // Fall through to Vectorize fallback
+    }
+  }
+
+  // Fallback to Vectorize
   if (!env.VECTORIZE) {
-    console.warn('Vectorize not configured, skipping knowledge base search');
+    console.warn('Neither Vertex RAG nor Vectorize configured, skipping knowledge base search');
     return [];
   }
 
   try {
+    console.log('Using Vectorize for search (fallback)');
     // Generate embedding for query
     const queryEmbedding = await generateEmbedding(query, env);
 
@@ -118,15 +151,43 @@ export async function searchKnowledgeBase(query, env, options = {}) {
         id: m.id,
         score: m.score,
         ...m.metadata,
+        backend: 'vectorize',
       }));
   } catch (err) {
-    console.error('Knowledge base search error:', err);
+    console.error('Vectorize search error:', err);
     return [];
   }
 }
 
 /**
+ * Search using Vertex AI RAG Engine only (no fallback)
+ * @param {string} query - Search query
+ * @param {object} env - Environment with Vertex configuration
+ * @param {object} options - Search options
+ * @returns {Promise<object[]>} - Array of matching results
+ */
+export async function searchVertexRag(query, env, options = {}) {
+  const { topK = 5, filters = {} } = options;
+
+  const vertexConfig = checkVertexConfig(env);
+  if (!vertexConfig.configured) {
+    throw new Error('Vertex AI RAG Engine not configured: ' + vertexConfig.issues.join(', '));
+  }
+
+  const results = await ragRetrieve(env, query, filters, topK);
+
+  return results.map((r, i) => ({
+    id: `vertex_result_${i}`,
+    score: r.score,
+    content: r.text,
+    sourceUri: r.sourceUri,
+    ...r.metadata,
+  }));
+}
+
+/**
  * Format search results for injection into prompts
+ * Works with both Vertex RAG and Vectorize results
  * @param {object[]} results - Search results
  * @returns {string} - Formatted context string
  */
@@ -137,13 +198,28 @@ export function formatKnowledgeContext(results) {
 
   return results.map((r, i) => {
     let header = `【参考资料 ${i + 1}】`;
-    if (r.year) header += ` ${r.year} DSE`;
+
+    // Extract year from metadata or sourceUri
+    const year = r.year || extractYearFromUri(r.sourceUri);
+    if (year) header += ` ${year} DSE`;
     if (r.paper) header += ` ${r.paper}`;
     if (r.question_number) header += ` ${r.question_number}`;
     if (r.topic) header += ` [${r.topic}]`;
 
-    return `${header}\n${r.content || ''}`;
+    // Use content from either Vertex (text) or Vectorize (content)
+    const content = r.content || r.text || '';
+
+    return `${header}\n${content}`;
   }).join('\n\n---\n\n');
+}
+
+/**
+ * Extract year from GCS URI or source path
+ */
+function extractYearFromUri(uri) {
+  if (!uri) return null;
+  const match = uri.match(/(\d{4})/);
+  return match ? match[1] : null;
 }
 
 /**

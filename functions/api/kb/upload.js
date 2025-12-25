@@ -1,11 +1,12 @@
 /**
- * Knowledge Base Upload API - Async Version
- * Stores file in R2 and queues for background OCR processing
- * Returns immediately with document ID for status polling
+ * Knowledge Base Upload API - Vertex AI RAG Engine Version
+ * Stores file in GCS and triggers Vertex RAG Engine import
+ * Falls back to local Vectorize for text-only uploads
  */
 
 import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
-import { generateEmbeddings, chunkDocument, EMBEDDING_DIMENSIONS } from '../../../shared/embedding.js';
+import { uploadToGcs, ragImportDocument, checkVertexConfig } from '../../../shared/vertexRag.js';
+import { generateEmbeddings, chunkDocument } from '../../../shared/embedding.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,7 +14,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB max for PDF
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB max for PDF (GCS handles larger files)
 
 export async function onRequestOptions() {
   return new Response(null, { headers: corsHeaders });
@@ -38,19 +39,21 @@ export async function onRequestPost(context) {
     if (!env.DB) {
       return errorResponse(500, 'Database not configured');
     }
-    if (!env.GEMINI_API_KEY) {
-      return errorResponse(500, 'Gemini API key not configured');
-    }
+
+    // Check Vertex AI configuration
+    const vertexConfig = checkVertexConfig(env);
+    const useVertexRag = vertexConfig.configured;
 
     // Check content type
     const contentType = request.headers.get('Content-Type') || '';
 
     let title, content, year, paper, source, filename, language, subject, docType;
     let isFileUpload = false;
-    let r2Key = null;
+    let fileData = null;
+    let fileMimeType = null;
 
     if (contentType.includes('multipart/form-data')) {
-      // Handle file upload - store in R2 and queue for async processing
+      // Handle file upload
       const formData = await request.formData();
       const file = formData.get('file');
       title = formData.get('title');
@@ -67,40 +70,22 @@ export async function onRequestPost(context) {
 
       // Check file size
       if (file.size > MAX_FILE_SIZE) {
-        return errorResponse(400, 'File too large (max 10MB)');
+        return errorResponse(400, 'File too large (max 20MB)');
       }
 
       filename = file.name;
-      const fileType = file.type;
+      fileMimeType = file.type;
 
       // Validate file type
-      if (fileType !== 'application/pdf' && !fileType.startsWith('image/')) {
+      if (fileMimeType !== 'application/pdf' && !fileMimeType.startsWith('image/')) {
         return errorResponse(400, 'Unsupported file type. Please upload PDF or image.');
       }
 
       isFileUpload = true;
-
-      // Store file in R2 for async processing
-      if (env.R2_BUCKET) {
-        r2Key = `uploads/${Date.now()}_${filename}`;
-        const arrayBuffer = await file.arrayBuffer();
-        await env.R2_BUCKET.put(r2Key, arrayBuffer, {
-          customMetadata: {
-            title,
-            year: year || '',
-            paper: paper || '',
-            language,
-            subject,
-            docType,
-            mimeType: fileType
-          },
-        });
-      } else {
-        return errorResponse(500, 'R2 storage not configured');
-      }
+      fileData = await file.arrayBuffer();
 
     } else {
-      // Handle JSON body (text content) - process synchronously
+      // Handle JSON body (text content)
       const body = await request.json();
       title = body.title;
       content = body.content;
@@ -123,40 +108,69 @@ export async function onRequestPost(context) {
     // Generate document ID
     const docId = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
-    // Create document record with pending status
-    await env.DB.prepare(`
-      INSERT INTO kb_documents (id, title, filename, year, paper, source, language, subject, doc_type, status, r2_key, created_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      docId,
-      title,
-      filename || null,
-      year || null,
-      paper || null,
-      source,
-      language,
-      subject,
-      docType,
-      isFileUpload ? 'pending' : 'processing',
-      r2Key,
-      user.id
-    ).run();
+    if (isFileUpload && useVertexRag) {
+      // Use Vertex AI RAG Engine for file uploads
+      return await uploadToVertexRag(env, user, docId, {
+        title,
+        filename,
+        fileData,
+        fileMimeType,
+        year,
+        paper,
+        source,
+        language,
+        subject,
+        docType,
+      });
+    } else if (isFileUpload && !useVertexRag) {
+      // Fallback: Store in R2 if Vertex not configured
+      if (!env.R2_BUCKET) {
+        return errorResponse(500, 'Neither Vertex RAG nor R2 storage configured');
+      }
 
-    if (isFileUpload) {
-      // File stored in R2, return immediately with pending status
-      // User needs to trigger /api/kb/process to process pending documents
+      const r2Key = `uploads/${Date.now()}_${filename}`;
+      await env.R2_BUCKET.put(r2Key, fileData, {
+        customMetadata: {
+          title,
+          year: year || '',
+          paper: paper || '',
+          language,
+          subject,
+          docType,
+          mimeType: fileMimeType
+        },
+      });
+
+      // Create document record with pending status
+      await env.DB.prepare(`
+        INSERT INTO kb_documents (id, title, filename, year, paper, source, language, subject, doc_type, status, r2_key, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        docId, title, filename, year || null, paper || null, source,
+        language, subject, docType, 'pending', r2Key, user.id
+      ).run();
+
       return new Response(JSON.stringify({
         success: true,
         documentId: docId,
         status: 'pending',
-        message: 'File uploaded. Click "Process Pending" to start OCR processing.',
+        message: 'File uploaded to R2. Process manually via /api/kb/process.',
+        backend: 'r2_fallback',
       }), {
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
-    }
+    } else {
+      // Text content - use local Vectorize (fallback path)
+      await env.DB.prepare(`
+        INSERT INTO kb_documents (id, title, year, paper, source, language, subject, doc_type, status, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        docId, title, year || null, paper || null, source,
+        language, subject, docType, 'processing', user.id
+      ).run();
 
-    // Process text content (from JSON upload)
-    return await processDocumentContent(env, docId, content, year, paper, language, subject, docType);
+      return await processTextContent(env, docId, content, { year, paper, language, subject, docType });
+    }
 
   } catch (err) {
     console.error('Upload error:', err);
@@ -165,19 +179,95 @@ export async function onRequestPost(context) {
 }
 
 /**
- * Process document content - generate embeddings and store
+ * Upload file to GCS and trigger Vertex RAG import
  */
-async function processDocumentContent(env, docId, content, year, paper, language, subject, docType) {
+async function uploadToVertexRag(env, user, docId, params) {
+  const { title, filename, fileData, fileMimeType, year, paper, source, language, subject, docType } = params;
+
   try {
-    if (!content || content.length < 50) {
-      await updateDocumentStatus(env.DB, docId, 'error', 'Content too short or extraction failed');
-      return errorResponse(400, 'Content too short or extraction failed (min 50 characters)');
+    // Create GCS object path
+    const sanitizedFilename = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const gcsObjectPath = `documents/${year || 'unknown'}/${sanitizedFilename}`;
+
+    // Prepare metadata for GCS
+    const metadata = {
+      title,
+      year: year || '',
+      paper: paper || '',
+      language,
+      subject,
+      docType,
+      source,
+      uploadedBy: user.email,
+      documentId: docId,
+    };
+
+    // Upload to GCS
+    console.log(`Uploading ${filename} to GCS...`);
+    const gcsUri = await uploadToGcs(env, new Uint8Array(fileData), gcsObjectPath, fileMimeType, metadata);
+    console.log(`Uploaded to: ${gcsUri}`);
+
+    // Create document record with processing status
+    await env.DB.prepare(`
+      INSERT INTO kb_documents (id, title, filename, year, paper, source, language, subject, doc_type, status, gcs_uri, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      docId, title, filename, year || null, paper || null, source,
+      language, subject, docType, 'processing', gcsUri, user.id
+    ).run();
+
+    // Trigger Vertex RAG import with Document AI layout parser
+    console.log('Triggering Vertex RAG import...');
+    const importResult = await ragImportDocument(env, gcsUri, metadata, {
+      useLayoutParser: true,
+      chunkSize: 1024,
+      chunkOverlap: 256,
+    });
+    console.log(`Import operation: ${importResult.operationName}`);
+
+    // Update document with operation ID
+    await env.DB.prepare(`
+      UPDATE kb_documents SET ingest_job_id = ?, updated_at = datetime('now')
+      WHERE id = ?
+    `).bind(importResult.operationName, docId).run();
+
+    return new Response(JSON.stringify({
+      success: true,
+      documentId: docId,
+      status: 'processing',
+      gcsUri,
+      operationName: importResult.operationName,
+      message: 'File uploaded to GCS and RAG import started. Check status for progress.',
+      backend: 'vertex_rag',
+    }), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
+
+  } catch (err) {
+    console.error('Vertex RAG upload error:', err);
+
+    // Update document status to error
+    try {
+      await env.DB.prepare(`
+        UPDATE kb_documents SET status = 'error', error_message = ?, updated_at = datetime('now')
+        WHERE id = ?
+      `).bind(err.message, docId).run();
+    } catch (dbErr) {
+      console.error('Failed to update error status:', dbErr);
     }
 
-    // Check Vectorize binding
+    return errorResponse(500, 'Vertex RAG upload failed: ' + err.message);
+  }
+}
+
+/**
+ * Process text content with local Vectorize (fallback for JSON uploads)
+ */
+async function processTextContent(env, docId, content, metadata) {
+  try {
     if (!env.VECTORIZE) {
       await updateDocumentStatus(env.DB, docId, 'error', 'Vectorize not configured');
-      return errorResponse(500, 'Vectorize not configured');
+      return errorResponse(500, 'Vectorize not configured for text processing');
     }
 
     // Chunk the document
@@ -230,14 +320,14 @@ async function processDocumentContent(env, docId, content, year, paper, language
         values: embeddings[i],
         metadata: {
           document_id: docId,
-          year: year ? parseInt(year) : 0,
-          paper: paper || '',
+          year: metadata.year ? parseInt(metadata.year) : 0,
+          paper: metadata.paper || '',
           question_number: chunk.questionNumber || '',
           topic: detectedTopic || '',
           content_type: detectContentType(chunk.content),
-          language: language || 'en',
-          subject: subject || 'Physics',
-          doc_type: docType || 'Past Paper',
+          language: metadata.language || 'en',
+          subject: metadata.subject || 'Physics',
+          doc_type: metadata.docType || 'Past Paper',
           content: chunk.content.substring(0, 1000),
         },
       });
@@ -262,7 +352,8 @@ async function processDocumentContent(env, docId, content, year, paper, language
       status: 'ready',
       chunkCount: chunks.length,
       contentLength: content.length,
-      message: `Successfully processed ${chunks.length} chunks from ${content.length} characters`,
+      message: `Successfully processed ${chunks.length} chunks`,
+      backend: 'vectorize',
     }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
@@ -272,143 +363,6 @@ async function processDocumentContent(env, docId, content, year, paper, language
     await updateDocumentStatus(env.DB, docId, 'error', err.message);
     return errorResponse(500, 'Processing failed: ' + err.message);
   }
-}
-
-/**
- * Extract text from PDF using Gemini
- */
-async function extractTextFromPDF(arrayBuffer, env) {
-  if (!env.GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY not configured');
-  }
-
-  const uint8Array = new Uint8Array(arrayBuffer);
-  let base64 = '';
-  const chunkSize = 8192;
-  for (let i = 0; i < uint8Array.length; i += chunkSize) {
-    const chunk = uint8Array.slice(i, i + chunkSize);
-    base64 += String.fromCharCode.apply(null, chunk);
-  }
-  base64 = btoa(base64);
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{
-        parts: [
-          {
-            text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this document.
-
-Important instructions:
-- Extract every question, answer, and explanation exactly as written
-- Preserve question numbers (Q1, Q2, Q.1, etc.)
-- Preserve mathematical formulas and equations (use LaTeX format like $F=ma$)
-- Preserve the structure (MC options A/B/C/D, long questions, marking schemes)
-- Output ONLY the extracted text, no commentary
-- If there are multiple pages, extract text from all pages in order
-- For Chinese text, preserve the original Chinese characters`
-          },
-          {
-            inline_data: {
-              mime_type: 'application/pdf',
-              data: base64
-            }
-          }
-        ]
-      }],
-      generationConfig: {
-        temperature: 0.1,
-        maxOutputTokens: 32000,
-      }
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('Gemini OCR error:', error);
-    throw new Error('Failed to extract text from PDF: ' + response.status);
-  }
-
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-  if (!text) {
-    console.error('Empty response from Gemini:', JSON.stringify(data));
-    throw new Error('Empty response from Gemini');
-  }
-
-  return text;
-}
-
-/**
- * Extract text from image using Gemini
- */
-async function extractTextFromImage(arrayBuffer, mimeType, env) {
-  if (!env.GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY not configured');
-  }
-
-  const uint8Array = new Uint8Array(arrayBuffer);
-  let base64 = '';
-  const chunkSize = 8192;
-  for (let i = 0; i < uint8Array.length; i += chunkSize) {
-    const chunk = uint8Array.slice(i, i + chunkSize);
-    base64 += String.fromCharCode.apply(null, chunk);
-  }
-  base64 = btoa(base64);
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{
-        parts: [
-          {
-            text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this image.
-
-Important instructions:
-- Extract every question, answer, and explanation exactly as written
-- Preserve question numbers (Q1, Q2, Q.1, etc.)
-- Preserve mathematical formulas and equations (use LaTeX format like $F=ma$)
-- Preserve the structure (MC options A/B/C/D, long questions, marking schemes)
-- Output ONLY the extracted text, no commentary
-- For Chinese text, preserve the original Chinese characters`
-          },
-          {
-            inline_data: {
-              mime_type: mimeType,
-              data: base64
-            }
-          }
-        ]
-      }],
-      generationConfig: {
-        temperature: 0.1,
-        maxOutputTokens: 16000,
-      }
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('Gemini OCR error:', error);
-    throw new Error('Failed to extract text from image: ' + response.status);
-  }
-
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-  if (!text) {
-    console.error('Empty response from Gemini:', JSON.stringify(data));
-    throw new Error('Empty response from Gemini');
-  }
-
-  return text;
 }
 
 async function updateDocumentStatus(db, docId, status, errorMessage = null) {
@@ -462,6 +416,3 @@ function errorResponse(status, message) {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 }
-
-// Export for queue consumer
-export { extractTextFromPDF, extractTextFromImage, processDocumentContent, detectTopic, detectContentType, updateDocumentStatus };

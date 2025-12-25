@@ -9,6 +9,7 @@ import { PHYSICS_TOPICS, getSubtopicNames } from '../../../shared/topics.js';
 import { getUserFromSession } from '../../../shared/auth.js';
 import { saveTokenUsage } from '../../../shared/tokenUsage.js';
 import { searchKnowledgeBase, formatKnowledgeContext } from '../../../shared/embedding.js';
+import { checkVertexConfig } from '../../../shared/vertexRag.js';
 
 const REQUEST_TIMEOUT = 120000; // 2 minutes for larger requests
 
@@ -67,18 +68,35 @@ export async function onRequestPost(context) {
     const topicNames = getSubtopicNames(topics, language === 'en' ? 'en' : 'zh');
 
     // Fetch style context from knowledge base (real HKDSE examples)
+    // Uses Vertex AI RAG Engine if configured, otherwise Vectorize
     let styleContext = '';
-    try {
-      // Search for relevant past paper examples based on topics
-      const styleQuery = `HKDSE Physics ${topicNames.slice(0, 3).join(' ')} past paper marking scheme`;
-      const kbResults = await searchKnowledgeBase(styleQuery, env, {
-        topK: 3,
-        minScore: 0.5,
-      });
+    let kbBackend = 'none';
 
-      if (kbResults && kbResults.length > 0) {
-        styleContext = formatKnowledgeContext(kbResults);
-        console.log(`Found ${kbResults.length} KB examples for style context`);
+    try {
+      const vertexConfig = checkVertexConfig(env);
+      kbBackend = vertexConfig.configured ? 'vertex_rag' : (env.VECTORIZE ? 'vectorize' : 'none');
+
+      if (kbBackend !== 'none') {
+        // Search for relevant past paper examples based on topics
+        // Use specific filters for better results
+        const styleQuery = `HKDSE Physics ${topicNames.slice(0, 3).join(' ')} exam question marking scheme`;
+
+        const kbResults = await searchKnowledgeBase(styleQuery, env, {
+          topK: 5,
+          minScore: 0.5,
+          filter: {
+            subject: 'Physics',
+            language: language === 'en' ? 'en' : 'zh',
+            // Include both past papers and marking schemes for style reference
+          },
+        });
+
+        if (kbResults && kbResults.length > 0) {
+          styleContext = formatKnowledgeContext(kbResults);
+          console.log(`Found ${kbResults.length} KB examples for style context (backend: ${kbBackend})`);
+        } else {
+          console.log(`No KB results found for topics: ${topicNames.slice(0, 3).join(', ')}`);
+        }
       }
     } catch (err) {
       console.warn('KB search for style context failed, continuing without:', err.message);

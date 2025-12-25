@@ -596,19 +596,23 @@
         <header class="header">
             <h1><i class="fas fa-brain"></i> Knowledge Base</h1>
             <div class="header-actions">
-                <button id="retryFailedBtn" class="btn btn-danger" onclick="retryFailed()"
+                <button id="refreshStatusBtn" class="btn btn-secondary" onclick="refreshStatus()"
                     style="display: none;">
-                    <i class="fas fa-redo"></i> <span id="retryBtnText">Retry Failed</span>
+                    <i class="fas fa-sync-alt"></i> <span id="refreshBtnText">Refresh Status</span>
                 </button>
-                <button id="processPendingBtn" class="btn btn-primary" onclick="processPending()"
-                    style="display: none;">
-                    <i class="fas fa-cog"></i> <span id="processBtnText">Process Pending</span>
+                <button id="retryFailedBtn" class="btn btn-danger" onclick="retryFailed()" style="display: none;">
+                    <i class="fas fa-redo"></i> <span id="retryBtnText">Re-ingest Failed</span>
                 </button>
                 <a href="/admin.html" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Admin
                 </a>
             </div>
         </header>
+
+        <!-- Backend indicator -->
+        <div id="backendIndicator" class="alert alert-info" style="display: none; margin-bottom: 20px;">
+            <i class="fas fa-cloud"></i> <span id="backendText">Loading...</span>
+        </div>
 
         <!-- Stats -->
         <div class="stats-grid" id="statsGrid">
@@ -670,10 +674,13 @@
 
                 <!-- File Upload Mode -->
                 <div id="fileUploadSection">
-                    <div class="alert alert-info">
+                    <div class="alert alert-info" id="uploadBackendInfo">
                         <i class="fas fa-info-circle"></i>
-                        Upload PDF or image files. <strong>Gemini 3 Pro</strong> will automatically extract text (OCR).
-                        <br><strong>Supported formats:</strong> PDF, PNG, JPG, WebP (max 10MB)
+                        <span id="uploadBackendText">
+                            Upload PDF or image files. <strong>Vertex AI RAG Engine</strong> will automatically parse,
+                            chunk, and index your documents.
+                            <br><strong>Supported formats:</strong> PDF, PNG, JPG, WebP (max 20MB)
+                        </span>
                     </div>
 
                     <form id="fileUploadForm" enctype="multipart/form-data">
@@ -917,13 +924,41 @@
                             </div>
                         </div>
 
-                        <!-- Vectorize -->
+                        <!-- Vertex AI RAG -->
+                        <div class="connection-card" id="test-vertex">
+                            <div class="connection-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="connection-info">
+                                <div class="connection-name">Vertex AI RAG Engine</div>
+                                <div class="connection-status" id="status-vertex">Not tested</div>
+                            </div>
+                            <div class="connection-badge" id="badge-vertex">
+                                <i class="fas fa-minus"></i>
+                            </div>
+                        </div>
+
+                        <!-- GCS Storage -->
+                        <div class="connection-card" id="test-gcs">
+                            <div class="connection-icon">
+                                <i class="fas fa-bucket"></i>
+                            </div>
+                            <div class="connection-info">
+                                <div class="connection-name">Google Cloud Storage</div>
+                                <div class="connection-status" id="status-gcs">Not tested</div>
+                            </div>
+                            <div class="connection-badge" id="badge-gcs">
+                                <i class="fas fa-minus"></i>
+                            </div>
+                        </div>
+
+                        <!-- Vectorize (Fallback) -->
                         <div class="connection-card" id="test-vectorize">
                             <div class="connection-icon">
                                 <i class="fas fa-brain"></i>
                             </div>
                             <div class="connection-info">
-                                <div class="connection-name">Vectorize Index</div>
+                                <div class="connection-name">Vectorize (Fallback)</div>
                                 <div class="connection-status" id="status-vectorize">Not tested</div>
                             </div>
                             <div class="connection-badge" id="badge-vectorize">
@@ -945,27 +980,13 @@
                             </div>
                         </div>
 
-                        <!-- Gemini -->
-                        <div class="connection-card" id="test-gemini">
-                            <div class="connection-icon">
-                                <i class="fas fa-eye"></i>
-                            </div>
-                            <div class="connection-info">
-                                <div class="connection-name">Gemini OCR</div>
-                                <div class="connection-status" id="status-gemini">Not tested</div>
-                            </div>
-                            <div class="connection-badge" id="badge-gemini">
-                                <i class="fas fa-minus"></i>
-                            </div>
-                        </div>
-
-                        <!-- R2 -->
+                        <!-- R2 (Legacy) -->
                         <div class="connection-card" id="test-r2">
                             <div class="connection-icon">
-                                <i class="fas fa-cloud"></i>
+                                <i class="fas fa-archive"></i>
                             </div>
                             <div class="connection-info">
-                                <div class="connection-name">R2 Storage</div>
+                                <div class="connection-name">R2 Storage (Legacy)</div>
                                 <div class="connection-status" id="status-r2">Not tested</div>
                             </div>
                             <div class="connection-badge" id="badge-r2">
@@ -995,14 +1016,45 @@
         const API_BASE = '/api';
         let documents = [];
 
+        // Backend configuration
+        let backendType = 'unknown';
+
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
+            await checkBackend();
             await loadDocuments();
             initTabs();
             initUploadForm();
             initSearch();
             initConnectionTests();
         });
+
+        // Check which backend is configured
+        async function checkBackend() {
+            try {
+                const response = await fetch(`${API_BASE}/kb/test`, { credentials: 'include' });
+                const data = await response.json();
+
+                if (data.results?.vertex?.status === 'ok') {
+                    backendType = 'vertex';
+                    document.getElementById('backendIndicator').style.display = 'flex';
+                    document.getElementById('backendText').innerHTML =
+                        '<strong>Vertex AI RAG Engine</strong> is active. Documents are processed automatically after upload.';
+                    document.getElementById('uploadBackendText').innerHTML =
+                        'Upload PDF or image files. <strong>Vertex AI RAG Engine</strong> will automatically parse, chunk, and index your documents.<br><strong>Supported formats:</strong> PDF, PNG, JPG, WebP (max 20MB)';
+                } else if (data.results?.vectorize?.status === 'ok') {
+                    backendType = 'vectorize';
+                    document.getElementById('backendIndicator').style.display = 'flex';
+                    document.getElementById('backendIndicator').className = 'alert alert-warning';
+                    document.getElementById('backendText').innerHTML =
+                        '<strong>Vectorize (Fallback)</strong> is active. For better performance, configure Vertex AI RAG Engine.';
+                    document.getElementById('uploadBackendText').innerHTML =
+                        'Upload PDF or image files. <strong>Gemini OCR</strong> will extract text. May require manual processing.<br><strong>Supported formats:</strong> PDF, PNG, JPG, WebP (max 10MB)';
+                }
+            } catch (err) {
+                console.error('Backend check failed:', err);
+            }
+        }
 
         // Tab switching
         function initTabs() {
@@ -1132,110 +1184,113 @@
             const years = new Set(documents.filter(d => d.year).map(d => d.year));
             document.getElementById('statYears').textContent = years.size;
 
-            // Show/hide Process Pending button
-            const pendingCount = documents.filter(d => d.status === 'pending').length;
-            const processBtn = document.getElementById('processPendingBtn');
-            const processBtnText = document.getElementById('processBtnText');
+            // Show/hide Refresh Status button (for processing documents)
+            const processingCount = documents.filter(d => d.status === 'processing').length;
+            const refreshBtn = document.getElementById('refreshStatusBtn');
+            const refreshBtnText = document.getElementById('refreshBtnText');
 
-            if (pendingCount > 0) {
-                processBtn.style.display = 'inline-flex';
-                processBtnText.textContent = `Process Pending (${pendingCount})`;
+            if (processingCount > 0) {
+                refreshBtn.style.display = 'inline-flex';
+                refreshBtnText.textContent = `Refresh Status (${processingCount})`;
             } else {
-                processBtn.style.display = 'none';
+                refreshBtn.style.display = 'none';
             }
-            
-            // Show/hide Retry Failed button
+
+            // Show/hide Re-ingest Failed button
             const failedCount = documents.filter(d => d.status === 'error').length;
             const retryBtn = document.getElementById('retryFailedBtn');
             const retryBtnText = document.getElementById('retryBtnText');
-            
+
             if (failedCount > 0) {
                 retryBtn.style.display = 'inline-flex';
-                retryBtnText.textContent = `Retry Failed (${failedCount})`;
+                retryBtnText.textContent = `Re-ingest Failed (${failedCount})`;
             } else {
                 retryBtn.style.display = 'none';
             }
         }
-        
-        // Retry failed documents
+
+        // Re-ingest failed documents
         async function retryFailed() {
             const retryBtn = document.getElementById('retryFailedBtn');
             const retryBtnText = document.getElementById('retryBtnText');
-            
+
             retryBtn.disabled = true;
-            retryBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Retrying...';
-            
+            retryBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Re-ingesting...';
+
             try {
-                const response = await fetch(`${API_BASE}/kb/retry`, {
+                const response = await fetch(`${API_BASE}/kb/reingest`, {
                     method: 'POST',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({}) // Retry all failed
+                    body: JSON.stringify({}) // Re-ingest all failed
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    alert(`✅ ${result.message}`);
+                    alert(`✅ ${result.message}\nDocuments queued for re-ingestion.`);
                 } else {
                     alert(`❌ Error: ${result.error}`);
                 }
-                
+
                 await loadDocuments();
-                
+
             } catch (err) {
-                console.error('Retry error:', err);
-                alert('Failed to retry: ' + err.message);
+                console.error('Re-ingest error:', err);
+                alert('Failed to re-ingest: ' + err.message);
             } finally {
                 retryBtn.disabled = false;
             }
         }
 
-        // Process pending documents
-        let isProcessing = false;
+        // Refresh status for processing documents (Vertex AI)
+        let isRefreshing = false;
 
-        async function processPending() {
-            if (isProcessing) return;
+        async function refreshStatus() {
+            if (isRefreshing) return;
 
-            const processBtn = document.getElementById('processPendingBtn');
-            const processBtnText = document.getElementById('processBtnText');
+            const refreshBtn = document.getElementById('refreshStatusBtn');
+            const refreshBtnText = document.getElementById('refreshBtnText');
 
-            isProcessing = true;
-            processBtn.disabled = true;
-            processBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            isRefreshing = true;
+            refreshBtn.disabled = true;
+            refreshBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
 
             try {
-                const response = await fetch(`${API_BASE}/kb/process`, {
-                    method: 'POST',
+                const response = await fetch(`${API_BASE}/kb/status`, {
+                    method: 'GET',
                     credentials: 'include',
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
-                    if (result.status === 'ready') {
-                        alert(`✅ Processed: ${result.title}\n${result.chunkCount} chunks extracted`);
+                    const completedCount = result.updates?.filter(u => u.newStatus === 'ready').length || 0;
+                    const failedCount = result.updates?.filter(u => u.newStatus === 'error').length || 0;
+
+                    if (completedCount > 0 || failedCount > 0) {
+                        alert(`Status updated:\n✅ Completed: ${completedCount}\n❌ Failed: ${failedCount}`);
                     } else {
-                        alert(result.message);
+                        alert('All documents still processing. Check back in a moment.');
                     }
                 } else {
-                    alert(`❌ Error: ${result.error}`);
+                    alert(`❌ Error: ${result.error || 'Status check failed'}`);
                 }
 
                 // Reload documents to update status
                 await loadDocuments();
 
             } catch (err) {
-                console.error('Process error:', err);
-                alert('Failed to process: ' + err.message);
+                console.error('Refresh error:', err);
+                alert('Failed to refresh status: ' + err.message);
             } finally {
-                isProcessing = false;
-                processBtn.disabled = false;
+                isRefreshing = false;
+                refreshBtn.disabled = false;
 
-                // Update button text based on remaining pending docs
-                const pendingCount = documents.filter(d => d.status === 'pending').length;
-                if (pendingCount > 0) {
-                    processBtnText.textContent = `Process Pending (${pendingCount})`;
+                // Update button text based on remaining processing docs
+                const processingCount = documents.filter(d => d.status === 'processing').length;
+                if (processingCount > 0) {
+                    refreshBtnText.textContent = `Refresh Status (${processingCount})`;
                 }
             }
         }
@@ -1460,12 +1515,14 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
 
             // Reset all cards to testing state
-            const services = ['d1', 'vectorize', 'openai', 'gemini', 'r2'];
+            const services = ['d1', 'vertex', 'gcs', 'vectorize', 'openai', 'r2'];
             services.forEach(service => {
                 const card = document.getElementById(`test-${service}`);
-                card.className = 'connection-card testing';
-                document.getElementById(`status-${service}`).textContent = 'Testing...';
-                document.getElementById(`badge-${service}`).innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                if (card) {
+                    card.className = 'connection-card testing';
+                    document.getElementById(`status-${service}`).textContent = 'Testing...';
+                    document.getElementById(`badge-${service}`).innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                }
             });
 
             // Clear hints

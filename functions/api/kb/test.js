@@ -1,9 +1,10 @@
 /**
  * Knowledge Base Connection Test API
- * Tests all required services: D1, Vectorize, OpenAI, Gemini, R2
+ * Tests all required services: D1, Vertex AI RAG, GCS, Vectorize (fallback), Gemini, R2 (legacy)
  */
 
 import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
+import { checkVertexConfig, getGoogleAccessToken, getGcpConfig } from '../../../shared/vertexRag.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,9 +34,10 @@ export async function onRequestGet(context) {
     // Run all tests
     const results = {
       d1: await testD1(env),
+      vertex: await testVertexRAG(env),
+      gcs: await testGCS(env),
       vectorize: await testVectorize(env),
       openai: await testOpenAI(env),
-      gemini: await testGemini(env),
       r2: await testR2(env),
     };
 
@@ -98,37 +100,181 @@ async function testD1(env) {
 }
 
 /**
- * Test Vectorize index
+ * Test Vertex AI RAG Engine connection
+ */
+async function testVertexRAG(env) {
+  const config = checkVertexConfig(env);
+
+  if (!config.configured) {
+    return {
+      status: 'warning',
+      message: 'Vertex AI RAG not configured',
+      hint: config.issues.join(', '),
+    };
+  }
+
+  const start = Date.now();
+
+  try {
+    // Get access token to verify service account
+    await getGoogleAccessToken(env);
+
+    // Try to list RAG files (simple API call to verify corpus access)
+    const gcpConfig = getGcpConfig(env);
+    const corpusName = `projects/${gcpConfig.projectId}/locations/${gcpConfig.location}/ragCorpora/${gcpConfig.corpusId}`;
+    const url = `https://${gcpConfig.location}-aiplatform.googleapis.com/v1beta1/${corpusName}/ragFiles?pageSize=1`;
+
+    const accessToken = await getGoogleAccessToken(env);
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
+
+    const latency = Date.now() - start;
+
+    if (!response.ok) {
+      const error = await response.text();
+      if (response.status === 404) {
+        return {
+          status: 'error',
+          message: 'Corpus not found',
+          hint: 'Check VERTEX_RAG_CORPUS_ID and GCP_LOCATION',
+        };
+      }
+      return {
+        status: 'error',
+        message: `API error: ${response.status}`,
+        hint: error.substring(0, 100),
+      };
+    }
+
+    const data = await response.json();
+    const fileCount = data.ragFiles?.length || 0;
+
+    return {
+      status: 'ok',
+      message: `RAG Engine ready (${fileCount}+ files in corpus)`,
+      latency: `${latency}ms`,
+    };
+  } catch (err) {
+    return {
+      status: 'error',
+      message: err.message,
+      hint: 'Check GCP_SERVICE_ACCOUNT_JSON',
+    };
+  }
+}
+
+/**
+ * Test Google Cloud Storage connection
+ */
+async function testGCS(env) {
+  const config = getGcpConfig(env);
+
+  if (!config.bucketName) {
+    return {
+      status: 'warning',
+      message: 'GCS bucket not configured',
+      hint: 'Set GCS_BUCKET_NAME environment variable',
+    };
+  }
+
+  const start = Date.now();
+
+  try {
+    const accessToken = await getGoogleAccessToken(env);
+
+    // Try to list objects in bucket
+    const url = `https://storage.googleapis.com/storage/v1/b/${config.bucketName}/o?maxResults=1`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
+
+    const latency = Date.now() - start;
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return {
+          status: 'error',
+          message: 'Bucket not found',
+          hint: `Check bucket name: ${config.bucketName}`,
+        };
+      }
+      if (response.status === 403) {
+        return {
+          status: 'error',
+          message: 'Permission denied',
+          hint: 'Grant roles/storage.objectAdmin to service account',
+        };
+      }
+      return {
+        status: 'error',
+        message: `HTTP ${response.status}`,
+      };
+    }
+
+    return {
+      status: 'ok',
+      message: `Bucket accessible: ${config.bucketName}`,
+      latency: `${latency}ms`,
+    };
+  } catch (err) {
+    if (err.message?.includes('GCP_SERVICE_ACCOUNT_JSON')) {
+      return {
+        status: 'warning',
+        message: 'GCS test skipped (no service account)',
+        hint: 'Configure GCP_SERVICE_ACCOUNT_JSON',
+      };
+    }
+    return {
+      status: 'error',
+      message: err.message,
+    };
+  }
+}
+
+/**
+ * Test Vectorize index (fallback for text uploads)
  */
 async function testVectorize(env) {
   if (!env.VECTORIZE) {
     return {
-      status: 'error',
-      message: 'Vectorize not bound',
-      hint: 'Check wrangler.toml [[vectorize]] binding and create index in Cloudflare Dashboard',
+      status: 'warning',
+      message: 'Vectorize not bound (optional fallback)',
+      hint: 'Vertex RAG is primary. Vectorize is optional for text-only uploads.',
     };
   }
 
   try {
     // Try to describe the index or do a simple query
     // Vectorize doesn't have a describe method, so we'll try a dummy query
-    const dummyVector = new Array(1536).fill(0);
+    // Using 768 dimensions for Gemini embeddings
+    const dummyVector = new Array(768).fill(0);
     const result = await env.VECTORIZE.query(dummyVector, { topK: 1 });
 
     return {
       status: 'ok',
-      message: `Index ready (${result.matches?.length || 0} test matches)`,
+      message: `Vectorize ready (fallback for text)`,
     };
   } catch (err) {
     if (err.message?.includes('not found') || err.message?.includes('does not exist')) {
       return {
-        status: 'error',
+        status: 'warning',
         message: 'Vectorize index not found',
-        hint: 'Create index: wrangler vectorize create hkdse-physics-kb --dimensions=1536 --metric=cosine',
+        hint: 'Optional: wrangler vectorize create hkdse-physics-kb --dimensions=768 --metric=cosine',
+      };
+    }
+    if (err.message?.includes('dimension')) {
+      return {
+        status: 'warning',
+        message: 'Dimension mismatch (768 expected)',
+        hint: 'Recreate index with --dimensions=768',
       };
     }
     return {
-      status: 'error',
+      status: 'warning',
       message: err.message,
     };
   }
@@ -197,71 +343,14 @@ async function testOpenAI(env) {
 }
 
 /**
- * Test Gemini API (for OCR)
- */
-async function testGemini(env) {
-  if (!env.GEMINI_API_KEY) {
-    return {
-      status: 'warning',
-      message: 'GEMINI_API_KEY not set',
-      hint: 'Optional for PDF OCR. Set secret: wrangler pages secret put GEMINI_API_KEY',
-    };
-  }
-
-  const start = Date.now();
-
-  try {
-    // Test with a simple text generation request
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${env.GEMINI_API_KEY}`;
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: 'Say "ok" only' }] }],
-        generationConfig: { maxOutputTokens: 10 },
-      }),
-    });
-
-    const latency = Date.now() - start;
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      if (response.status === 400 && error.error?.message?.includes('API key')) {
-        return {
-          status: 'error',
-          message: 'Invalid API key',
-          hint: 'Check your GEMINI_API_KEY',
-        };
-      }
-      return {
-        status: 'error',
-        message: error.error?.message || `HTTP ${response.status}`,
-      };
-    }
-
-    return {
-      status: 'ok',
-      message: 'OCR ready (Gemini)',
-      latency: `${latency}ms`,
-    };
-  } catch (err) {
-    return {
-      status: 'error',
-      message: err.message,
-    };
-  }
-}
-
-/**
- * Test R2 Storage bucket
+ * Test R2 Storage bucket (legacy, for fallback processing)
  */
 async function testR2(env) {
   if (!env.R2_BUCKET) {
     return {
       status: 'warning',
-      message: 'R2_BUCKET not bound',
-      hint: 'Optional for file storage. Check wrangler.toml [[r2_buckets]] binding',
+      message: 'R2 not bound (legacy)',
+      hint: 'Optional legacy storage. GCS is now primary.',
     };
   }
 
@@ -271,13 +360,13 @@ async function testR2(env) {
 
     return {
       status: 'ok',
-      message: `Bucket accessible (${list.objects?.length || 0}+ files)`,
+      message: `R2 accessible (legacy fallback)`,
     };
   } catch (err) {
     return {
-      status: 'error',
+      status: 'warning',
       message: err.message,
-      hint: 'Check R2 bucket permissions',
+      hint: 'R2 is optional with Vertex RAG',
     };
   }
 }
