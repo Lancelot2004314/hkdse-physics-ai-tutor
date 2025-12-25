@@ -596,6 +596,10 @@
         <header class="header">
             <h1><i class="fas fa-brain"></i> Knowledge Base</h1>
             <div class="header-actions">
+                <button id="retryFailedBtn" class="btn btn-danger" onclick="retryFailed()"
+                    style="display: none;">
+                    <i class="fas fa-redo"></i> <span id="retryBtnText">Retry Failed</span>
+                </button>
                 <button id="processPendingBtn" class="btn btn-primary" onclick="processPending()"
                     style="display: none;">
                     <i class="fas fa-cog"></i> <span id="processBtnText">Process Pending</span>
@@ -1138,6 +1142,52 @@
                 processBtnText.textContent = `Process Pending (${pendingCount})`;
             } else {
                 processBtn.style.display = 'none';
+            }
+            
+            // Show/hide Retry Failed button
+            const failedCount = documents.filter(d => d.status === 'error').length;
+            const retryBtn = document.getElementById('retryFailedBtn');
+            const retryBtnText = document.getElementById('retryBtnText');
+            
+            if (failedCount > 0) {
+                retryBtn.style.display = 'inline-flex';
+                retryBtnText.textContent = `Retry Failed (${failedCount})`;
+            } else {
+                retryBtn.style.display = 'none';
+            }
+        }
+        
+        // Retry failed documents
+        async function retryFailed() {
+            const retryBtn = document.getElementById('retryFailedBtn');
+            const retryBtnText = document.getElementById('retryBtnText');
+            
+            retryBtn.disabled = true;
+            retryBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Retrying...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/kb/retry`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}) // Retry all failed
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`✅ ${result.message}`);
+                } else {
+                    alert(`❌ Error: ${result.error}`);
+                }
+                
+                await loadDocuments();
+                
+            } catch (err) {
+                console.error('Retry error:', err);
+                alert('Failed to retry: ' + err.message);
+            } finally {
+                retryBtn.disabled = false;
             }
         }
 
