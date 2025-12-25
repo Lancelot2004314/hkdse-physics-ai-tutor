@@ -253,8 +253,40 @@
             document.getElementById('flagBtn').classList.toggle('active', flaggedQuestions.has(index));
 
             // Re-render MathJax
-            if (window.MathJax) {
-                MathJax.typesetPromise();
+            safeTypesetMath();
+        }
+
+        function safeTypesetMath() {
+            try {
+                if (!window.MathJax) return;
+
+                // MathJax v3: wait for startup promise if available, then typeset
+                const startupPromise = window.MathJax.startup?.promise;
+                if (startupPromise && typeof startupPromise.then === 'function') {
+                    startupPromise
+                        .then(() => {
+                            if (typeof window.MathJax.typesetPromise === 'function') {
+                                return window.MathJax.typesetPromise();
+                            }
+                            if (typeof window.MathJax.typeset === 'function') {
+                                window.MathJax.typeset();
+                            }
+                            return null;
+                        })
+                        .catch(() => {
+                            // Ignore MathJax render errors to avoid breaking quiz UI
+                        });
+                    return;
+                }
+
+                // Fallback: typesetPromise if present, else typeset (sync)
+                if (typeof window.MathJax.typesetPromise === 'function') {
+                    window.MathJax.typesetPromise().catch(() => {});
+                } else if (typeof window.MathJax.typeset === 'function') {
+                    window.MathJax.typeset();
+                }
+            } catch (e) {
+                // Never allow MathJax to crash the whole page
             }
         }
 
