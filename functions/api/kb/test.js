@@ -152,7 +152,7 @@ async function testOpenAI(env) {
   try {
     // Test with a minimal embedding request using Gemini
     const url = `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${env.GEMINI_API_KEY}`;
-    
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {

@@ -43,14 +43,14 @@ export async function onRequestPost(context) {
     if (!env.VECTORIZE) {
       return errorResponse(500, 'Vectorize not configured');
     }
-    if (!env.OPENAI_API_KEY) {
-      return errorResponse(500, 'OpenAI API key not configured');
+    if (!env.GEMINI_API_KEY) {
+      return errorResponse(500, 'Gemini API key not configured');
     }
 
     // Check content type
     const contentType = request.headers.get('Content-Type') || '';
 
-    let title, content, year, paper, source, filename;
+    let title, content, year, paper, source, filename, language, subject, docType;
 
     if (contentType.includes('multipart/form-data')) {
       // Handle file upload
@@ -60,6 +60,9 @@ export async function onRequestPost(context) {
       year = formData.get('year');
       paper = formData.get('paper');
       source = formData.get('source') || 'DSE';
+      language = formData.get('language') || 'en';
+      subject = formData.get('subject') || 'Physics';
+      docType = formData.get('docType') || 'Past Paper';
 
       if (!file || !title) {
         return errorResponse(400, 'File and title are required');
@@ -89,7 +92,7 @@ export async function onRequestPost(context) {
         const fileId = `${Date.now()}_${filename}`;
         const arrayBuffer = await file.arrayBuffer();
         await env.R2_BUCKET.put(fileId, arrayBuffer, {
-          customMetadata: { title, year: year || '', paper: paper || '' },
+          customMetadata: { title, year: year || '', paper: paper || '', language, subject, docType },
         });
       }
 
@@ -101,6 +104,9 @@ export async function onRequestPost(context) {
       year = body.year;
       paper = body.paper;
       source = body.source || 'DSE';
+      language = body.language || 'en';
+      subject = body.subject || 'Physics';
+      docType = body.docType || 'Past Paper';
 
       if (!title || !content) {
         return errorResponse(400, 'Title and content are required');
@@ -116,9 +122,9 @@ export async function onRequestPost(context) {
 
     // Create document record
     await env.DB.prepare(`
-      INSERT INTO kb_documents (id, title, filename, year, paper, source, status, created_by)
-      VALUES (?, ?, ?, ?, ?, ?, 'processing', ?)
-    `).bind(docId, title, filename || null, year || null, paper || null, source, user.id).run();
+      INSERT INTO kb_documents (id, title, filename, year, paper, source, language, subject, doc_type, status, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'processing', ?)
+    `).bind(docId, title, filename || null, year || null, paper || null, source, language, subject, docType, user.id).run();
 
     // Chunk the document
     const chunks = chunkDocument(content);
@@ -175,6 +181,9 @@ export async function onRequestPost(context) {
           question_number: chunk.questionNumber || '',
           topic: detectedTopic || '',
           content_type: detectContentType(chunk.content),
+          language: language || 'en',
+          subject: subject || 'Physics',
+          doc_type: docType || 'Past Paper',
           content: chunk.content.substring(0, 1000),
         },
       });

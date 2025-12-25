@@ -240,6 +240,30 @@
             color: #991b1b;
         }
 
+        .tag-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-right: 4px;
+        }
+
+        .tag-lang {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .tag-subject {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .tag-doctype {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
         .search-box {
             margin-bottom: 20px;
         }
@@ -666,6 +690,40 @@
                             </div>
                         </div>
 
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fileLanguage">Language</label>
+                                <select id="fileLanguage">
+                                    <option value="en">English</option>
+                                    <option value="zh">中文</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="fileSubject">Subject</label>
+                                <select id="fileSubject">
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="M1">M1</option>
+                                    <option value="M2">M2</option>
+                                    <option value="ICT">ICT</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="fileDocType">Document Type</label>
+                                <select id="fileDocType">
+                                    <option value="Past Paper">Past Paper (Questions)</option>
+                                    <option value="Marking Scheme">Answers / Marking Scheme</option>
+                                    <option value="Candidate Performance">Candidate Performance</option>
+                                    <option value="Sample Paper">Curriculum Sample Paper</option>
+                                    <option value="Practice Paper">Practice Paper</option>
+                                    <option value="Notes">Notes</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label>File *</label>
                             <div class="file-drop-area" id="fileDropArea"
@@ -731,6 +789,40 @@
                                     <option value="Mock">Mock Exam</option>
                                     <option value="Textbook">Textbook</option>
                                     <option value="Notes">Personal Notes</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="language">Language</label>
+                                <select id="language">
+                                    <option value="en">English</option>
+                                    <option value="zh">中文</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="subject">Subject</label>
+                                <select id="subject">
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="M1">M1</option>
+                                    <option value="M2">M2</option>
+                                    <option value="ICT">ICT</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="docType">Document Type</label>
+                                <select id="docType">
+                                    <option value="Past Paper">Past Paper (Questions)</option>
+                                    <option value="Marking Scheme">Answers / Marking Scheme</option>
+                                    <option value="Candidate Performance">Candidate Performance</option>
+                                    <option value="Sample Paper">Curriculum Sample Paper</option>
+                                    <option value="Practice Paper">Practice Paper</option>
+                                    <option value="Notes">Notes</option>
                                 </select>
                             </div>
                         </div>
@@ -949,6 +1041,11 @@
                     <div class="document-info">
                         <div class="document-title">${escapeHtml(doc.title)}</div>
                         <div class="document-meta">
+                            ${doc.language ? `<span class="tag-badge tag-lang">${doc.language === 'zh' ? '中文' : 'EN'}</span>` : ''}
+                            ${doc.subject ? `<span class="tag-badge tag-subject">${escapeHtml(doc.subject)}</span>` : ''}
+                            ${doc.doc_type ? `<span class="tag-badge tag-doctype">${escapeHtml(doc.doc_type)}</span>` : ''}
+                        </div>
+                        <div class="document-meta" style="margin-top: 4px;">
                             ${doc.year ? `${doc.year} · ` : ''}
                             ${doc.paper || doc.source || 'Unknown'} · 
                             ${doc.chunk_count} chunks · 
@@ -1077,6 +1174,9 @@
                     formData.append('year', document.getElementById('fileYear').value);
                     formData.append('paper', document.getElementById('filePaper').value);
                     formData.append('source', document.getElementById('fileSource').value);
+                    formData.append('language', document.getElementById('fileLanguage').value);
+                    formData.append('subject', document.getElementById('fileSubject').value);
+                    formData.append('docType', document.getElementById('fileDocType').value);
 
                     const response = await fetch(`${API_BASE}/kb/upload`, {
                         method: 'POST',
@@ -1117,6 +1217,9 @@
                 const year = document.getElementById('year').value;
                 const paper = document.getElementById('paper').value;
                 const source = document.getElementById('source').value;
+                const language = document.getElementById('language').value;
+                const subject = document.getElementById('subject').value;
+                const docType = document.getElementById('docType').value;
 
                 if (!title || !content) {
                     showUploadStatus('Please fill in all required fields', 'error');
@@ -1138,6 +1241,9 @@
                             year: year ? parseInt(year) : null,
                             paper: paper || null,
                             source,
+                            language,
+                            subject,
+                            docType,
                         }),
                     });
 
@@ -1313,6 +1419,11 @@
                 if (response.ok) {
                     document.getElementById('viewModalTitle').textContent = data.document.title;
                     document.getElementById('viewModalContent').innerHTML = `
+                        <div class="document-meta" style="margin-bottom: 8px;">
+                            ${data.document.language ? `<span class="tag-badge tag-lang">${data.document.language === 'zh' ? '中文' : 'EN'}</span>` : ''}
+                            ${data.document.subject ? `<span class="tag-badge tag-subject">${escapeHtml(data.document.subject)}</span>` : ''}
+                            ${data.document.doc_type ? `<span class="tag-badge tag-doctype">${escapeHtml(data.document.doc_type)}</span>` : ''}
+                        </div>
                         <div class="document-meta" style="margin-bottom: 16px;">
                             ${data.document.year ? `Year: ${data.document.year} · ` : ''}
                             ${data.document.paper || ''} · ${data.document.source || ''}
@@ -1374,4 +1485,3 @@
 </body>
 
 </html>
-
