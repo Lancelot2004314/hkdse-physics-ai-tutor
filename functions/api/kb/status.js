@@ -34,6 +34,13 @@ export async function onRequest(context) {
     }
 
     if (request.method === 'GET') {
+      // Check if specific document ID is requested
+      const url = new URL(request.url);
+      const docId = url.searchParams.get('docId');
+      
+      if (docId) {
+        return await checkSpecificDocument(env, docId, null);
+      }
       return await checkAllProcessingDocuments(env);
     } else if (request.method === 'POST') {
       const body = await request.json();

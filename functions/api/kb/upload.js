@@ -16,6 +16,78 @@ const corsHeaders = {
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB max for PDF (GCS handles larger files)
 
+/**
+ * Auto-detect metadata from filename
+ * Supports patterns like:
+ * - 2012-physics-2.pdf → Year: 2012, Paper: Paper 2
+ * - 2013-ms.pdf → Year: 2013, Doc Type: Marking Scheme
+ * - 2013-physics-1a.pdf → Year: 2013, Paper: Paper 1A
+ * - 2012-candidate-performance.pdf → Year: 2012, Doc Type: Candidate Performance
+ */
+function autoDetectMetadata(filename) {
+  const result = {
+    year: null,
+    paper: null,
+    docType: 'Past Paper',
+    language: 'en',
+    subject: 'Physics',
+    title: null,
+  };
+
+  if (!filename) return result;
+
+  const lowerFilename = filename.toLowerCase();
+  const baseName = filename.replace(/\.[^/.]+$/, ''); // Remove extension
+
+  // Extract year (4 digits, 2012-2030)
+  const yearMatch = filename.match(/\b(20[1-3]\d)\b/);
+  if (yearMatch) {
+    result.year = yearMatch[1];
+  }
+
+  // Detect document type
+  if (lowerFilename.includes('ms') || lowerFilename.includes('marking') || lowerFilename.includes('answer')) {
+    result.docType = 'Marking Scheme';
+  } else if (lowerFilename.includes('candidate') || lowerFilename.includes('performance') || lowerFilename.includes('report')) {
+    result.docType = 'Candidate Performance';
+  } else if (lowerFilename.includes('sample') || lowerFilename.includes('practice')) {
+    result.docType = 'Practice Paper';
+  }
+
+  // Detect paper number
+  // Pattern: physics-1a, paper-2, 1a, 1b, 2
+  const paperPatterns = [
+    /(?:physics|paper)[_-]?(1a|1b|2)/i,
+    /[_-](1a|1b|2)(?:[_.\s-]|$)/i,
+    /\b(paper)\s*(1a|1b|2)\b/i,
+  ];
+
+  for (const pattern of paperPatterns) {
+    const match = lowerFilename.match(pattern);
+    if (match) {
+      const paperNum = match[1] || match[2];
+      result.paper = `Paper ${paperNum.toUpperCase()}`;
+      break;
+    }
+  }
+
+  // Detect language
+  if (lowerFilename.includes('chi') || lowerFilename.includes('中文') || lowerFilename.includes('chinese')) {
+    result.language = 'zh';
+  }
+
+  // Generate smart title
+  const parts = [];
+  if (result.year) parts.push(result.year);
+  parts.push('Physics');
+  if (result.paper) parts.push(result.paper);
+  if (result.docType !== 'Past Paper') parts.push(result.docType);
+
+  result.title = parts.join(' ');
+
+  return result;
+}
+
 export async function onRequestOptions() {
   return new Response(null, { headers: corsHeaders });
 }

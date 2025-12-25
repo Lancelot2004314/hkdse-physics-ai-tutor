@@ -181,7 +181,7 @@ export async function ragRetrieve(env, query, filters = {}, topK = 5) {
   }
 
   const corpusName = `projects/${config.projectId}/locations/${config.location}/ragCorpora/${config.corpusId}`;
-  
+
   // Use the location-level retrieveContexts endpoint (not corpus-level)
   const url = `https://${config.location}-aiplatform.googleapis.com/v1beta1/projects/${config.projectId}/locations/${config.location}:retrieveContexts`;
 

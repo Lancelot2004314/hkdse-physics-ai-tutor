@@ -276,6 +276,47 @@ function uploadFile(filePath, options) {
     });
 }
 
+// 检查文档处理状态
+function checkDocumentStatus(docId, options) {
+    return new Promise((resolve, reject) => {
+        const url = new URL(`${options.apiUrl}/api/kb/status`);
+        const isHttps = url.protocol === 'https:';
+        const httpModule = isHttps ? https : http;
+
+        const reqOptions = {
+            hostname: url.hostname,
+            port: url.port || (isHttps ? 443 : 80),
+            path: `${url.pathname}?docId=${docId}`,
+            method: 'GET',
+            timeout: 30000,
+            headers: {
+                'Cookie': options.cookie || ''
+            }
+        };
+
+        const req = httpModule.request(reqOptions, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                try {
+                    const result = JSON.parse(data);
+                    resolve(result);
+                } catch (e) {
+                    reject(new Error('Invalid response'));
+                }
+            });
+        });
+
+        req.on('timeout', () => {
+            req.destroy();
+            reject(new Error('Status check timeout'));
+        });
+
+        req.on('error', reject);
+        req.end();
+    });
+}
+
 // 主函数
 async function main() {
     const args = process.argv.slice(2);
@@ -400,17 +441,52 @@ async function main() {
 
         try {
             const result = await uploadFile(file, options);
-            console.log('✅ 成功');
+            console.log('✅ 上传成功');
+            
+            // 检查是否返回了 operationId (Vertex AI RAG)
+            if (result.result && result.result.operationId) {
+                console.log(`   🔄 Vertex AI 处理中... (Operation: ${result.result.operationId.slice(-20)})`);
+                
+                // 轮询等待处理完成
+                const docId = result.result.id;
+                let attempts = 0;
+                const maxAttempts = 60; // 最多等待 5 分钟 (60 * 5秒)
+                
+                while (attempts < maxAttempts) {
+                    await new Promise(r => setTimeout(r, 5000)); // 每 5 秒检查一次
+                    attempts++;
+                    
+                    try {
+                        const status = await checkDocumentStatus(docId, options);
+                        process.stdout.write(`\r   ⏳ 等待处理... (${attempts * 5}s) - 状态: ${status.status}    `);
+                        
+                        if (status.status === 'ready') {
+                            console.log(`\n   ✅ 处理完成！`);
+                            break;
+                        } else if (status.status === 'error') {
+                            console.log(`\n   ⚠️ 处理出错: ${status.error || 'Unknown error'}`);
+                            break;
+                        }
+                    } catch (e) {
+                        // 忽略状态检查错误，继续等待
+                    }
+                }
+                
+                if (attempts >= maxAttempts) {
+                    console.log(`\n   ⚠️ 处理超时，但会在后台继续`);
+                }
+            }
+            
             results.success.push({ file: fileName, result: result.result });
         } catch (error) {
             console.log(`❌ 失败: ${error.message}`);
             results.failed.push({ file: fileName, error: error.message });
         }
 
-        // 延迟 3 秒，让服务器有时间处理
+        // 短暂延迟后继续下一个
         if (i < files.length - 1) {
-            console.log('   ⏳ 等待 3 秒...');
-            await new Promise(r => setTimeout(r, 3000));
+            console.log('   ⏳ 准备下一个文件...');
+            await new Promise(r => setTimeout(r, 2000));
         }
     }
 
