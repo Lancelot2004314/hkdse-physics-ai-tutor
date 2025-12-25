@@ -85,12 +85,12 @@ export async function onRequestPost(context) {
         r2Key = `uploads/${Date.now()}_${filename}`;
         const arrayBuffer = await file.arrayBuffer();
         await env.R2_BUCKET.put(r2Key, arrayBuffer, {
-          customMetadata: { 
-            title, 
-            year: year || '', 
-            paper: paper || '', 
-            language, 
-            subject, 
+          customMetadata: {
+            title,
+            year: year || '',
+            paper: paper || '',
+            language,
+            subject,
             docType,
             mimeType: fileType
           },
@@ -128,15 +128,15 @@ export async function onRequestPost(context) {
       INSERT INTO kb_documents (id, title, filename, year, paper, source, language, subject, doc_type, status, r2_key, created_by)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
-      docId, 
-      title, 
-      filename || null, 
-      year || null, 
-      paper || null, 
-      source, 
-      language, 
-      subject, 
-      docType, 
+      docId,
+      title,
+      filename || null,
+      year || null,
+      paper || null,
+      source,
+      language,
+      subject,
+      docType,
       isFileUpload ? 'pending' : 'processing',
       r2Key,
       user.id

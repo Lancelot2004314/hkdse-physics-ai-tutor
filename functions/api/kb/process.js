@@ -163,7 +163,7 @@ export async function onRequestPost(context) {
 
     } catch (err) {
       console.error(`Error processing document ${docId}:`, err);
-      
+
       // Update status to error
       await env.DB.prepare(`
         UPDATE kb_documents SET status = 'error', error_message = ?, updated_at = datetime('now') WHERE id = ?

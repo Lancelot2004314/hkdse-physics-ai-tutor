@@ -81,6 +81,41 @@ function getFilesInFolder(folderPath) {
     return files;
 }
 
+// 智能检测文档类型
+function detectDocType(fileName, defaultType) {
+    const lowerName = fileName.toLowerCase();
+    
+    // Marking Scheme / 评分标准
+    if (lowerName.includes('-ms') || lowerName.includes('_ms') || 
+        lowerName.includes('marking') || lowerName.includes('mark-scheme') ||
+        lowerName.includes('答案') || lowerName.includes('评分')) {
+        return 'Marking Scheme';
+    }
+    
+    // Candidate Performance / 考生表现
+    if (lowerName.includes('candidate') || lowerName.includes('performance') ||
+        lowerName.includes('考生') || lowerName.includes('表现')) {
+        return 'Candidate Performance';
+    }
+    
+    // Sample Paper / 样本试卷
+    if (lowerName.includes('sample') || lowerName.includes('样本')) {
+        return 'Sample Paper';
+    }
+    
+    // Practice Paper / 练习卷
+    if (lowerName.includes('practice') || lowerName.includes('练习')) {
+        return 'Practice Paper';
+    }
+    
+    // Notes / 笔记
+    if (lowerName.includes('notes') || lowerName.includes('笔记') || lowerName.includes('note')) {
+        return 'Notes';
+    }
+    
+    return defaultType;
+}
+
 // 上传单个文件 - 使用正确的 multipart/form-data 格式
 function uploadFile(filePath, options) {
     return new Promise((resolve, reject) => {
@@ -105,11 +140,15 @@ function uploadFile(filePath, options) {
 
         // 使用文件名（去掉扩展名）作为标题
         const title = path.basename(fileName, path.extname(fileName));
+        
+        // 智能检测文档类型
+        const docType = detectDocType(fileName, options.type);
+        
         const fields = {
             title: title,
             language: options.lang,
             subject: options.subject,
-            docType: options.type
+            docType: docType
         };
 
         // 构建各个部分
@@ -256,8 +295,16 @@ async function main() {
     console.log(`\n⚙️  上传设置:`);
     console.log(`   语言: ${options.lang}`);
     console.log(`   科目: ${options.subject}`);
-    console.log(`   类型: ${options.type}`);
+    console.log(`   默认类型: ${options.type}`);
     console.log(`   API:  ${options.apiUrl}`);
+    
+    // 显示智能检测结果
+    console.log(`\n📋 文档类型检测:`);
+    files.forEach((f, i) => {
+        const fileName = path.basename(f);
+        const detectedType = detectDocType(fileName, options.type);
+        console.log(`   ${i + 1}. ${fileName} → ${detectedType}`);
+    });
 
     if (options.dryRun) {
         console.log('\n🔍 Dry-run 模式 - 不会实际上传文件');
