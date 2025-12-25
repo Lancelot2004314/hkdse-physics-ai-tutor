@@ -198,8 +198,8 @@ async function extractTextFromPDF(arrayBuffer, env) {
   }
   base64 = btoa(base64);
 
-  // Use gemini-1.5-pro for best PDF/document understanding
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${env.GEMINI_API_KEY}`;
+  // Use Gemini 2.5 Pro (latest preview) for best PDF/document understanding
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-05-06:generateContent?key=${env.GEMINI_API_KEY}`;
 
   console.log(`Processing PDF: ${arrayBuffer.byteLength} bytes`);
 
@@ -282,8 +282,8 @@ async function extractTextFromImage(arrayBuffer, mimeType, env) {
   }
   base64 = btoa(base64);
 
-  // Use gemini-1.5-pro for best image/document understanding
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${env.GEMINI_API_KEY}`;
+  // Use Gemini 2.5 Pro (latest preview) for best image/document understanding
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-05-06:generateContent?key=${env.GEMINI_API_KEY}`;
 
   const response = await fetch(url, {
     method: 'POST',
