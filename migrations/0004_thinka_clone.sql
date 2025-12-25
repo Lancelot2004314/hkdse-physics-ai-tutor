@@ -59,3 +59,5 @@ CREATE INDEX IF NOT EXISTS idx_quiz_sessions_completed ON quiz_sessions(complete
 CREATE INDEX IF NOT EXISTS idx_bookmarks_user ON bookmarks(user_id);
 CREATE INDEX IF NOT EXISTS idx_bookmarks_topic ON bookmarks(topic);
 CREATE INDEX IF NOT EXISTS idx_flagged_session ON flagged_questions(session_id);
+
+

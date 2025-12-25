@@ -33,3 +33,5 @@ CREATE INDEX IF NOT EXISTS idx_kb_chunks_document ON kb_chunks(document_id);
 CREATE INDEX IF NOT EXISTS idx_kb_chunks_topic ON kb_chunks(topic);
 CREATE INDEX IF NOT EXISTS idx_kb_documents_year ON kb_documents(year);
 CREATE INDEX IF NOT EXISTS idx_kb_documents_status ON kb_documents(status);
+
+

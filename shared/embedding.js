@@ -1,96 +1,90 @@
 /**
  * Embedding generation utilities for RAG knowledge base
- * Uses OpenAI text-embedding-3-small model
+ * Uses Google Gemini text-embedding-004 model
  */
 
-const EMBEDDING_MODEL = 'text-embedding-3-small';
-const EMBEDDING_DIMENSIONS = 1536;
+const EMBEDDING_MODEL = 'text-embedding-004';
+const EMBEDDING_DIMENSIONS = 768; // Gemini embedding dimensions
 
 /**
- * Generate embedding for a single text
+ * Generate embedding for a single text using Gemini
  * @param {string} text - Text to embed
- * @param {object} env - Environment with OPENAI_API_KEY
+ * @param {object} env - Environment with GEMINI_API_KEY
  * @returns {Promise<number[]>} - Embedding vector
  */
 export async function generateEmbedding(text, env) {
-  if (!env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY not configured');
+  if (!env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY not configured');
   }
 
-  const response = await fetch('https://api.openai.com/v1/embeddings', {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:embedContent?key=${env.GEMINI_API_KEY}`;
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: EMBEDDING_MODEL,
-      input: text.substring(0, 8000), // Limit text length
+      model: `models/${EMBEDDING_MODEL}`,
+      content: {
+        parts: [{ text: text.substring(0, 8000) }] // Limit text length
+      },
     }),
   });
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('OpenAI embedding error:', error);
+    console.error('Gemini embedding error:', error);
     throw new Error(`Failed to generate embedding: ${response.status}`);
   }
 
   const data = await response.json();
-  return data.data[0].embedding;
+  return data.embedding.values;
 }
 
 /**
- * Generate embeddings for multiple texts in batch
+ * Generate embeddings for multiple texts in batch using Gemini
  * @param {string[]} texts - Array of texts to embed
- * @param {object} env - Environment with OPENAI_API_KEY
+ * @param {object} env - Environment with GEMINI_API_KEY
  * @returns {Promise<number[][]>} - Array of embedding vectors
  */
 export async function generateEmbeddings(texts, env) {
-  if (!env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY not configured');
+  if (!env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY not configured');
   }
 
-  // OpenAI supports batching up to 2048 inputs
-  const batchSize = 100;
-  const allEmbeddings = [];
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:batchEmbedContents?key=${env.GEMINI_API_KEY}`;
 
-  for (let i = 0; i < texts.length; i += batchSize) {
-    const batch = texts.slice(i, i + batchSize).map(t => t.substring(0, 8000));
+  // Gemini batch API
+  const requests = texts.map(text => ({
+    model: `models/${EMBEDDING_MODEL}`,
+    content: {
+      parts: [{ text: text.substring(0, 8000) }]
+    },
+  }));
 
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: EMBEDDING_MODEL,
-        input: batch,
-      }),
-    });
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ requests }),
+  });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('OpenAI embedding batch error:', error);
-      throw new Error(`Failed to generate embeddings: ${response.status}`);
-    }
-
-    const data = await response.json();
-    // Sort by index to maintain order
-    const sortedEmbeddings = data.data
-      .sort((a, b) => a.index - b.index)
-      .map(d => d.embedding);
-
-    allEmbeddings.push(...sortedEmbeddings);
+  if (!response.ok) {
+    const error = await response.text();
+    console.error('Gemini embedding batch error:', error);
+    throw new Error(`Failed to generate embeddings: ${response.status}`);
   }
 
-  return allEmbeddings;
+  const data = await response.json();
+  return data.embeddings.map(e => e.values);
 }
 
 /**
  * Search Vectorize for similar content
  * @param {string} query - Search query
- * @param {object} env - Environment with OPENAI_API_KEY and VECTORIZE
+ * @param {object} env - Environment with GEMINI_API_KEY and VECTORIZE
  * @param {object} options - Search options
  * @returns {Promise<object[]>} - Array of matching results
  */

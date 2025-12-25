@@ -135,30 +135,34 @@ async function testVectorize(env) {
 }
 
 /**
- * Test OpenAI API (for embeddings)
+ * Test Gemini Embeddings API
  */
 async function testOpenAI(env) {
-  if (!env.OPENAI_API_KEY) {
+  // Now using Gemini for embeddings instead of OpenAI
+  if (!env.GEMINI_API_KEY) {
     return {
       status: 'error',
-      message: 'OPENAI_API_KEY not set',
-      hint: 'Set secret: wrangler pages secret put OPENAI_API_KEY',
+      message: 'GEMINI_API_KEY not set (used for embeddings)',
+      hint: 'Set secret: wrangler pages secret put GEMINI_API_KEY',
     };
   }
 
   const start = Date.now();
 
   try {
-    // Test with a minimal embedding request
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
+    // Test with a minimal embedding request using Gemini
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${env.GEMINI_API_KEY}`;
+    
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: 'test',
+        model: 'models/text-embedding-004',
+        content: {
+          parts: [{ text: 'test' }]
+        },
       }),
     });
 
@@ -166,18 +170,11 @@ async function testOpenAI(env) {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      if (response.status === 401) {
+      if (response.status === 400 && error.error?.message?.includes('API key')) {
         return {
           status: 'error',
           message: 'Invalid API key',
-          hint: 'Check your OPENAI_API_KEY',
-        };
-      }
-      if (response.status === 429) {
-        return {
-          status: 'warning',
-          message: 'Rate limited',
-          hint: 'API key works but rate limited',
+          hint: 'Check your GEMINI_API_KEY',
         };
       }
       return {
@@ -188,7 +185,7 @@ async function testOpenAI(env) {
 
     return {
       status: 'ok',
-      message: `Embeddings working`,
+      message: `Embeddings working (Gemini)`,
       latency: `${latency}ms`,
     };
   } catch (err) {
@@ -291,3 +288,5 @@ function errorResponse(status, message) {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 }
+
+

@@ -126,3 +126,5 @@ export const DIFFICULTY_LABELS = {
   4: { zh: '困難', en: 'Hard' },
   5: { zh: '非常困難', en: 'Very Hard' }
 };
+
+
