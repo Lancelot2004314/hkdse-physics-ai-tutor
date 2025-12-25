@@ -4,7 +4,8 @@
  */
 
 import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
-import { checkVertexConfig, getGoogleAccessToken, getGcpConfig } from '../../../shared/vertexRag.js';
+import { checkVertexConfig } from '../../../shared/vertexRag.js';
+import { getGoogleAccessToken, getGcpConfig } from '../../../shared/googleAuth.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
