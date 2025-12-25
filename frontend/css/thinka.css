@@ -311,6 +311,11 @@
     z-index: 1000;
 }
 
+/* Ensure HTML [hidden] always hides overlay */
+.loading-overlay[hidden] {
+    display: none !important;
+}
+
 .loading-content {
     text-align: center;
     color: white;

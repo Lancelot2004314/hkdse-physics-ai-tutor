@@ -238,7 +238,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             // Force hide loading overlay immediately on page load
             hideLoadingOverlay();
-            
+
             await checkAuth();
             renderTopics();
             initEventListeners();
@@ -251,7 +251,7 @@
                     const data = await response.json();
                     // Handle both { user: {...} } and flat { email, name } formats
                     currentUser = data.user || data;
-                    
+
                     if (currentUser && currentUser.email) {
                         document.getElementById('userName').textContent = currentUser.name || currentUser.email.split('@')[0] || 'User';
                         document.getElementById('userEmail').textContent = currentUser.email;
@@ -337,7 +337,7 @@
         async function startQuiz() {
             // Prevent double-trigger
             if (isGenerating) return;
-            
+
             const mcCount = parseInt(document.getElementById('mcCount').value) || 0;
             const shortCount = parseInt(document.getElementById('shortCount').value) || 0;
             const longCount = parseInt(document.getElementById('longCount').value) || 0;
@@ -397,4 +397,3 @@
 </body>
 
 </html>
-

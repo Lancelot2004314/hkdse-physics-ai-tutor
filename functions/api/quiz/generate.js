@@ -75,7 +75,7 @@ export async function onRequestPost(context) {
         topK: 3,
         minScore: 0.5,
       });
-      
+
       if (kbResults && kbResults.length > 0) {
         styleContext = formatKnowledgeContext(kbResults);
         console.log(`Found ${kbResults.length} KB examples for style context`);
