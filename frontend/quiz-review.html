@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Review - HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/thinka.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .review-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .review-summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 980px) {
+            .review-summary {
+                grid-template-columns: repeat(2, minmax(140px, 1fr));
+            }
+        }
+
+        .summary-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .summary-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .question-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .q-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .q-title {
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+        }
+
+        .badge-correct {
+            background: rgba(34, 197, 94, 0.12);
+            color: rgb(34, 197, 94);
+            border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        .badge-wrong {
+            background: rgba(239, 68, 68, 0.12);
+            color: rgb(239, 68, 68);
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        .q-block {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .q-block h3 {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 0 0 8px 0;
+            font-weight: 800;
+            letter-spacing: .02em;
+            text-transform: uppercase;
+        }
+
+        .q-content {
+            color: var(--text-primary);
+            line-height: 1.55;
+            word-break: break-word;
+        }
+
+        .mc-review {
+            display: grid;
+            gap: 8px;
+        }
+
+        .mc-item {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .mc-letter {
+            font-weight: 900;
+            min-width: 22px;
+        }
+
+        .mc-item.correct {
+            border-color: rgba(34, 197, 94, 0.35);
+            background: rgba(34, 197, 94, 0.08);
+        }
+
+        .mc-item.user-wrong {
+            border-color: rgba(239, 68, 68, 0.35);
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .notice {
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+    </style>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo"><i class="fas fa-atom"></i></div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Guest</div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
+                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
+                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> History</a></li>
+                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
+                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+                <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i
+                            class="fas fa-cog"></i> Admin Panel</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="review-header">
+                <div>
+                    <h1 style="margin: 0;">Quiz Review</h1>
+                    <div style="color: var(--text-secondary); margin-top: 6px;" id="sessionSubtitle">Loading...</div>
+                </div>
+                <div class="review-actions">
+                    <button class="btn-secondary" id="backBtn" type="button"><i class="fas fa-arrow-left"></i>
+                        Back</button>
+                    <button class="btn-primary" id="newQuizBtn" type="button"><i class="fas fa-plus"></i> New
+                        Quiz</button>
+                </div>
+            </div>
+
+            <div class="review-summary" id="summaryGrid"></div>
+            <div id="questionsContainer"></div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const sessionId = new URLSearchParams(window.location.search).get('session');
+            if (!sessionId) {
+                alert('Missing session id');
+                window.location.href = '/practice-history.html';
+                return;
+            }
+
+            await checkAuth();
+
+            document.getElementById('newQuizBtn').addEventListener('click', () => {
+                window.location.href = '/free-practice.html';
+            });
+            document.getElementById('backBtn').addEventListener('click', () => {
+                const ref = document.referrer || '';
+                if (ref.includes('/practice-history.html')) {
+                    window.location.href = '/practice-history.html';
+                } else {
+                    // Prefer history for old sessions
+                    window.location.href = '/practice-history.html';
+                }
+            });
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+                window.location.href = '/';
+            });
+
+            await loadAndRender(sessionId);
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('userName').textContent = user.name || user.email?.split('@')[0] || 'User';
+                    document.getElementById('userEmail').textContent = user.email || '';
+                    checkAdminAccess();
+                } else {
+                    window.location.href = '/?login=true';
+                }
+            } catch (err) {
+                console.error('Auth check failed:', err);
+            }
+        }
+
+        async function checkAdminAccess() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`, { credentials: 'include' });
+                if (response.ok) {
+                    const adminNav = document.getElementById('adminNavItem');
+                    if (adminNav) adminNav.hidden = false;
+                }
+            } catch (err) { /* Not admin */ }
+        }
+
+        async function loadAndRender(sessionId) {
+            try {
+                const res = await fetch(`${API_BASE}/quiz/${sessionId}`, { credentials: 'include' });
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        window.location.href = '/?login=true';
+                        return;
+                    }
+                    throw new Error(`Failed to load session (${res.status})`);
+                }
+
+                const data = await res.json();
+
+                document.getElementById('sessionSubtitle').textContent =
+                    `Session: ${data.id} • Status: ${data.status} • Date: ${formatDate(data.completedAt || data.createdAt)}`;
+
+                renderSummary(data);
+                renderQuestions(data);
+                safeTypesetMath();
+            } catch (e) {
+                console.error(e);
+                document.getElementById('summaryGrid').innerHTML = '';
+                document.getElementById('questionsContainer').innerHTML = `
+                    <div class="notice">
+                        無法載入回顧內容（可能 session 不存在或你未登入）。
+                    </div>
+                `;
+            }
+        }
+
+        function renderSummary(data) {
+            const grid = document.getElementById('summaryGrid');
+
+            const percentage = (typeof data.maxScore === 'number' && data.maxScore > 0 && typeof data.score === 'number')
+                ? Math.round((data.score / data.maxScore) * 100)
+                : (data.percentage || 0);
+
+            const items = [
+                { label: 'Score', value: `${data.score ?? 0} / ${data.maxScore ?? 0}` },
+                { label: 'Percentage', value: `${percentage}%` },
+                { label: 'Grade', value: data.grade || '-' },
+                { label: 'Questions', value: `${data.questions?.length || 0}` },
+            ];
+
+            grid.innerHTML = items.map(x => `
+                <div class="summary-card">
+                    <div class="summary-label">${escapeHtml(x.label)}</div>
+                    <div class="summary-value">${escapeHtml(String(x.value))}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderQuestions(data) {
+            const container = document.getElementById('questionsContainer');
+            const questions = Array.isArray(data.questions) ? data.questions : [];
+
+            if (!questions.length) {
+                container.innerHTML = `<div class="notice">沒有題目可回顧。</div>`;
+                return;
+            }
+
+            if (data.status !== 'completed') {
+                container.innerHTML = `
+                    <div class="notice" style="margin-bottom: 14px;">
+                        這個 session 尚未完成提交；系統會隱藏正確答案與評分細節。
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '';
+            }
+
+            const html = questions.map((q, idx) => {
+                const userAnswer = q.userAnswer ?? (Array.isArray(data.answers) ? data.answers[idx] : '');
+                const correctAnswer = q.correctAnswer ?? q.modelAnswer ?? '';
+                const isMC = q.type === 'mc';
+                const maxScore = q.score ?? 1;
+
+                const isCorrect = data.status === 'completed'
+                    ? normalizeAnswer(userAnswer) && normalizeAnswer(correctAnswer) && normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer)
+                    : false;
+
+                const badge = data.status === 'completed'
+                    ? `<span class="badge ${isCorrect ? 'badge-correct' : 'badge-wrong'}">${isCorrect ? 'Correct' : 'Incorrect'}</span>`
+                    : `<span class="badge">In progress</span>`;
+
+                const questionHtml = `
+                    <div class="q-block">
+                        <h3>Question</h3>
+                        <div class="q-content">${formatMath(q.question || '')}</div>
+                    </div>
+                `;
+
+                const mcHtml = isMC ? renderMCReview(q, userAnswer, correctAnswer, data.status) : '';
+                const userAnswerHtml = !isMC ? `
+                    <div class="q-block">
+                        <h3>Your Answer</h3>
+                        <div class="q-content">${formatMath(userAnswer || '(empty)')}</div>
+                    </div>
+                ` : `
+                    <div class="q-block">
+                        <h3>Your Answer</h3>
+                        <div class="q-content">${escapeHtml((userAnswer || '(empty)').toString())}</div>
+                    </div>
+                `;
+
+                const correctHtml = data.status === 'completed' ? `
+                    <div class="q-block">
+                        <h3>Correct Answer</h3>
+                        <div class="q-content">${isMC ? escapeHtml(String(correctAnswer || '(unknown)')) : formatMath(correctAnswer || '(unknown)')}</div>
+                    </div>
+                ` : '';
+
+                const explanationHtml = data.status === 'completed' && (q.explanation || q.feedback) ? `
+                    <div class="q-block">
+                        <h3>Explanation / Feedback</h3>
+                        <div class="q-content">
+                            ${q.explanation ? `<div style="margin-bottom: 10px;">${formatMath(q.explanation)}</div>` : ''}
+                            ${q.feedback ? `<div>${formatMath(q.feedback)}</div>` : ''}
+                        </div>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="question-card" id="q-${idx}">
+                        <div class="q-meta">
+                            <div class="q-title">Q${idx + 1} • ${escapeHtml(q.topic || 'Physics')} • ${escapeHtml(q.difficulty || '')}</div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span class="badge">Max ${escapeHtml(String(maxScore))}</span>
+                                ${badge}
+                            </div>
+                        </div>
+                        ${questionHtml}
+                        ${mcHtml}
+                        ${userAnswerHtml}
+                        ${correctHtml}
+                        ${explanationHtml}
+                    </div>
+                `;
+            }).join('');
+
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function renderMCReview(q, userAnswer, correctAnswer, status) {
+            const options = Array.isArray(q.options) ? q.options : [];
+            const ua = normalizeAnswer(userAnswer);
+            const ca = normalizeAnswer(correctAnswer);
+
+            const items = options.map((opt, i) => {
+                const letter = String.fromCharCode(65 + i);
+                const isCorrectOpt = status === 'completed' && ca && letter === ca;
+                const isUserPick = ua && letter === ua;
+                const cls = [
+                    'mc-item',
+                    isCorrectOpt ? 'correct' : '',
+                    (status === 'completed' && isUserPick && !isCorrectOpt) ? 'user-wrong' : ''
+                ].filter(Boolean).join(' ');
+
+                const cleanText = (opt || '').replace(/^[A-D]\.\s*/, '');
+                return `
+                    <div class="${cls}">
+                        <div class="mc-letter">${letter}.</div>
+                        <div class="q-content">${formatMath(cleanText)}</div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="q-block">
+                    <h3>Options</h3>
+                    <div class="mc-review">${items || '<div class="notice">No options.</div>'}</div>
+                </div>
+            `;
+        }
+
+        function normalizeAnswer(a) {
+            if (a === null || a === undefined) return '';
+            return String(a).trim().toUpperCase();
+        }
+
+        function formatMath(text) {
+            if (!text) return '';
+            return escapeHtml(String(text)).replace(/\n/g, '<br>');
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;',
+            }[m]));
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            if (Number.isNaN(d.getTime())) return '-';
+            return d.toISOString().split('T')[0];
+        }
+
+        function safeTypesetMath() {
+            try {
+                if (!window.MathJax) return;
+                const startupPromise = window.MathJax.startup?.promise;
+                if (startupPromise && typeof startupPromise.then === 'function') {
+                    startupPromise
+                        .then(() => {
+                            if (typeof window.MathJax.typesetPromise === 'function') {
+                                return window.MathJax.typesetPromise();
+                            }
+                            if (typeof window.MathJax.typeset === 'function') {
+                                window.MathJax.typeset();
+                            }
+                            return null;
+                        })
+                        .catch(() => { });
+                    return;
+                }
+                if (typeof window.MathJax.typesetPromise === 'function') {
+                    window.MathJax.typesetPromise().catch(() => { });
+                } else if (typeof window.MathJax.typeset === 'function') {
+                    window.MathJax.typeset();
+                }
+            } catch (e) { }
+        }
+    </script>
+</body>
+
+</html>
+
+

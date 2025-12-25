@@ -113,7 +113,7 @@
             <h2>Quiz Complete!</h2>
             <div class="results-summary" id="resultsSummary"></div>
             <div class="modal-actions">
-                <button class="btn-secondary" onclick="reviewAnswers()">Review Answers</button>
+                <button class="btn-secondary" type="button" onclick="reviewAnswers()">Review Answers</button>
                 <button class="btn-primary" onclick="window.location.href='/free-practice.html'">New Quiz</button>
             </div>
         </div>
@@ -144,6 +144,11 @@
                     window.location.href = '/free-practice.html';
                     return;
                 }
+            }
+
+            // Normalize session id field (API returns `id`, generator stores `sessionId`)
+            if (quizData && !quizData.sessionId && quizData.id) {
+                quizData.sessionId = quizData.id;
             }
 
             if (quizData && quizData.questions) {

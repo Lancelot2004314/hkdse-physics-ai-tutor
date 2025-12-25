@@ -102,75 +102,49 @@ export async function onRequestPost(context) {
       console.warn('KB search for style context failed, continuing without:', err.message);
     }
 
-    // Generate questions
+    // Generate questions - run all types in PARALLEL for speed
     const allQuestions = [];
     let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
 
-    // Generate MC questions
+    // Build parallel generation promises
+    const generationTasks = [];
+
     if (mcCount > 0) {
-      const mcResult = await generateQuestions(
-        apiKey,
-        QUIZ_MC_PROMPT,
-        topicNames,
-        difficulty,
-        mcCount,
-        language,
-        styleContext
+      generationTasks.push(
+        generateQuestions(apiKey, QUIZ_MC_PROMPT, topicNames, difficulty, mcCount, language, styleContext)
+          .then(result => ({ type: 'mc', result }))
       );
-      if (mcResult.success && mcResult.questions) {
-        mcResult.questions.forEach((q, i) => {
-          allQuestions.push({ ...q, type: 'mc', index: allQuestions.length });
-        });
-        if (mcResult.usage) {
-          totalUsage.prompt_tokens += mcResult.usage.prompt_tokens || 0;
-          totalUsage.completion_tokens += mcResult.usage.completion_tokens || 0;
-          totalUsage.total_tokens += mcResult.usage.total_tokens || 0;
-        }
-      }
     }
 
-    // Generate Short questions
     if (shortCount > 0) {
-      const shortResult = await generateQuestions(
-        apiKey,
-        QUIZ_SHORT_PROMPT,
-        topicNames,
-        difficulty,
-        shortCount,
-        language,
-        styleContext
+      generationTasks.push(
+        generateQuestions(apiKey, QUIZ_SHORT_PROMPT, topicNames, difficulty, shortCount, language, styleContext)
+          .then(result => ({ type: 'short', result }))
       );
-      if (shortResult.success && shortResult.questions) {
-        shortResult.questions.forEach((q, i) => {
-          allQuestions.push({ ...q, type: 'short', index: allQuestions.length });
-        });
-        if (shortResult.usage) {
-          totalUsage.prompt_tokens += shortResult.usage.prompt_tokens || 0;
-          totalUsage.completion_tokens += shortResult.usage.completion_tokens || 0;
-          totalUsage.total_tokens += shortResult.usage.total_tokens || 0;
-        }
-      }
     }
 
-    // Generate Long questions
     if (longCount > 0) {
-      const longResult = await generateQuestions(
-        apiKey,
-        QUIZ_LONG_PROMPT,
-        topicNames,
-        difficulty,
-        longCount,
-        language,
-        styleContext
+      generationTasks.push(
+        generateQuestions(apiKey, QUIZ_LONG_PROMPT, topicNames, difficulty, longCount, language, styleContext)
+          .then(result => ({ type: 'long', result }))
       );
-      if (longResult.success && longResult.questions) {
-        longResult.questions.forEach((q, i) => {
-          allQuestions.push({ ...q, type: 'long', index: allQuestions.length });
+    }
+
+    // Run all generation tasks in parallel
+    const results = await Promise.all(generationTasks);
+
+    // Process results in order: MC -> Short -> Long
+    const typeOrder = ['mc', 'short', 'long'];
+    for (const typeKey of typeOrder) {
+      const entry = results.find(r => r.type === typeKey);
+      if (entry && entry.result.success && entry.result.questions) {
+        entry.result.questions.forEach(q => {
+          allQuestions.push({ ...q, type: typeKey, index: allQuestions.length });
         });
-        if (longResult.usage) {
-          totalUsage.prompt_tokens += longResult.usage.prompt_tokens || 0;
-          totalUsage.completion_tokens += longResult.usage.completion_tokens || 0;
-          totalUsage.total_tokens += longResult.usage.total_tokens || 0;
+        if (entry.result.usage) {
+          totalUsage.prompt_tokens += entry.result.usage.prompt_tokens || 0;
+          totalUsage.completion_tokens += entry.result.usage.completion_tokens || 0;
+          totalUsage.total_tokens += entry.result.usage.total_tokens || 0;
         }
       }
     }
@@ -304,5 +278,6 @@ function errorResponse(status, message) {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 }
+
 
 
