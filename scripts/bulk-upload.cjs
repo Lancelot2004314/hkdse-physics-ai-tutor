@@ -330,9 +330,25 @@ async function main() {
         process.exit(1);
     }
 
-    // 扫描文件
-    console.log(`\n📁 扫描文件夹: ${path.resolve(options.folder)}`);
-    const files = getFilesInFolder(options.folder);
+    // 扫描文件或单个文件
+    let files = [];
+    const inputPath = path.resolve(options.folder);
+    const stat = fs.statSync(inputPath);
+
+    if (stat.isDirectory()) {
+        console.log(`\n📁 扫描文件夹: ${inputPath}`);
+        files = getFilesInFolder(options.folder);
+    } else if (stat.isFile()) {
+        // 单个文件
+        const ext = path.extname(inputPath).toLowerCase();
+        if (SUPPORTED_EXTENSIONS.includes(ext)) {
+            console.log(`\n📄 单个文件: ${inputPath}`);
+            files = [inputPath];
+        } else {
+            console.error(`❌ 不支持的文件类型: ${ext}`);
+            process.exit(1);
+        }
+    }
 
     if (files.length === 0) {
         console.log('⚠️  没有找到支持的文件 (PDF/JPG/PNG/GIF/WEBP)');
