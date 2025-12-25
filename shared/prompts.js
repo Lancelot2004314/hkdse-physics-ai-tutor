@@ -134,6 +134,19 @@ export const QUIZ_MC_PROMPT = `Generate HKDSE Physics multiple choice questions 
 ## Real HKDSE Past Paper Examples (Study these for style reference)
 {styleContext}
 
+## CRITICAL CONSTRAINT - NO DIAGRAMS/GRAPHS
+**DO NOT generate questions that REQUIRE a diagram, graph, figure, or image to understand.**
+Examples of FORBIDDEN question types:
+- "The diagram shows..." (unless you can fully describe it in text)
+- "According to the graph below..." 
+- Questions about reading values from graphs/charts
+- Questions about apparatus setup that need visual reference
+- Questions about force diagrams, circuit diagrams, ray diagrams unless fully described in words
+- Questions like "箭頭表示水的流動方向" that need arrows/visual indicators
+
+**ALLOWED**: Questions where any visual can be completely replaced by text description.
+Example: Instead of "In the diagram, a ball rolls down a slope", write "A ball rolls down a slope inclined at 30° to the horizontal."
+
 ## DSE MC Question Style Rules (MUST FOLLOW)
 1. **Format**: Exactly like HKDSE Paper 1A/1B - concise stem, 4 options (A, B, C, D)
 2. **Wording**: Use official DSE phrasing like:
@@ -178,12 +191,19 @@ export const QUIZ_SHORT_PROMPT = `Generate HKDSE Physics short answer questions 
 ## Real HKDSE Past Paper Examples (Study these for style reference)
 {styleContext}
 
+## CRITICAL CONSTRAINT - NO DIAGRAMS/GRAPHS
+**DO NOT generate questions that REQUIRE a diagram, graph, figure, or image to understand.**
+- FORBIDDEN: "With reference to the diagram...", "The graph shows...", "From the figure..."
+- FORBIDDEN: Questions requiring visual apparatus setup, circuit diagrams, ray diagrams
+- ALLOWED: Fully text-describable scenarios. Replace visuals with complete text descriptions.
+- Example: Instead of "The diagram shows a spring...", write "A spring with spring constant k = 50 N/m is compressed by 0.1 m..."
+
 ## DSE Short Answer Style Rules (MUST FOLLOW)
 1. **Question Types** (like Paper 2):
    - "Explain why..." (conceptual understanding)
    - "Calculate the..." (show working)
    - "State TWO reasons..." (list format)
-   - "With reference to the diagram, describe..." (diagram-based)
+   - "Describe the experimental setup for..." (text description only)
 2. **Marking Scheme** (CRITICAL - follow DSE format):
    - Each marking point = 1 mark
    - Separate marks for: correct formula, substitution, correct answer with unit
@@ -225,14 +245,21 @@ export const QUIZ_LONG_PROMPT = `Generate HKDSE Physics long answer/structured q
 ## Real HKDSE Past Paper Examples (Study these for style reference)
 {styleContext}
 
+## CRITICAL CONSTRAINT - NO DIAGRAMS/GRAPHS
+**DO NOT generate questions that REQUIRE a diagram, graph, figure, or image to understand.**
+- FORBIDDEN: "The diagram shows...", "Referring to the circuit diagram...", "The graph indicates..."
+- FORBIDDEN: Questions requiring visual interpretation (reading graph values, identifying parts from figure)
+- ALLOWED: Scenarios fully described in text. All numerical data given explicitly.
+- Example: Instead of "The circuit diagram shows...", write "A circuit consists of a 12V battery connected in series with a 4Ω resistor and a 2Ω resistor..."
+
 ## DSE Long Question Style Rules (MUST FOLLOW)
 1. **Structure**: Multi-part questions (a), (b), (c)... like Paper 2
    - Part (a): Usually easier, tests basic understanding or data extraction
    - Part (b): Calculation or explanation, moderate difficulty
    - Part (c): Challenging - synthesis, evaluation, or extended calculation
 2. **Question Stem**:
-   - Provide a realistic scenario/experiment setup
-   - Include relevant data, diagrams description, or given information
+   - Provide a realistic scenario/experiment setup (described fully in text)
+   - Include relevant data and given information explicitly (no reference to diagrams)
    - Reference real-world applications when appropriate
 3. **Part Wording** (DSE style):
    - "(a) State the physical quantity measured by..."
