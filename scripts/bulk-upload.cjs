@@ -84,36 +84,79 @@ function getFilesInFolder(folderPath) {
 // 智能检测文档类型
 function detectDocType(fileName, defaultType) {
     const lowerName = fileName.toLowerCase();
-    
+
     // Marking Scheme / 评分标准
-    if (lowerName.includes('-ms') || lowerName.includes('_ms') || 
+    if (lowerName.includes('-ms') || lowerName.includes('_ms') ||
         lowerName.includes('marking') || lowerName.includes('mark-scheme') ||
         lowerName.includes('答案') || lowerName.includes('评分')) {
         return 'Marking Scheme';
     }
-    
+
     // Candidate Performance / 考生表现
     if (lowerName.includes('candidate') || lowerName.includes('performance') ||
         lowerName.includes('考生') || lowerName.includes('表现')) {
         return 'Candidate Performance';
     }
-    
+
     // Sample Paper / 样本试卷
     if (lowerName.includes('sample') || lowerName.includes('样本')) {
         return 'Sample Paper';
     }
-    
+
     // Practice Paper / 练习卷
     if (lowerName.includes('practice') || lowerName.includes('练习')) {
         return 'Practice Paper';
     }
-    
+
     // Notes / 笔记
     if (lowerName.includes('notes') || lowerName.includes('笔记') || lowerName.includes('note')) {
         return 'Notes';
     }
-    
+
     return defaultType;
+}
+
+// 从文件名提取年份
+function extractYear(fileName) {
+    // 匹配 2012, 2013, 2014... 等年份
+    const match = fileName.match(/\b(20\d{2})\b/);
+    return match ? match[1] : null;
+}
+
+// 从文件名提取试卷编号
+function extractPaper(fileName) {
+    const lowerName = fileName.toLowerCase();
+    
+    // 匹配 Paper 1A, 1B, 2 等格式
+    // 例如: 2013-physics-1a.pdf → Paper 1A
+    //       2013-physics-1b.pdf → Paper 1B
+    //       2013-physics-2.pdf → Paper 2
+    
+    // 检查 -1a, _1a, paper1a 等
+    if (/-1a|_1a|paper1a|paper-1a|paper_1a|\bp1a\b/i.test(lowerName)) {
+        return 'Paper 1A';
+    }
+    if (/-1b|_1b|paper1b|paper-1b|paper_1b|\bp1b\b/i.test(lowerName)) {
+        return 'Paper 1B';
+    }
+    if (/-2\b|_2\b|paper2|paper-2|paper_2|\bp2\b/i.test(lowerName)) {
+        return 'Paper 2';
+    }
+    if (/-1\b|_1\b|paper1\b|paper-1\b|paper_1\b|\bp1\b/i.test(lowerName)) {
+        return 'Paper 1';
+    }
+    
+    // Marking Scheme
+    if (/-ms|_ms|marking/i.test(lowerName)) {
+        return 'Marking Scheme';
+    }
+    
+    // Candidate Performance
+    if (/candidate|performance/i.test(lowerName)) {
+        return 'Candidate Performance';
+    }
+    
+    return null;
 }
 
 // 上传单个文件 - 使用正确的 multipart/form-data 格式
@@ -140,16 +183,26 @@ function uploadFile(filePath, options) {
 
         // 使用文件名（去掉扩展名）作为标题
         const title = path.basename(fileName, path.extname(fileName));
-        
-        // 智能检测文档类型
+
+        // 智能检测文档类型、年份、试卷编号
         const docType = detectDocType(fileName, options.type);
-        
+        const year = extractYear(fileName);
+        const paper = extractPaper(fileName);
+
         const fields = {
             title: title,
             language: options.lang,
             subject: options.subject,
             docType: docType
         };
+        
+        // 只有检测到时才添加年份和试卷
+        if (year) {
+            fields.year = year;
+        }
+        if (paper) {
+            fields.paper = paper;
+        }
 
         // 构建各个部分
         const parts = [];
@@ -297,13 +350,16 @@ async function main() {
     console.log(`   科目: ${options.subject}`);
     console.log(`   默认类型: ${options.type}`);
     console.log(`   API:  ${options.apiUrl}`);
-    
+
     // 显示智能检测结果
-    console.log(`\n📋 文档类型检测:`);
+    console.log(`\n📋 智能检测结果:`);
     files.forEach((f, i) => {
         const fileName = path.basename(f);
         const detectedType = detectDocType(fileName, options.type);
-        console.log(`   ${i + 1}. ${fileName} → ${detectedType}`);
+        const detectedYear = extractYear(fileName) || '-';
+        const detectedPaper = extractPaper(fileName) || '-';
+        console.log(`   ${i + 1}. ${fileName}`);
+        console.log(`      年份: ${detectedYear} | 试卷: ${detectedPaper} | 类型: ${detectedType}`);
     });
 
     if (options.dryRun) {
