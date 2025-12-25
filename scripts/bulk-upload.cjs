@@ -442,41 +442,43 @@ async function main() {
         try {
             const result = await uploadFile(file, options);
             console.log('✅ 上传成功');
-            
-            // 检查是否返回了 operationId (Vertex AI RAG)
-            if (result.result && result.result.operationId) {
-                console.log(`   🔄 Vertex AI 处理中... (Operation: ${result.result.operationId.slice(-20)})`);
-                
+
+            // 检查是否返回了 operationName (Vertex AI RAG)
+            if (result.result && result.result.operationName) {
+                console.log(`   🔄 Vertex AI 处理中...`);
+
                 // 轮询等待处理完成
-                const docId = result.result.id;
+                const docId = result.result.documentId;
                 let attempts = 0;
                 const maxAttempts = 60; // 最多等待 5 分钟 (60 * 5秒)
-                
+
                 while (attempts < maxAttempts) {
                     await new Promise(r => setTimeout(r, 5000)); // 每 5 秒检查一次
                     attempts++;
-                    
+
                     try {
-                        const status = await checkDocumentStatus(docId, options);
-                        process.stdout.write(`\r   ⏳ 等待处理... (${attempts * 5}s) - 状态: ${status.status}    `);
-                        
-                        if (status.status === 'ready') {
+                        const statusResult = await checkDocumentStatus(docId, options);
+                        const docStatus = statusResult.document?.status || statusResult.status || 'unknown';
+                        process.stdout.write(`\r   ⏳ 等待处理... (${attempts * 5}s) - 状态: ${docStatus}    `);
+
+                        if (docStatus === 'ready') {
                             console.log(`\n   ✅ 处理完成！`);
                             break;
-                        } else if (status.status === 'error') {
-                            console.log(`\n   ⚠️ 处理出错: ${status.error || 'Unknown error'}`);
+                        } else if (docStatus === 'error') {
+                            console.log(`\n   ⚠️ 处理出错: ${statusResult.document?.error_message || statusResult.error || 'Unknown error'}`);
                             break;
                         }
                     } catch (e) {
                         // 忽略状态检查错误，继续等待
+                        process.stdout.write(`\r   ⏳ 等待处理... (${attempts * 5}s) - 检查中...    `);
                     }
                 }
-                
+
                 if (attempts >= maxAttempts) {
                     console.log(`\n   ⚠️ 处理超时，但会在后台继续`);
                 }
             }
-            
+
             results.success.push({ file: fileName, result: result.result });
         } catch (error) {
             console.log(`❌ 失败: ${error.message}`);

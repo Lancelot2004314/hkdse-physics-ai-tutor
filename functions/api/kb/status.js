@@ -37,7 +37,7 @@ export async function onRequest(context) {
       // Check if specific document ID is requested
       const url = new URL(request.url);
       const docId = url.searchParams.get('docId');
-      
+
       if (docId) {
         return await checkSpecificDocument(env, docId, null);
       }
