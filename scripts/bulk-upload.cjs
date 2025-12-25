@@ -126,12 +126,12 @@ function extractYear(fileName) {
 // 从文件名提取试卷编号
 function extractPaper(fileName) {
     const lowerName = fileName.toLowerCase();
-    
+
     // 匹配 Paper 1A, 1B, 2 等格式
     // 例如: 2013-physics-1a.pdf → Paper 1A
     //       2013-physics-1b.pdf → Paper 1B
     //       2013-physics-2.pdf → Paper 2
-    
+
     // 检查 -1a, _1a, paper1a 等
     if (/-1a|_1a|paper1a|paper-1a|paper_1a|\bp1a\b/i.test(lowerName)) {
         return 'Paper 1A';
@@ -145,17 +145,17 @@ function extractPaper(fileName) {
     if (/-1\b|_1\b|paper1\b|paper-1\b|paper_1\b|\bp1\b/i.test(lowerName)) {
         return 'Paper 1';
     }
-    
+
     // Marking Scheme
     if (/-ms|_ms|marking/i.test(lowerName)) {
         return 'Marking Scheme';
     }
-    
+
     // Candidate Performance
     if (/candidate|performance/i.test(lowerName)) {
         return 'Candidate Performance';
     }
-    
+
     return null;
 }
 
@@ -195,7 +195,7 @@ function uploadFile(filePath, options) {
             subject: options.subject,
             docType: docType
         };
-        
+
         // 只有检测到时才添加年份和试卷
         if (year) {
             fields.year = year;

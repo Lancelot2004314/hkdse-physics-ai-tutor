@@ -186,7 +186,7 @@ export async function onRequestPost(context) {
 }
 
 /**
- * Extract text from PDF using Gemini
+ * Extract text from PDF using Gemini 1.5 Flash (supports PDF natively)
  */
 async function extractTextFromPDF(arrayBuffer, env) {
   const uint8Array = new Uint8Array(arrayBuffer);
@@ -198,7 +198,10 @@ async function extractTextFromPDF(arrayBuffer, env) {
   }
   base64 = btoa(base64);
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+  // Use gemini-1.5-flash which has better PDF support
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+
+  console.log(`Processing PDF: ${arrayBuffer.byteLength} bytes`);
 
   const response = await fetch(url, {
     method: 'POST',
@@ -207,16 +210,19 @@ async function extractTextFromPDF(arrayBuffer, env) {
       contents: [{
         parts: [
           {
-            text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this document.
+            text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this PDF document.
 
-Important instructions:
+CRITICAL: You MUST extract text even if the document appears to be mostly images or scanned pages.
+
+Instructions:
 - Extract every question, answer, and explanation exactly as written
 - Preserve question numbers (Q1, Q2, Q.1, etc.)
 - Preserve mathematical formulas and equations (use LaTeX format like $F=ma$)
 - Preserve the structure (MC options A/B/C/D, long questions, marking schemes)
 - Output ONLY the extracted text, no commentary
 - If there are multiple pages, extract text from all pages in order
-- For Chinese text, preserve the original Chinese characters`
+- For Chinese text, preserve the original Chinese characters
+- If you cannot extract text, describe what you see in the document`
           },
           {
             inline_data: {
@@ -236,21 +242,35 @@ Important instructions:
   if (!response.ok) {
     const error = await response.text();
     console.error('Gemini OCR error:', error);
-    throw new Error('OCR failed: ' + response.status);
+    throw new Error('OCR failed: ' + response.status + ' - ' + error.substring(0, 200));
   }
 
   const data = await response.json();
+  console.log('Gemini response:', JSON.stringify(data).substring(0, 500));
+  
+  // Check for blocked content or safety issues
+  if (data.candidates?.[0]?.finishReason === 'SAFETY') {
+    throw new Error('Content blocked by safety filter');
+  }
+  
+  if (data.candidates?.[0]?.finishReason === 'RECITATION') {
+    throw new Error('Content blocked - possible copyright issue');
+  }
+  
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!text) {
-    throw new Error('Empty OCR response');
+    // Log the full response for debugging
+    console.error('Empty OCR - full response:', JSON.stringify(data));
+    const reason = data.candidates?.[0]?.finishReason || 'unknown';
+    throw new Error(`Empty OCR response (reason: ${reason})`);
   }
 
   return text;
 }
 
 /**
- * Extract text from image using Gemini
+ * Extract text from image using Gemini 1.5 Flash
  */
 async function extractTextFromImage(arrayBuffer, mimeType, env) {
   const uint8Array = new Uint8Array(arrayBuffer);
@@ -262,7 +282,7 @@ async function extractTextFromImage(arrayBuffer, mimeType, env) {
   }
   base64 = btoa(base64);
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -271,7 +291,7 @@ async function extractTextFromImage(arrayBuffer, mimeType, env) {
       contents: [{
         parts: [
           {
-            text: `Extract ALL text from this HKDSE Physics image. Preserve question numbers, LaTeX formulas, MC options.`
+            text: `Extract ALL text from this HKDSE Physics image. Preserve question numbers, LaTeX formulas ($...$), MC options A/B/C/D. Output only the extracted text.`
           },
           {
             inline_data: {
@@ -289,6 +309,8 @@ async function extractTextFromImage(arrayBuffer, mimeType, env) {
   });
 
   if (!response.ok) {
+    const error = await response.text();
+    console.error('Image OCR error:', error);
     throw new Error('OCR failed: ' + response.status);
   }
 
