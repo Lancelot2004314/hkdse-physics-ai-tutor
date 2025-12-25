@@ -1,12 +1,14 @@
 /**
  * Quiz Generation API
  * Generates MC, Short, and Long questions based on selected topics
+ * With RAG: Injects real HKDSE past paper examples for style consistency
  */
 
 import { QUIZ_MC_PROMPT, QUIZ_SHORT_PROMPT, QUIZ_LONG_PROMPT } from '../../../shared/prompts.js';
 import { PHYSICS_TOPICS, getSubtopicNames } from '../../../shared/topics.js';
 import { getUserFromSession } from '../../../shared/auth.js';
 import { saveTokenUsage } from '../../../shared/tokenUsage.js';
+import { searchKnowledgeBase, formatKnowledgeContext } from '../../../shared/embedding.js';
 
 const REQUEST_TIMEOUT = 120000; // 2 minutes for larger requests
 
@@ -64,6 +66,24 @@ export async function onRequestPost(context) {
     // Get topic names for prompt
     const topicNames = getSubtopicNames(topics, language === 'en' ? 'en' : 'zh');
 
+    // Fetch style context from knowledge base (real HKDSE examples)
+    let styleContext = '';
+    try {
+      // Search for relevant past paper examples based on topics
+      const styleQuery = `HKDSE Physics ${topicNames.slice(0, 3).join(' ')} past paper marking scheme`;
+      const kbResults = await searchKnowledgeBase(styleQuery, env, {
+        topK: 3,
+        minScore: 0.5,
+      });
+      
+      if (kbResults && kbResults.length > 0) {
+        styleContext = formatKnowledgeContext(kbResults);
+        console.log(`Found ${kbResults.length} KB examples for style context`);
+      }
+    } catch (err) {
+      console.warn('KB search for style context failed, continuing without:', err.message);
+    }
+
     // Generate questions
     const allQuestions = [];
     let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
@@ -76,7 +96,8 @@ export async function onRequestPost(context) {
         topicNames,
         difficulty,
         mcCount,
-        language
+        language,
+        styleContext
       );
       if (mcResult.success && mcResult.questions) {
         mcResult.questions.forEach((q, i) => {
@@ -98,7 +119,8 @@ export async function onRequestPost(context) {
         topicNames,
         difficulty,
         shortCount,
-        language
+        language,
+        styleContext
       );
       if (shortResult.success && shortResult.questions) {
         shortResult.questions.forEach((q, i) => {
@@ -120,7 +142,8 @@ export async function onRequestPost(context) {
         topicNames,
         difficulty,
         longCount,
-        language
+        language,
+        styleContext
       );
       if (longResult.success && longResult.questions) {
         longResult.questions.forEach((q, i) => {
@@ -191,12 +214,13 @@ export async function onRequestPost(context) {
   }
 }
 
-async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty, count, language) {
+async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty, count, language, styleContext = '') {
   const prompt = promptTemplate
     .replace('{topics}', topicNames.join(', '))
     .replace('{difficulty}', difficulty)
     .replace('{count}', count)
-    .replace('{language}', language === 'en' ? 'English' : 'Traditional Chinese');
+    .replace('{language}', language === 'en' ? 'English' : 'Traditional Chinese')
+    .replace('{styleContext}', styleContext || '(No past paper examples available)');
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);

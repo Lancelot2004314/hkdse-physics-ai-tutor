@@ -122,8 +122,8 @@ export const PRACTICE_QUESTION_PROMPT = `Generate a similar HKDSE Physics practi
 - Make sure the correct answer is actually correct!
 - Options should be plausible (common mistakes as wrong options)`;
 
-// Quiz Generation Prompts for Thinka-style system
-export const QUIZ_MC_PROMPT = `Generate HKDSE Physics multiple choice questions.
+// Quiz Generation Prompts for Thinka-style system with RAG style context
+export const QUIZ_MC_PROMPT = `Generate HKDSE Physics multiple choice questions that closely match the official DSE exam style.
 
 ## Input
 - Topics: {topics}
@@ -131,30 +131,43 @@ export const QUIZ_MC_PROMPT = `Generate HKDSE Physics multiple choice questions.
 - Count: {count} questions
 - Language: {language}
 
-## Rules
-1. Questions must be HKDSE exam style
-2. Each question has exactly 4 options (A, B, C, D)
-3. Use $...$ for math with DOUBLE backslash: "$\\\\frac{1}{2}$"
-4. Difficulty 1-2: Basic concepts, simple calculations
-5. Difficulty 3: Standard HKDSE level
-6. Difficulty 4-5: Challenging, multi-step reasoning
-7. Include realistic scenarios and proper physics context
+## Real HKDSE Past Paper Examples (Study these for style reference)
+{styleContext}
 
-## Output JSON (array of questions)
+## DSE MC Question Style Rules (MUST FOLLOW)
+1. **Format**: Exactly like HKDSE Paper 1A/1B - concise stem, 4 options (A, B, C, D)
+2. **Wording**: Use official DSE phrasing like:
+   - "Which of the following statements is/are correct?"
+   - "What is the magnitude of..."
+   - "If X increases, Y will..."
+   - "The diagram shows..." (describe diagram context)
+3. **Distractors**: Wrong options should be PLAUSIBLE common mistakes:
+   - Sign errors (positive/negative)
+   - Unit conversion errors
+   - Formula misapplication
+   - Conceptual misconceptions
+4. **Difficulty Levels**:
+   - Level 1-2: Direct concept recall, single-step calculation
+   - Level 3: Standard DSE (2-3 steps, moderate reasoning)
+   - Level 4-5: Complex multi-step, combination of concepts, traps
+5. **LaTeX**: Use $...$ with DOUBLE backslash in JSON: "$\\\\frac{1}{2}mv^2$"
+6. **Context**: Include realistic scenarios (experiments, daily life, technology)
+
+## Output JSON
 {
   "questions": [
     {
-      "question": "Question text with $LaTeX$ math...",
+      "question": "Question text matching DSE style...",
       "options": ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"],
       "correctAnswer": "A",
-      "explanation": "Step-by-step solution...",
+      "explanation": "Step-by-step DSE-style solution with key physics concepts...",
       "topic": "topic_id",
       "score": 1
     }
   ]
 }`;
 
-export const QUIZ_SHORT_PROMPT = `Generate HKDSE Physics short answer questions.
+export const QUIZ_SHORT_PROMPT = `Generate HKDSE Physics short answer questions matching Paper 2 structured question style.
 
 ## Input
 - Topics: {topics}
@@ -162,26 +175,46 @@ export const QUIZ_SHORT_PROMPT = `Generate HKDSE Physics short answer questions.
 - Count: {count} questions
 - Language: {language}
 
-## Rules
-1. Questions require 2-4 sentence answers or simple calculations
-2. Use $...$ for math with DOUBLE backslash
-3. Include marking scheme (what points are awarded for)
-4. Typical score: 3-5 marks per question
+## Real HKDSE Past Paper Examples (Study these for style reference)
+{styleContext}
+
+## DSE Short Answer Style Rules (MUST FOLLOW)
+1. **Question Types** (like Paper 2):
+   - "Explain why..." (conceptual understanding)
+   - "Calculate the..." (show working)
+   - "State TWO reasons..." (list format)
+   - "With reference to the diagram, describe..." (diagram-based)
+2. **Marking Scheme** (CRITICAL - follow DSE format):
+   - Each marking point = 1 mark
+   - Separate marks for: correct formula, substitution, correct answer with unit
+   - Conceptual marks: key physics principle stated
+   - Example: "1M for $F = ma$, 1M for substitution, 1A for $F = 20$ N"
+3. **Difficulty Levels**:
+   - Level 1-2: Single concept, direct application
+   - Level 3: Combine 2 concepts, explain reasoning
+   - Level 4-5: Multi-step derivation, explain limitations/assumptions
+4. **Score Range**: 3-5 marks per question
+5. **LaTeX**: Use $...$ with DOUBLE backslash: "$\\\\Delta p = F\\\\Delta t$"
 
 ## Output JSON
 {
   "questions": [
     {
-      "question": "Explain why... / Calculate...",
-      "modelAnswer": "The answer should include: 1) ... 2) ...",
-      "markingScheme": ["1 mark for concept X", "1 mark for formula", "1 mark for correct calculation"],
+      "question": "DSE-style question text...",
+      "modelAnswer": "Complete model answer with all key points...",
+      "markingScheme": [
+        "1M for stating [physics concept]",
+        "1M for correct formula $...$",
+        "1M for correct substitution",
+        "1A for final answer with correct unit"
+      ],
       "topic": "topic_id",
       "score": 4
     }
   ]
 }`;
 
-export const QUIZ_LONG_PROMPT = `Generate HKDSE Physics long answer/structured questions.
+export const QUIZ_LONG_PROMPT = `Generate HKDSE Physics long answer/structured questions matching Paper 2 essay-style questions.
 
 ## Input
 - Topics: {topics}
@@ -189,22 +222,62 @@ export const QUIZ_LONG_PROMPT = `Generate HKDSE Physics long answer/structured q
 - Count: {count} questions
 - Language: {language}
 
-## Rules
-1. Multi-part questions (a), (b), (c)...
-2. Each part builds on previous or tests related concepts
-3. Include diagrams description if needed (describe what diagram shows)
-4. Typical score: 8-15 marks per question
-5. Use $...$ for math with DOUBLE backslash
+## Real HKDSE Past Paper Examples (Study these for style reference)
+{styleContext}
+
+## DSE Long Question Style Rules (MUST FOLLOW)
+1. **Structure**: Multi-part questions (a), (b), (c)... like Paper 2
+   - Part (a): Usually easier, tests basic understanding or data extraction
+   - Part (b): Calculation or explanation, moderate difficulty
+   - Part (c): Challenging - synthesis, evaluation, or extended calculation
+2. **Question Stem**:
+   - Provide a realistic scenario/experiment setup
+   - Include relevant data, diagrams description, or given information
+   - Reference real-world applications when appropriate
+3. **Part Wording** (DSE style):
+   - "(a) State the physical quantity measured by..."
+   - "(b) Calculate the... Show your working clearly."
+   - "(c) Explain, with reference to..., why..."
+   - "(d) Suggest ONE way to improve the accuracy of..."
+4. **Marking Scheme per Part** (CRITICAL):
+   - Each part: list marking points (1M, 1A format)
+   - 1M = method mark (formula, approach)
+   - 1A = answer mark (correct final value + unit)
+   - Partial credit for intermediate steps
+5. **Difficulty Distribution**:
+   - Level 1-2: 60% easy parts, 40% moderate
+   - Level 3: 40% easy, 40% moderate, 20% hard
+   - Level 4-5: 20% easy, 40% moderate, 40% hard/synthesis
+6. **Score Range**: 8-15 marks total (sum of all parts)
+7. **LaTeX**: Use $...$ with DOUBLE backslash: "$\\\\frac{mv^2}{r}$"
 
 ## Output JSON
 {
   "questions": [
     {
-      "question": "Main question stem...",
+      "question": "Main scenario/experiment description...",
       "parts": [
-        {"part": "a", "question": "Part (a) question...", "marks": 3, "modelAnswer": "..."},
-        {"part": "b", "question": "Part (b) question...", "marks": 4, "modelAnswer": "..."},
-        {"part": "c", "question": "Part (c) question...", "marks": 5, "modelAnswer": "..."}
+        {
+          "part": "a",
+          "question": "Part (a) question text...",
+          "marks": 3,
+          "modelAnswer": "Complete answer for part (a)...",
+          "markingScheme": ["1M for...", "1M for...", "1A for..."]
+        },
+        {
+          "part": "b",
+          "question": "Part (b) question text...",
+          "marks": 4,
+          "modelAnswer": "Complete answer for part (b)...",
+          "markingScheme": ["1M for...", "1M for...", "1M for...", "1A for..."]
+        },
+        {
+          "part": "c",
+          "question": "Part (c) question text...",
+          "marks": 5,
+          "modelAnswer": "Complete answer for part (c)...",
+          "markingScheme": ["1M for...", "1M for...", "1M for...", "1M for...", "1A for..."]
+        }
       ],
       "topic": "topic_id",
       "score": 12

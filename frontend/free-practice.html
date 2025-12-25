@@ -155,6 +155,16 @@
         let currentUser = null;
         let selectedDifficulty = 3;
         let selectedTopics = new Set();
+        let isGenerating = false; // Prevent double-trigger lock
+
+        // Force hide loading overlay on page load (fallback)
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.hidden = true;
+        }
+
+        // Handle bfcache (back/forward navigation) - ensure overlay is hidden
+        window.addEventListener('pageshow', hideLoadingOverlay);
 
         // Topics data
         const PHYSICS_TOPICS = {
@@ -226,6 +236,9 @@
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Force hide loading overlay immediately on page load
+            hideLoadingOverlay();
+            
             await checkAuth();
             renderTopics();
             initEventListeners();
@@ -235,13 +248,21 @@
             try {
                 const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
                 if (response.ok) {
-                    currentUser = await response.json();
-                    document.getElementById('userName').textContent = currentUser.name || currentUser.email?.split('@')[0] || 'User';
-                    document.getElementById('userEmail').textContent = currentUser.email || '';
-                    checkAdminAccess();
+                    const data = await response.json();
+                    // Handle both { user: {...} } and flat { email, name } formats
+                    currentUser = data.user || data;
+                    
+                    if (currentUser && currentUser.email) {
+                        document.getElementById('userName').textContent = currentUser.name || currentUser.email.split('@')[0] || 'User';
+                        document.getElementById('userEmail').textContent = currentUser.email;
+                        checkAdminAccess();
+                    } else {
+                        // No valid user data - redirect to login
+                        window.location.href = '/login.html';
+                    }
                 } else {
-                    // Not logged in - redirect to dashboard with login prompt
-                    window.location.href = '/?login=true';
+                    // Not logged in - redirect to login page
+                    window.location.href = '/login.html';
                 }
             } catch (err) {
                 console.error('Auth check failed:', err);
@@ -314,6 +335,9 @@
         }
 
         async function startQuiz() {
+            // Prevent double-trigger
+            if (isGenerating) return;
+            
             const mcCount = parseInt(document.getElementById('mcCount').value) || 0;
             const shortCount = parseInt(document.getElementById('shortCount').value) || 0;
             const longCount = parseInt(document.getElementById('longCount').value) || 0;
@@ -330,6 +354,7 @@
                 return;
             }
 
+            isGenerating = true;
             const loadingOverlay = document.getElementById('loadingOverlay');
             loadingOverlay.hidden = false;
 
@@ -365,6 +390,7 @@
                 alert(err.message || '生成題目失敗，請重試');
             } finally {
                 loadingOverlay.hidden = true;
+                isGenerating = false;
             }
         }
     </script>
