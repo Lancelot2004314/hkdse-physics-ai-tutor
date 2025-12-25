@@ -1152,7 +1152,7 @@
                         <div class="document-meta" style="margin-top: 4px;">
                             ${doc.year ? `${doc.year} · ` : ''}
                             ${doc.paper || doc.source || 'Unknown'} · 
-                            ${doc.status === 'ready' ? `${doc.chunk_count} chunks · ` : ''}
+                            ${doc.status === 'ready' ? (doc.gcs_uri ? 'RAG indexed · ' : `${doc.chunk_count} chunks · `) : ''}
                             <span class="status-badge status-${doc.status}">
                                 ${doc.status === 'pending' ? '⏳ 排队中' :
                     doc.status === 'processing' ? '⚙️ 处理中' :
@@ -1160,9 +1160,9 @@
                             '✅ 就绪'}
                             </span>
                             ${doc.status === 'error' && doc.error_message ? `<span style="color: #991b1b; margin-left: 8px;">${escapeHtml(doc.error_message)}</span>` : ''}
-                            ${doc.gcs_uri ? '<span class="tag-badge" style="background: #4285f4; color: white; margin-left: 8px;">☁️ Vertex AI</span>' : 
-                              doc.r2_key ? '<span class="tag-badge" style="background: #f6821f; color: white; margin-left: 8px;">📦 R2</span>' : 
-                              '<span class="tag-badge" style="background: #6b7280; color: white; margin-left: 8px;">📝 Text</span>'}
+                            ${doc.gcs_uri ? '<span class="tag-badge" style="background: #4285f4; color: white; margin-left: 8px;">☁️ Vertex AI</span>' :
+                    doc.r2_key ? '<span class="tag-badge" style="background: #f6821f; color: white; margin-left: 8px;">📦 R2</span>' :
+                        '<span class="tag-badge" style="background: #6b7280; color: white; margin-left: 8px;">📝 Text</span>'}
                         </div>
                     </div>
                     <div class="document-actions">
