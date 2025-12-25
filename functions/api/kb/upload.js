@@ -1,9 +1,7 @@
 /**
- * Knowledge Base Upload API
- * Allows admin to upload DSE past papers and learning materials
- * Supports:
- * - Text content (paste from PDF)
- * - PDF file upload with OCR via GPT-4o Vision
+ * Knowledge Base Upload API - Async Version
+ * Stores file in R2 and queues for background OCR processing
+ * Returns immediately with document ID for status polling
  */
 
 import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
@@ -40,9 +38,6 @@ export async function onRequestPost(context) {
     if (!env.DB) {
       return errorResponse(500, 'Database not configured');
     }
-    if (!env.VECTORIZE) {
-      return errorResponse(500, 'Vectorize not configured');
-    }
     if (!env.GEMINI_API_KEY) {
       return errorResponse(500, 'Gemini API key not configured');
     }
@@ -51,9 +46,11 @@ export async function onRequestPost(context) {
     const contentType = request.headers.get('Content-Type') || '';
 
     let title, content, year, paper, source, filename, language, subject, docType;
+    let isFileUpload = false;
+    let r2Key = null;
 
     if (contentType.includes('multipart/form-data')) {
-      // Handle file upload
+      // Handle file upload - store in R2 and queue for async processing
       const formData = await request.formData();
       const file = formData.get('file');
       title = formData.get('title');
@@ -76,28 +73,34 @@ export async function onRequestPost(context) {
       filename = file.name;
       const fileType = file.type;
 
-      // Check if it's a PDF or image
-      if (fileType === 'application/pdf') {
-        // For PDF, we need to extract text using OCR
-        content = await extractTextFromPDF(file, env);
-      } else if (fileType.startsWith('image/')) {
-        // For images, use GPT-4o Vision directly
-        content = await extractTextFromImage(file, env);
-      } else {
+      // Validate file type
+      if (fileType !== 'application/pdf' && !fileType.startsWith('image/')) {
         return errorResponse(400, 'Unsupported file type. Please upload PDF or image.');
       }
 
-      // Store original file in R2 if available
+      isFileUpload = true;
+
+      // Store file in R2 for async processing
       if (env.R2_BUCKET) {
-        const fileId = `${Date.now()}_${filename}`;
+        r2Key = `uploads/${Date.now()}_${filename}`;
         const arrayBuffer = await file.arrayBuffer();
-        await env.R2_BUCKET.put(fileId, arrayBuffer, {
-          customMetadata: { title, year: year || '', paper: paper || '', language, subject, docType },
+        await env.R2_BUCKET.put(r2Key, arrayBuffer, {
+          customMetadata: { 
+            title, 
+            year: year || '', 
+            paper: paper || '', 
+            language, 
+            subject, 
+            docType,
+            mimeType: fileType
+          },
         });
+      } else {
+        return errorResponse(500, 'R2 storage not configured');
       }
 
     } else {
-      // Handle JSON body (text content)
+      // Handle JSON body (text content) - process synchronously
       const body = await request.json();
       title = body.title;
       content = body.content;
@@ -111,26 +114,77 @@ export async function onRequestPost(context) {
       if (!title || !content) {
         return errorResponse(400, 'Title and content are required');
       }
-    }
 
-    if (!content || content.length < 50) {
-      return errorResponse(400, 'Content too short or extraction failed (min 50 characters)');
+      if (content.length < 50) {
+        return errorResponse(400, 'Content too short (min 50 characters)');
+      }
     }
 
     // Generate document ID
     const docId = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
-    // Create document record
+    // Create document record with pending status
     await env.DB.prepare(`
-      INSERT INTO kb_documents (id, title, filename, year, paper, source, language, subject, doc_type, status, created_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'processing', ?)
-    `).bind(docId, title, filename || null, year || null, paper || null, source, language, subject, docType, user.id).run();
+      INSERT INTO kb_documents (id, title, filename, year, paper, source, language, subject, doc_type, status, r2_key, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      docId, 
+      title, 
+      filename || null, 
+      year || null, 
+      paper || null, 
+      source, 
+      language, 
+      subject, 
+      docType, 
+      isFileUpload ? 'pending' : 'processing',
+      r2Key,
+      user.id
+    ).run();
+
+    if (isFileUpload) {
+      // File stored in R2, return immediately with pending status
+      // User needs to trigger /api/kb/process to process pending documents
+      return new Response(JSON.stringify({
+        success: true,
+        documentId: docId,
+        status: 'pending',
+        message: 'File uploaded. Click "Process Pending" to start OCR processing.',
+      }), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+
+    // Process text content (from JSON upload)
+    return await processDocumentContent(env, docId, content, year, paper, language, subject, docType);
+
+  } catch (err) {
+    console.error('Upload error:', err);
+    return errorResponse(500, 'Upload failed: ' + err.message);
+  }
+}
+
+/**
+ * Process document content - generate embeddings and store
+ */
+async function processDocumentContent(env, docId, content, year, paper, language, subject, docType) {
+  try {
+    if (!content || content.length < 50) {
+      await updateDocumentStatus(env.DB, docId, 'error', 'Content too short or extraction failed');
+      return errorResponse(400, 'Content too short or extraction failed (min 50 characters)');
+    }
+
+    // Check Vectorize binding
+    if (!env.VECTORIZE) {
+      await updateDocumentStatus(env.DB, docId, 'error', 'Vectorize not configured');
+      return errorResponse(500, 'Vectorize not configured');
+    }
 
     // Chunk the document
     const chunks = chunkDocument(content);
 
     if (chunks.length === 0) {
-      await updateDocumentStatus(env.DB, docId, 'error');
+      await updateDocumentStatus(env.DB, docId, 'error', 'Failed to chunk document');
       return errorResponse(400, 'Failed to chunk document');
     }
 
@@ -142,7 +196,7 @@ export async function onRequestPost(context) {
       embeddings = await generateEmbeddings(chunkTexts, env);
     } catch (err) {
       console.error('Embedding generation failed:', err);
-      await updateDocumentStatus(env.DB, docId, 'error');
+      await updateDocumentStatus(env.DB, docId, 'error', 'Failed to generate embeddings: ' + err.message);
       return errorResponse(500, 'Failed to generate embeddings');
     }
 
@@ -198,13 +252,14 @@ export async function onRequestPost(context) {
 
     // Update document status
     await env.DB.prepare(`
-      UPDATE kb_documents SET status = 'ready', chunk_count = ?, updated_at = datetime('now')
+      UPDATE kb_documents SET status = 'ready', chunk_count = ?, processed_at = datetime('now'), updated_at = datetime('now')
       WHERE id = ?
     `).bind(chunks.length, docId).run();
 
     return new Response(JSON.stringify({
       success: true,
       documentId: docId,
+      status: 'ready',
       chunkCount: chunks.length,
       contentLength: content.length,
       message: `Successfully processed ${chunks.length} chunks from ${content.length} characters`,
@@ -213,22 +268,20 @@ export async function onRequestPost(context) {
     });
 
   } catch (err) {
-    console.error('Upload error:', err);
-    return errorResponse(500, 'Upload failed: ' + err.message);
+    console.error('Processing error:', err);
+    await updateDocumentStatus(env.DB, docId, 'error', err.message);
+    return errorResponse(500, 'Processing failed: ' + err.message);
   }
 }
 
 /**
- * Extract text from PDF using Gemini 3 Pro
- * Uses Google's latest model for superior document understanding
+ * Extract text from PDF using Gemini
  */
-async function extractTextFromPDF(file, env) {
+async function extractTextFromPDF(arrayBuffer, env) {
   if (!env.GEMINI_API_KEY) {
     throw new Error('GEMINI_API_KEY not configured');
   }
 
-  // Read file as base64
-  const arrayBuffer = await file.arrayBuffer();
   const uint8Array = new Uint8Array(arrayBuffer);
   let base64 = '';
   const chunkSize = 8192;
@@ -238,19 +291,16 @@ async function extractTextFromPDF(file, env) {
   }
   base64 = btoa(base64);
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`;
 
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      contents: [
-        {
-          parts: [
-            {
-              text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this document.
+      contents: [{
+        parts: [
+          {
+            text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this document.
 
 Important instructions:
 - Extract every question, answer, and explanation exactly as written
@@ -260,16 +310,15 @@ Important instructions:
 - Output ONLY the extracted text, no commentary
 - If there are multiple pages, extract text from all pages in order
 - For Chinese text, preserve the original Chinese characters`
-            },
-            {
-              inline_data: {
-                mime_type: 'application/pdf',
-                data: base64
-              }
+          },
+          {
+            inline_data: {
+              mime_type: 'application/pdf',
+              data: base64
             }
-          ]
-        }
-      ],
+          }
+        ]
+      }],
       generationConfig: {
         temperature: 0.1,
         maxOutputTokens: 32000,
@@ -279,7 +328,7 @@ Important instructions:
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('Gemini 3 Pro OCR error:', error);
+    console.error('Gemini OCR error:', error);
     throw new Error('Failed to extract text from PDF: ' + response.status);
   }
 
@@ -287,22 +336,21 @@ Important instructions:
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!text) {
-    console.error('Empty response from Gemini 3 Pro:', JSON.stringify(data));
-    throw new Error('Empty response from Gemini 3 Pro');
+    console.error('Empty response from Gemini:', JSON.stringify(data));
+    throw new Error('Empty response from Gemini');
   }
 
   return text;
 }
 
 /**
- * Extract text from image using Gemini 3 Pro
+ * Extract text from image using Gemini
  */
-async function extractTextFromImage(file, env) {
+async function extractTextFromImage(arrayBuffer, mimeType, env) {
   if (!env.GEMINI_API_KEY) {
     throw new Error('GEMINI_API_KEY not configured');
   }
 
-  const arrayBuffer = await file.arrayBuffer();
   const uint8Array = new Uint8Array(arrayBuffer);
   let base64 = '';
   const chunkSize = 8192;
@@ -312,21 +360,16 @@ async function extractTextFromImage(file, env) {
   }
   base64 = btoa(base64);
 
-  const mimeType = file.type;
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`;
 
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      contents: [
-        {
-          parts: [
-            {
-              text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this image.
+      contents: [{
+        parts: [
+          {
+            text: `You are a document text extractor for HKDSE Physics papers. Extract ALL text content from this image.
 
 Important instructions:
 - Extract every question, answer, and explanation exactly as written
@@ -335,16 +378,15 @@ Important instructions:
 - Preserve the structure (MC options A/B/C/D, long questions, marking schemes)
 - Output ONLY the extracted text, no commentary
 - For Chinese text, preserve the original Chinese characters`
-            },
-            {
-              inline_data: {
-                mime_type: mimeType,
-                data: base64
-              }
+          },
+          {
+            inline_data: {
+              mime_type: mimeType,
+              data: base64
             }
-          ]
-        }
-      ],
+          }
+        ]
+      }],
       generationConfig: {
         temperature: 0.1,
         maxOutputTokens: 16000,
@@ -354,7 +396,7 @@ Important instructions:
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('Gemini 3 Pro OCR error:', error);
+    console.error('Gemini OCR error:', error);
     throw new Error('Failed to extract text from image: ' + response.status);
   }
 
@@ -362,22 +404,19 @@ Important instructions:
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!text) {
-    console.error('Empty response from Gemini 3 Pro:', JSON.stringify(data));
-    throw new Error('Empty response from Gemini 3 Pro');
+    console.error('Empty response from Gemini:', JSON.stringify(data));
+    throw new Error('Empty response from Gemini');
   }
 
   return text;
 }
 
-async function updateDocumentStatus(db, docId, status) {
+async function updateDocumentStatus(db, docId, status, errorMessage = null) {
   await db.prepare(`
-    UPDATE kb_documents SET status = ?, updated_at = datetime('now') WHERE id = ?
-  `).bind(status, docId).run();
+    UPDATE kb_documents SET status = ?, error_message = ?, updated_at = datetime('now') WHERE id = ?
+  `).bind(status, errorMessage, docId).run();
 }
 
-/**
- * Detect physics topic from content
- */
 function detectTopic(content) {
   const topicPatterns = {
     'mechanics': /force|motion|velocity|acceleration|momentum|energy|work|power|newton|projectile|friction|torque|力|運動|速度|加速度|動量/i,
@@ -398,9 +437,6 @@ function detectTopic(content) {
   return null;
 }
 
-/**
- * Detect content type from text
- */
 function detectContentType(content) {
   const lowerContent = content.toLowerCase();
 
@@ -426,3 +462,6 @@ function errorResponse(status, message) {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 }
+
+// Export for queue consumer
+export { extractTextFromPDF, extractTextFromImage, processDocumentContent, detectTopic, detectContentType, updateDocumentStatus };

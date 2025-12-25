@@ -22,6 +22,8 @@ index_name = "hkdse-physics-kb"
 binding = "R2_BUCKET"
 bucket_name = "hkdse-physics-docs"
 
+# Note: Queues require paid plan. Using manual /api/kb/process endpoint instead.
+
 # Required environment variables (set in Cloudflare Dashboard):
 # - QWEN_API_KEY: 通义千问 API key
 # - DEEPSEEK_API_KEY: DeepSeek API key

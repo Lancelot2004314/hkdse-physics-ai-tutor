@@ -64,7 +64,8 @@ export async function onRequestGet(context) {
       SELECT 
         d.id, d.title, d.filename, d.year, d.paper, d.source,
         d.language, d.subject, d.doc_type,
-        d.chunk_count, d.status, d.created_at, d.updated_at,
+        d.chunk_count, d.status, d.error_message, d.r2_key,
+        d.created_at, d.updated_at, d.processed_at,
         u.email as created_by_email
       FROM kb_documents d
       LEFT JOIN users u ON d.created_by = u.id

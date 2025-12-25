@@ -230,14 +230,26 @@
             color: #065f46;
         }
 
+        .status-pending {
+            background: #e0e7ff;
+            color: #3730a3;
+            animation: pulse 2s infinite;
+        }
+
         .status-processing {
             background: #fef3c7;
             color: #92400e;
+            animation: pulse 1.5s infinite;
         }
 
         .status-error {
             background: #fee2e2;
             color: #991b1b;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
 
         .tag-badge {
@@ -577,6 +589,9 @@
         <header class="header">
             <h1><i class="fas fa-brain"></i> Knowledge Base</h1>
             <div class="header-actions">
+                <button id="processPendingBtn" class="btn btn-primary" onclick="processPending()" style="display: none;">
+                    <i class="fas fa-cog"></i> <span id="processBtnText">Process Pending</span>
+                </button>
                 <a href="/admin.html" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back to Admin
                 </a>
@@ -1009,6 +1024,9 @@
 
                 renderDocuments();
                 updateStats();
+                
+                // Auto-refresh if any documents are pending/processing
+                scheduleAutoRefresh();
             } catch (err) {
                 console.error('Load error:', err);
                 document.getElementById('documentList').innerHTML = `
@@ -1016,6 +1034,28 @@
                         <i class="fas fa-exclamation-circle"></i> Failed to load documents: ${err.message}
                     </div>
                 `;
+            }
+        }
+
+        // Auto-refresh for pending/processing documents
+        let autoRefreshTimer = null;
+        
+        function scheduleAutoRefresh() {
+            // Clear existing timer
+            if (autoRefreshTimer) {
+                clearTimeout(autoRefreshTimer);
+                autoRefreshTimer = null;
+            }
+            
+            // Check if any documents are pending or processing
+            const hasPendingDocs = documents.some(d => d.status === 'pending' || d.status === 'processing');
+            
+            if (hasPendingDocs) {
+                // Refresh every 5 seconds while documents are processing
+                autoRefreshTimer = setTimeout(() => {
+                    console.log('Auto-refreshing documents...');
+                    loadDocuments();
+                }, 5000);
             }
         }
 
@@ -1048,8 +1088,14 @@
                         <div class="document-meta" style="margin-top: 4px;">
                             ${doc.year ? `${doc.year} · ` : ''}
                             ${doc.paper || doc.source || 'Unknown'} · 
-                            ${doc.chunk_count} chunks · 
-                            <span class="status-badge status-${doc.status}">${doc.status}</span>
+                            ${doc.status === 'ready' ? `${doc.chunk_count} chunks · ` : ''}
+                            <span class="status-badge status-${doc.status}">
+                                ${doc.status === 'pending' ? '⏳ 排队中' : 
+                                  doc.status === 'processing' ? '⚙️ 处理中' : 
+                                  doc.status === 'error' ? '❌ 失败' : 
+                                  '✅ 就绪'}
+                            </span>
+                            ${doc.status === 'error' && doc.error_message ? `<span style="color: #991b1b; margin-left: 8px;">${escapeHtml(doc.error_message)}</span>` : ''}
                         </div>
                     </div>
                     <div class="document-actions">
@@ -1073,6 +1119,67 @@
 
             const years = new Set(documents.filter(d => d.year).map(d => d.year));
             document.getElementById('statYears').textContent = years.size;
+            
+            // Show/hide Process Pending button
+            const pendingCount = documents.filter(d => d.status === 'pending').length;
+            const processBtn = document.getElementById('processPendingBtn');
+            const processBtnText = document.getElementById('processBtnText');
+            
+            if (pendingCount > 0) {
+                processBtn.style.display = 'inline-flex';
+                processBtnText.textContent = `Process Pending (${pendingCount})`;
+            } else {
+                processBtn.style.display = 'none';
+            }
+        }
+        
+        // Process pending documents
+        let isProcessing = false;
+        
+        async function processPending() {
+            if (isProcessing) return;
+            
+            const processBtn = document.getElementById('processPendingBtn');
+            const processBtnText = document.getElementById('processBtnText');
+            
+            isProcessing = true;
+            processBtn.disabled = true;
+            processBtnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/kb/process`, {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.status === 'ready') {
+                        alert(`✅ Processed: ${result.title}\n${result.chunkCount} chunks extracted`);
+                    } else {
+                        alert(result.message);
+                    }
+                } else {
+                    alert(`❌ Error: ${result.error}`);
+                }
+                
+                // Reload documents to update status
+                await loadDocuments();
+                
+            } catch (err) {
+                console.error('Process error:', err);
+                alert('Failed to process: ' + err.message);
+            } finally {
+                isProcessing = false;
+                processBtn.disabled = false;
+                
+                // Update button text based on remaining pending docs
+                const pendingCount = documents.filter(d => d.status === 'pending').length;
+                if (pendingCount > 0) {
+                    processBtnText.textContent = `Process Pending (${pendingCount})`;
+                }
+            }
         }
 
         // Upload mode switching
