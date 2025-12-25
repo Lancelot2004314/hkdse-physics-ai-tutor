@@ -198,8 +198,8 @@ async function extractTextFromPDF(arrayBuffer, env) {
   }
   base64 = btoa(base64);
 
-  // Use gemini-1.5-flash which has better PDF support
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+  // Use gemini-1.5-pro for best PDF/document understanding
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${env.GEMINI_API_KEY}`;
 
   console.log(`Processing PDF: ${arrayBuffer.byteLength} bytes`);
 
@@ -247,16 +247,16 @@ Instructions:
 
   const data = await response.json();
   console.log('Gemini response:', JSON.stringify(data).substring(0, 500));
-  
+
   // Check for blocked content or safety issues
   if (data.candidates?.[0]?.finishReason === 'SAFETY') {
     throw new Error('Content blocked by safety filter');
   }
-  
+
   if (data.candidates?.[0]?.finishReason === 'RECITATION') {
     throw new Error('Content blocked - possible copyright issue');
   }
-  
+
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!text) {
@@ -282,7 +282,8 @@ async function extractTextFromImage(arrayBuffer, mimeType, env) {
   }
   base64 = btoa(base64);
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`;
+  // Use gemini-1.5-pro for best image/document understanding
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${env.GEMINI_API_KEY}`;
 
   const response = await fetch(url, {
     method: 'POST',
