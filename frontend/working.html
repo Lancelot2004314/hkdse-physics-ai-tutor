@@ -281,7 +281,7 @@
 
                 // Fallback: typesetPromise if present, else typeset (sync)
                 if (typeof window.MathJax.typesetPromise === 'function') {
-                    window.MathJax.typesetPromise().catch(() => {});
+                    window.MathJax.typesetPromise().catch(() => { });
                 } else if (typeof window.MathJax.typeset === 'function') {
                     window.MathJax.typeset();
                 }
@@ -479,4 +479,3 @@
 </body>
 
 </html>
-

@@ -117,6 +117,13 @@ body {
     color: var(--text-muted);
 }
 
+/* Ensure hidden attribute works even with display:flex */
+.loading-state[hidden],
+.error-state[hidden],
+.admin-main[hidden] {
+    display: none !important;
+}
+
 .error-actions {
     display: flex;
     gap: 12px;
