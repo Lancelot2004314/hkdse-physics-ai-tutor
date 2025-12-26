@@ -241,9 +241,14 @@ export async function onRequestPost(context) {
       timeLimit,
       maxScore,
       totalQuestions: allQuestions.length,
+      ragInfo: {
+        kbBackend,
+        rewriteMode: usedRewriteMode,
+        kbResultsCount,
+      },
     };
 
-    // Optional debug payload (admin only) to verify RAG usage
+    // Optional debug payload (admin only) to verify RAG usage in detail
     if (debug === true && isAdmin(user.email, env)) {
       responsePayload.debug = {
         kbBackend,
@@ -370,7 +375,10 @@ function selectPrototypeCandidates(results, language) {
   }));
 
   const langMatched = enriched.filter(r => !r._lang || r._lang === lang);
-  const withoutExcluded = langMatched.filter(r => !excluded.has(r._docType));
+  // If we don't have enough docs in the requested language (e.g. only English KB),
+  // fall back to cross-language prototypes and let the generator output in requested language.
+  const langBase = langMatched.length > 0 ? langMatched : enriched;
+  const withoutExcluded = langBase.filter(r => !excluded.has(r._docType));
   const preferredOnly = withoutExcluded.filter(r => preferred.has(r._docType));
 
   const base = preferredOnly.length > 0 ? preferredOnly : withoutExcluded;
