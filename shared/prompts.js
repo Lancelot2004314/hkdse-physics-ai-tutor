@@ -180,6 +180,50 @@ Example: Instead of "In the diagram, a ball rolls down a slope", write "A ball r
   ]
 }`;
 
+// Prototype-based rewrite prompts (80% DSE-like)
+// These use {styleContext} as the "prototype pack" (retrieved past paper + marking scheme excerpts).
+export const QUIZ_MC_REWRITE_PROMPT = `Generate HKDSE Physics multiple choice questions that are VERY similar to real DSE questions.
+
+## Goal (IMPORTANT)
+- Create {count} NEW questions.
+- Each new question should look about 80% like an authentic DSE question (structure/phrasing), but with ~20% changes (numbers/situation).
+- Use the provided Prototype Pack below as the base. Do NOT ignore it.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Prototype Pack (Past Paper + Marking Scheme excerpts)
+{styleContext}
+
+## Graph/Diagram Policy (IMPORTANT)
+- If the prototype relies on a graph/diagram/figure, rewrite the question so that ALL required information is provided in text.
+- Prefer a small data table (4-8 rows) or a short list of coordinate points.
+- Do NOT ask the student to read values from a figure or draw a graph.
+- Keep it SIMPLE to avoid wrong information.
+- Answers/solutions must NOT include any diagrams/graphs.
+
+## DSE MC Output Rules
+1. DSE phrasing and concise stems.
+2. 4 options (A-D), plausible distractors (common mistakes).
+3. Use $...$ for math; in JSON strings use DOUBLE backslash for LaTeX commands like "$\\\\frac{1}{2}$".
+
+## Output JSON (STRICT)
+{
+  "questions": [
+    {
+      "question": "DSE-style question...",
+      "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+      "correctAnswer": "A",
+      "explanation": "Brief marking-scheme-like reasoning (no diagrams).",
+      "topic": "topic_id",
+      "score": 1
+    }
+  ]
+}`;
+
 export const QUIZ_SHORT_PROMPT = `Generate HKDSE Physics short answer questions matching Paper 2 structured question style.
 
 ## Input
@@ -227,6 +271,50 @@ export const QUIZ_SHORT_PROMPT = `Generate HKDSE Physics short answer questions 
         "1M for correct formula $...$",
         "1M for correct substitution",
         "1A for final answer with correct unit"
+      ],
+      "topic": "topic_id",
+      "score": 4
+    }
+  ]
+}`;
+
+export const QUIZ_SHORT_REWRITE_PROMPT = `Generate HKDSE Physics short answer questions that are VERY similar to real DSE Paper 2 questions.
+
+## Goal (IMPORTANT)
+- Create {count} NEW questions.
+- Each new question should look about 80% like an authentic DSE question, with ~20% changes (numbers/situation).
+- Use the provided Prototype Pack below as the base. Do NOT ignore it.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Prototype Pack (Past Paper + Marking Scheme excerpts)
+{styleContext}
+
+## Graph/Diagram Policy (IMPORTANT)
+- If the prototype relies on a graph/diagram/figure, rewrite the question to provide all info in text.
+- Prefer a small data table (4-8 rows) or a short list of points.
+- Do NOT require drawing or reading from a figure.
+
+## Marking Scheme Style (CRITICAL)
+- Provide marking points in HKDSE style:
+  - 1M = method/formula/approach
+  - 1A = final answer with correct unit
+- Keep marking points aligned with the solution steps.
+
+## Output JSON (STRICT)
+{
+  "questions": [
+    {
+      "question": "DSE-style short question text...",
+      "modelAnswer": "Model answer in DSE style (no diagrams).",
+      "markingScheme": [
+        "1M for ...",
+        "1M for ...",
+        "1A for ..."
       ],
       "topic": "topic_id",
       "score": 4
@@ -308,6 +396,51 @@ export const QUIZ_LONG_PROMPT = `Generate HKDSE Physics long answer/structured q
       ],
       "topic": "topic_id",
       "score": 12
+    }
+  ]
+}`;
+
+export const QUIZ_LONG_REWRITE_PROMPT = `Generate HKDSE Physics long structured questions that are VERY similar to real DSE Paper 2 questions.
+
+## Goal (IMPORTANT)
+- Create {count} NEW long structured questions.
+- Each question should look about 80% like an authentic DSE question, with ~20% changes (numbers/situation).
+- Use the provided Prototype Pack below as the base. Do NOT ignore it.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Prototype Pack (Past Paper + Marking Scheme excerpts)
+{styleContext}
+
+## Graph/Diagram Policy (IMPORTANT)
+- If the prototype relies on a graph/diagram/figure, rewrite the question to include all needed info in text.
+- Use small tables / explicit values. Do NOT require reading/drawing figures.
+- Keep it SIMPLE.
+
+## Marking Scheme Style (CRITICAL)
+- For each part, provide marking points using 1M/1A style.
+- Award method marks for correct formula/approach and answer marks for final numerical answers with units.
+
+## Output JSON (STRICT)
+{
+  "questions": [
+    {
+      "question": "Main scenario (DSE-like)...",
+      "parts": [
+        {
+          "part": "a",
+          "question": "Part (a)...",
+          "marks": 3,
+          "modelAnswer": "...",
+          "markingScheme": ["1M for...", "1M for...", "1A for..."]
+        }
+      ],
+      "topic": "topic_id",
+      "score": 10
     }
   ]
 }`;

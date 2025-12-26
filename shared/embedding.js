@@ -160,6 +160,61 @@ export async function searchKnowledgeBase(query, env, options = {}) {
 }
 
 /**
+ * Fetch KB document metadata from D1 by GCS URI (Vertex RAG sourceUri).
+ * @param {object} env
+ * @param {string[]} sourceUris - e.g. ["gs://bucket/path/file.pdf", ...]
+ * @returns {Promise<Map<string, object>>} map keyed by gcs_uri
+ */
+export async function fetchKbMetadataBySourceUris(env, sourceUris = []) {
+  const map = new Map();
+
+  if (!env?.DB) return map;
+  const uris = (sourceUris || []).filter(Boolean);
+  if (uris.length === 0) return map;
+
+  // D1 has a limit on bound params; keep it safe.
+  const limited = uris.slice(0, 100);
+  const placeholders = limited.map(() => '?').join(', ');
+
+  const res = await env.DB.prepare(`
+    SELECT
+      gcs_uri,
+      doc_type,
+      year,
+      paper,
+      language,
+      subject,
+      title,
+      filename,
+      source
+    FROM kb_documents
+    WHERE gcs_uri IN (${placeholders})
+  `).bind(...limited).all();
+
+  for (const row of (res.results || [])) {
+    if (row?.gcs_uri) map.set(row.gcs_uri, row);
+  }
+
+  return map;
+}
+
+/**
+ * Enrich Vertex RAG results with D1 kb_documents metadata (doc_type/year/paper/language...).
+ * @param {object} env
+ * @param {object[]} results
+ * @returns {Promise<object[]>}
+ */
+export async function enrichKbResultsWithMetadata(env, results = []) {
+  const sourceUris = results.map(r => r?.sourceUri).filter(Boolean);
+  const metaMap = await fetchKbMetadataBySourceUris(env, sourceUris);
+
+  return results.map(r => {
+    const meta = (r?.sourceUri && metaMap.get(r.sourceUri)) ? metaMap.get(r.sourceUri) : null;
+    return meta ? { ...r, ...meta } : r;
+  });
+}
+
+/**
  * Search using Vertex AI RAG Engine only (no fallback)
  * @param {string} query - Search query
  * @param {object} env - Environment with Vertex configuration
