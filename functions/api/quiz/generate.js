@@ -11,6 +11,7 @@ import {
   QUIZ_MC_REWRITE_PROMPT,
   QUIZ_SHORT_REWRITE_PROMPT,
   QUIZ_LONG_REWRITE_PROMPT,
+  QUIZ_VALIDATE_AND_FIX_PROMPT,
 } from '../../../shared/prompts.js';
 import { PHYSICS_TOPICS, getSubtopicNames } from '../../../shared/topics.js';
 import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
@@ -147,6 +148,16 @@ export async function onRequestPost(context) {
     const allQuestions = [];
     let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
 
+    // Validation stats
+    const validatorStats = {
+      totalProcessed: 0,
+      passedInitial: 0,
+      repairedCount: 0,
+      regeneratedCount: 0,
+      droppedCount: 0,
+      sampleIssues: [],
+    };
+
     // Build parallel generation promises
     const generationTasks = [];
 
@@ -157,21 +168,21 @@ export async function onRequestPost(context) {
     if (mcCount > 0) {
       generationTasks.push(
         generateQuestions(apiKey, mcPrompt, topicNames, difficulty, mcCount, language, prototypePack)
-          .then(result => ({ type: 'mc', result }))
+          .then(result => ({ type: 'mc', result, prompt: mcPrompt }))
       );
     }
 
     if (shortCount > 0) {
       generationTasks.push(
         generateQuestions(apiKey, shortPrompt, topicNames, difficulty, shortCount, language, prototypePack)
-          .then(result => ({ type: 'short', result }))
+          .then(result => ({ type: 'short', result, prompt: shortPrompt }))
       );
     }
 
     if (longCount > 0) {
       generationTasks.push(
         generateQuestions(apiKey, longPrompt, topicNames, difficulty, longCount, language, prototypePack)
-          .then(result => ({ type: 'long', result }))
+          .then(result => ({ type: 'long', result, prompt: longPrompt }))
       );
     }
 
@@ -179,13 +190,38 @@ export async function onRequestPost(context) {
     const results = await Promise.all(generationTasks);
 
     // Process results in order: MC -> Short -> Long
+    // Now with validation for each question type
     const typeOrder = ['mc', 'short', 'long'];
     for (const typeKey of typeOrder) {
       const entry = results.find(r => r.type === typeKey);
-      if (entry && entry.result.success && entry.result.questions) {
-        entry.result.questions.forEach(q => {
+      if (entry && entry.result.success && entry.result.questions && entry.result.questions.length > 0) {
+        // Validate and fix questions for this type
+        const { questions: validatedQs, stats } = await validateAndProcessQuestions(
+          apiKey,
+          entry.result.questions,
+          typeKey,
+          language,
+          entry.prompt,
+          topicNames,
+          difficulty,
+          prototypePack
+        );
+
+        // Merge validation stats
+        validatorStats.totalProcessed += stats.totalProcessed;
+        validatorStats.passedInitial += stats.passedInitial;
+        validatorStats.repairedCount += stats.repairedCount;
+        validatorStats.regeneratedCount += stats.regeneratedCount;
+        validatorStats.droppedCount += stats.droppedCount;
+        if (stats.issues && stats.issues.length > 0) {
+          validatorStats.sampleIssues.push(...stats.issues.slice(0, 3));
+        }
+
+        // Add validated questions
+        validatedQs.forEach(q => {
           allQuestions.push({ ...q, type: typeKey, index: allQuestions.length });
         });
+
         if (entry.result.usage) {
           totalUsage.prompt_tokens += entry.result.usage.prompt_tokens || 0;
           totalUsage.completion_tokens += entry.result.usage.completion_tokens || 0;
@@ -193,6 +229,9 @@ export async function onRequestPost(context) {
         }
       }
     }
+
+    // Trim sample issues to max 5
+    validatorStats.sampleIssues = validatorStats.sampleIssues.slice(0, 5);
 
     if (allQuestions.length === 0) {
       return errorResponse(500, 'Failed to generate questions');
@@ -230,8 +269,9 @@ export async function onRequestPost(context) {
     }
 
     // Return questions without answers for frontend
+    // Also strip internal validation metadata
     const questionsForClient = allQuestions.map(q => {
-      const { correctAnswer, modelAnswer, markingScheme, ...clientQ } = q;
+      const { correctAnswer, modelAnswer, markingScheme, _validated, _wasRepaired, _repairAttempts, ...clientQ } = q;
       return clientQ;
     });
 
@@ -248,7 +288,7 @@ export async function onRequestPost(context) {
       },
     };
 
-    // Optional debug payload (admin only) to verify RAG usage in detail
+    // Optional debug payload (admin only) to verify RAG usage and validation stats
     if (debug === true && isAdmin(user.email, env)) {
       responsePayload.debug = {
         kbBackend,
@@ -259,6 +299,22 @@ export async function onRequestPost(context) {
         selectedPrototypes,
         detectedVisualInPrototype,
         prototypePackExcerpt: prototypePack ? prototypePack.slice(0, 900) : null,
+        // Validator stats
+        validator: {
+          totalProcessed: validatorStats.totalProcessed,
+          passedInitial: validatorStats.passedInitial,
+          repairedCount: validatorStats.repairedCount,
+          regeneratedCount: validatorStats.regeneratedCount,
+          droppedCount: validatorStats.droppedCount,
+          sampleIssues: validatorStats.sampleIssues,
+        },
+        // Per-question validation metadata
+        questionsValidation: allQuestions.map((q, i) => ({
+          index: i,
+          type: q.type,
+          wasRepaired: q._wasRepaired || false,
+          repairAttempts: q._repairAttempts || 0,
+        })),
       };
     }
 
@@ -336,6 +392,254 @@ async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty,
     console.error('Question generation error:', err);
     return { success: false, error: err.message };
   }
+}
+
+// Validation constants
+const MAX_REPAIR_ATTEMPTS = 2;
+const MAX_REGEN_ATTEMPTS = 2;
+const VALIDATION_TIMEOUT = 30000;
+
+// Forbidden phrases that indicate LLM meta-commentary
+const FORBIDDEN_PHRASES = [
+  '修正', '假設', '為保持', '重新提供', '但此為正確答案',
+  '實際上', '在實際生成中', '調整', '為符合', '為了保持原型一致',
+  'in actual generation', 'to maintain', 'assuming', 'correction',
+  'let me correct', 'i should note', 'note:', 'actually',
+];
+
+// Visual reference patterns that should not appear in answer/explanation
+// (The question can mention data tables, but answers should not reference figures)
+const VISUAL_ANSWER_PATTERNS = [
+  /from the (?:graph|diagram|figure)/i,
+  /as shown in (?:the )?(?:graph|diagram|figure)/i,
+  /refer(?:ring)? to (?:the )?(?:graph|diagram|figure)/i,
+  /see (?:the )?(?:graph|diagram|figure)/i,
+  /根據(?:上)?圖/,
+  /如(?:上|下)?圖所示/,
+  /從圖中/,
+  /參見(?:上|下)?圖/,
+  /draw(?:ing)? (?:a |the )?(?:graph|diagram|figure)/i,
+  /畫(?:出)?(?:圖|曲線)/,
+];
+
+/**
+ * Validate a single question using the validator prompt
+ */
+async function validateQuestion(apiKey, question, questionType, language) {
+  const prompt = QUIZ_VALIDATE_AND_FIX_PROMPT
+    .replace('{questionType}', questionType)
+    .replace('{language}', language === 'en' ? 'English' : 'Traditional Chinese')
+    .replace('{questionJson}', JSON.stringify(question, null, 2));
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), VALIDATION_TIMEOUT);
+
+  try {
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: 'You are a strict exam question validator. Output ONLY valid JSON.' },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.2, // Lower temperature for consistent validation
+        max_tokens: 2048,
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      console.error('Validation API error:', response.status);
+      return { isConsistent: true, issues: [], error: 'API error' }; // Fail open
+    }
+
+    const data = await response.json();
+    const text = data.choices[0]?.message?.content || '';
+
+    // Parse JSON
+    try {
+      const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      const jsonText = codeBlockMatch ? codeBlockMatch[1] : text;
+      const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return {
+          isConsistent: parsed.isConsistent ?? true,
+          issues: parsed.issues || [],
+          fixedQuestion: parsed.fixedQuestion || null,
+          usage: data.usage,
+        };
+      }
+    } catch (parseErr) {
+      console.error('Failed to parse validation response:', parseErr);
+    }
+
+    return { isConsistent: true, issues: [], error: 'Parse error' };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    console.error('Validation error:', err);
+    return { isConsistent: true, issues: [], error: err.message }; // Fail open
+  }
+}
+
+/**
+ * Quick local check for forbidden phrases and visual references (before calling LLM validator)
+ */
+function quickForbiddenCheck(question, questionType) {
+  const issues = [];
+  const textToCheck = questionType === 'mc'
+    ? (question.explanation || '')
+    : (question.modelAnswer || '');
+
+  // Check for forbidden meta-commentary phrases
+  for (const phrase of FORBIDDEN_PHRASES) {
+    if (textToCheck.toLowerCase().includes(phrase.toLowerCase())) {
+      issues.push(`Contains forbidden phrase: "${phrase}"`);
+    }
+  }
+
+  // Check for visual references in answer/explanation (these should be converted to data)
+  for (const pattern of VISUAL_ANSWER_PATTERNS) {
+    if (pattern.test(textToCheck)) {
+      issues.push(`Answer references visual element: "${pattern.source}"`);
+      break; // One issue is enough to trigger repair
+    }
+  }
+
+  // Structure check for MC
+  if (questionType === 'mc') {
+    if (!question.options || question.options.length !== 4) {
+      issues.push('MC must have exactly 4 options');
+    }
+    if (!['A', 'B', 'C', 'D'].includes(question.correctAnswer)) {
+      issues.push('correctAnswer must be A, B, C, or D');
+    }
+  }
+
+  // Check for short/long answer structure
+  if (questionType === 'short' || questionType === 'long') {
+    if (!question.modelAnswer) {
+      issues.push('Short/Long question must have modelAnswer');
+    }
+    if (!question.markingScheme || !Array.isArray(question.markingScheme) || question.markingScheme.length === 0) {
+      issues.push('Short/Long question must have markingScheme array');
+    }
+  }
+
+  return issues;
+}
+
+/**
+ * Validate and fix all questions, with retry logic
+ */
+async function validateAndProcessQuestions(apiKey, questions, questionType, language, promptTemplate, topicNames, difficulty, prototypePack) {
+  const validatedQuestions = [];
+  const stats = {
+    totalProcessed: 0,
+    passedInitial: 0,
+    repairedCount: 0,
+    regeneratedCount: 0,
+    droppedCount: 0,
+    issues: [],
+  };
+
+  for (const question of questions) {
+    stats.totalProcessed++;
+    let currentQuestion = { ...question };
+    let repairAttempts = 0;
+    let wasRepaired = false;
+    let passed = false;
+
+    // Step 1: Quick local check
+    const quickIssues = quickForbiddenCheck(currentQuestion, questionType);
+    if (quickIssues.length === 0) {
+      // Step 2: LLM validation
+      const validation = await validateQuestion(apiKey, currentQuestion, questionType, language);
+
+      if (validation.isConsistent) {
+        stats.passedInitial++;
+        passed = true;
+      } else {
+        // Try to use the fixed version from validator
+        if (validation.fixedQuestion) {
+          currentQuestion = { ...validation.fixedQuestion };
+          wasRepaired = true;
+          repairAttempts++;
+          stats.repairedCount++;
+
+          // Re-validate the fixed version
+          const revalidation = await validateQuestion(apiKey, currentQuestion, questionType, language);
+          passed = revalidation.isConsistent;
+        }
+
+        if (!passed && validation.issues) {
+          stats.issues.push(...validation.issues.slice(0, 2));
+        }
+      }
+    } else {
+      // Quick check failed - needs repair
+      stats.issues.push(...quickIssues.slice(0, 2));
+    }
+
+    // Step 3: Additional repair attempts if still not passed
+    while (!passed && repairAttempts < MAX_REPAIR_ATTEMPTS) {
+      const validation = await validateQuestion(apiKey, currentQuestion, questionType, language);
+      repairAttempts++;
+
+      if (validation.isConsistent) {
+        passed = true;
+        wasRepaired = true;
+        stats.repairedCount++;
+      } else if (validation.fixedQuestion) {
+        currentQuestion = { ...validation.fixedQuestion };
+        wasRepaired = true;
+      }
+    }
+
+    // Step 4: If still not passed, try regenerating this single question
+    if (!passed) {
+      let regenAttempts = 0;
+      while (!passed && regenAttempts < MAX_REGEN_ATTEMPTS) {
+        regenAttempts++;
+        const regenResult = await generateQuestions(apiKey, promptTemplate, topicNames, difficulty, 1, language, prototypePack);
+
+        if (regenResult.success && regenResult.questions && regenResult.questions.length > 0) {
+          const newQ = regenResult.questions[0];
+          const newValidation = await validateQuestion(apiKey, newQ, questionType, language);
+
+          if (newValidation.isConsistent) {
+            currentQuestion = { ...newQ };
+            passed = true;
+            stats.regeneratedCount++;
+          } else if (newValidation.fixedQuestion) {
+            currentQuestion = { ...newValidation.fixedQuestion };
+            passed = true;
+            stats.regeneratedCount++;
+          }
+        }
+      }
+    }
+
+    // Step 5: Final decision
+    if (passed) {
+      currentQuestion._validated = true;
+      currentQuestion._wasRepaired = wasRepaired;
+      currentQuestion._repairAttempts = repairAttempts;
+      validatedQuestions.push(currentQuestion);
+    } else {
+      stats.droppedCount++;
+      console.warn(`Dropped question after validation failures:`, question.question?.slice(0, 100));
+    }
+  }
+
+  return { questions: validatedQuestions, stats };
 }
 
 function looksLikeVisualQuestion(text) {

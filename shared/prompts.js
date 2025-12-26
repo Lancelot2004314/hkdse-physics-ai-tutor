@@ -476,3 +476,64 @@ export const GRADE_SHORT_ANSWER_PROMPT = `Grade a student's short answer for HKD
     {"criterion": "Calculation", "awarded": 1, "max": 2}
   ]
 }`;
+
+// Quiz Validator and Fixer Prompt - ensures consistency between question data, options, correctAnswer, and explanation
+export const QUIZ_VALIDATE_AND_FIX_PROMPT = `You are a strict HKDSE Physics exam question validator and fixer.
+
+## Task
+Validate the given question for mathematical/logical consistency and fix any issues.
+
+## Input
+- Question Type: {questionType} (mc, short, or long)
+- Language: {language}
+- Question JSON:
+{questionJson}
+
+## Validation Rules (ALL must pass)
+### 1. Mathematical Consistency (CRITICAL)
+- For MC: The correctAnswer (A/B/C/D) MUST be the actually correct option when you recalculate using the question data.
+- For Short/Long: The modelAnswer calculations MUST match the question data.
+- If a data table is provided, use ONLY those values for calculations.
+
+### 2. Structure Validation
+- MC: Exactly 4 options starting with "A.", "B.", "C.", "D."
+- MC: correctAnswer must be exactly "A", "B", "C", or "D"
+- Short/Long: Must have modelAnswer and markingScheme array
+
+### 3. Forbidden Content (MUST NOT appear in explanation/modelAnswer)
+These phrases indicate the model was confused and must be removed:
+- "修正" / "假設" / "為保持" / "重新提供" / "但此為正確答案"
+- "實際上" / "在實際生成中" / "調整" / "為符合"
+- "In actual generation" / "to maintain" / "assuming" / "correction"
+- Any meta-commentary about the question itself
+
+### 4. Graph/Diagram Handling (CRITICAL - NO VISUAL REFERENCES IN ANSWERS)
+- If the question mentions graph/diagram/figure/曲線/圖表, ALL required data must be provided as a text table or data points.
+- The explanation/modelAnswer MUST NOT contain phrases like:
+  - "from the graph", "as shown in the figure", "refer to the diagram", "see the graph"
+  - "根據圖", "如圖所示", "從圖中", "參見圖"
+  - "draw a graph", "畫圖", "繪製曲線"
+- Instead, the answer should directly use the numerical data provided in the question.
+- If the original question requires reading a graph, CONVERT it: add explicit data points in the question text (e.g., "t=0s, v=0; t=2s, v=5m/s; t=4s, v=10m/s").
+
+## Output Format (STRICT JSON)
+{
+  "isConsistent": true|false,
+  "issues": ["issue1", "issue2"],
+  "fixedQuestion": { /* only if isConsistent=false, provide the corrected question object */ }
+}
+
+## Fixing Rules (when isConsistent=false)
+1. MINIMAL changes: prefer fixing the incorrect option value over rewriting the whole question.
+2. Keep the same structure, topic, difficulty, and style.
+3. Recalculate and ensure the new correctAnswer is mathematically correct.
+4. Remove all forbidden phrases from explanation.
+5. If graph/diagram is mentioned, convert to explicit data table (4-8 rows).
+6. Output the complete fixed question in fixedQuestion field.
+
+## Example Fix
+If option B says "1.0 m/s" but the calculation gives 2.5 m/s:
+- Either change option B to "2.5 m/s" and keep correctAnswer as B
+- Or find/create an option with 2.5 m/s and update correctAnswer accordingly
+
+Output ONLY valid JSON. No explanation outside the JSON.`;
