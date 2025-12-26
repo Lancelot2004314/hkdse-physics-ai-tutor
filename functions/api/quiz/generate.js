@@ -372,6 +372,7 @@ function selectPrototypeCandidates(results, language) {
     _docType: normalizeDocType(r),
     _lang: (r.language || r.lang || '').toString() || null,
     _text: r.content || r.text || '',
+    _isQuestiony: isProbablyQuestionChunk(r.content || r.text || ''),
   }));
 
   const langMatched = enriched.filter(r => !r._lang || r._lang === lang);
@@ -383,9 +384,11 @@ function selectPrototypeCandidates(results, language) {
 
   const base = preferredOnly.length > 0 ? preferredOnly : withoutExcluded;
 
-  return base
-    .filter(r => isProbablyQuestionChunk(r._text))
-    .map(r => ({ ...r, content: r._text }));
+  // Keep Vertex relevance order, but bubble up more question-like chunks.
+  const sorted = [...base].sort((a, b) => Number(b._isQuestiony) - Number(a._isQuestiony));
+
+  // If everything looks non-questiony (cover pages etc.), still return top chunks as fallback.
+  return sorted.map(r => ({ ...r, content: r._text }));
 }
 
 function pickPrototypePack(candidates) {
@@ -398,14 +401,24 @@ function pickPrototypePack(candidates) {
 
   const pickTop = (arr) => arr.length > 0 ? arr[0] : null;
 
-  let a = pickTop(papers) || pickTop(items);
+  // Prefer question-like chunks when available
+  const papersQ = papers.filter(p => p._isQuestiony);
+  const schemesQ = schemes.filter(s => s._isQuestiony);
+
+  let a = pickTop(papersQ) || pickTop(papers) || pickTop(items);
   let b = null;
 
   if (a && schemes.length > 0) {
-    b = schemes.find(s => (a.year && s.year && String(a.year) === String(s.year))) || schemes[0];
+    const pool = schemesQ.length > 0 ? schemesQ : schemes;
+    b = pool.find(s => (a.year && s.year && String(a.year) === String(s.year))) || pool[0];
   }
 
+  // If we still don't have 2 prototypes, take the next best candidate.
   const picked = [a, b].filter(Boolean);
+  if (picked.length < 2) {
+    const pool = items.filter(x => x !== a && x !== b);
+    if (pool.length > 0) picked.push(pool[0]);
+  }
   // Deduplicate by sourceUri + first 80 chars
   const seen = new Set();
   return picked.filter(p => {
