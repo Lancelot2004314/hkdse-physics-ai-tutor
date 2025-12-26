@@ -6,7 +6,7 @@
 
 import { QUIZ_MC_PROMPT, QUIZ_SHORT_PROMPT, QUIZ_LONG_PROMPT } from '../../../shared/prompts.js';
 import { PHYSICS_TOPICS, getSubtopicNames } from '../../../shared/topics.js';
-import { getUserFromSession } from '../../../shared/auth.js';
+import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
 import { saveTokenUsage } from '../../../shared/tokenUsage.js';
 import { searchKnowledgeBase, formatKnowledgeContext } from '../../../shared/embedding.js';
 import { checkVertexConfig } from '../../../shared/vertexRag.js';
@@ -35,7 +35,8 @@ export async function onRequestPost(context) {
       longCount = 0,
       difficulty = 3,
       timeLimit = 60,
-      language = 'zh'
+      language = 'zh',
+      debug = false,
     } = body;
 
     // Validate
@@ -71,6 +72,9 @@ export async function onRequestPost(context) {
     // Uses Vertex AI RAG Engine if configured, otherwise Vectorize
     let styleContext = '';
     let kbBackend = 'none';
+    let styleQuery = '';
+    let kbSources = [];
+    let kbResultsCount = 0;
 
     try {
       const vertexConfig = checkVertexConfig(env);
@@ -79,7 +83,7 @@ export async function onRequestPost(context) {
       if (kbBackend !== 'none') {
         // Search for relevant past paper examples based on topics
         // Use specific filters for better results
-        const styleQuery = `HKDSE Physics ${topicNames.slice(0, 3).join(' ')} exam question marking scheme`;
+        styleQuery = `HKDSE Physics ${topicNames.slice(0, 3).join(' ')} exam question marking scheme`;
 
         const kbResults = await searchKnowledgeBase(styleQuery, env, {
           topK: 5,
@@ -92,6 +96,11 @@ export async function onRequestPost(context) {
         });
 
         if (kbResults && kbResults.length > 0) {
+          kbResultsCount = kbResults.length;
+          kbSources = kbResults
+            .map(r => r.sourceUri || r.source || r.filename || r.title || '')
+            .filter(Boolean)
+            .slice(0, 10);
           styleContext = formatKnowledgeContext(kbResults);
           console.log(`Found ${kbResults.length} KB examples for style context (backend: ${kbBackend})`);
         } else {
@@ -190,13 +199,26 @@ export async function onRequestPost(context) {
       return clientQ;
     });
 
-    return new Response(JSON.stringify({
+    const responsePayload = {
       sessionId,
       questions: questionsForClient,
       timeLimit,
       maxScore,
       totalQuestions: allQuestions.length,
-    }), {
+    };
+
+    // Optional debug payload (admin only) to verify RAG usage
+    if (debug === true && isAdmin(user.email, env)) {
+      responsePayload.debug = {
+        kbBackend,
+        styleQuery: styleQuery || null,
+        kbResultsCount,
+        kbSources,
+        styleContextExcerpt: styleContext ? styleContext.slice(0, 800) : null,
+      };
+    }
+
+    return new Response(JSON.stringify(responsePayload), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
 
