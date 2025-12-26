@@ -225,10 +225,9 @@ export async function ragRetrieve(env, query, filters = {}, topK = 5) {
     metadata: parseGcsMetadata(ctx),
   }));
 
-  // Filter by min similarity score if specified
-  if (filters.minSimilarity) {
-    results = results.filter(r => r.score >= filters.minSimilarity);
-  }
+  // Note: Vertex AI RAG returns distance scores (lower = more similar)
+  // Don't filter here - let the API handle relevance ranking
+  // The scores are typically 0.3-0.5 for relevant results
 
   // Limit to topK results
   return results.slice(0, topK);

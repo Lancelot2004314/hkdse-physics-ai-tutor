@@ -83,7 +83,7 @@ export async function onRequestPost(context) {
 
         const kbResults = await searchKnowledgeBase(styleQuery, env, {
           topK: 5,
-          minScore: 0.5,
+          minScore: 0.3, // Vertex AI RAG uses distance scores
           filter: {
             subject: 'Physics',
             language: language === 'en' ? 'en' : 'zh',

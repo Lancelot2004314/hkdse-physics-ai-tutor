@@ -31,7 +31,7 @@ export async function onRequestPost(context) {
     const {
       query,
       topK = 5,
-      minScore = 0.7,
+      minScore = 0.3, // Vertex AI RAG uses distance scores (lower = more similar)
       year,
       topic,
       language,
