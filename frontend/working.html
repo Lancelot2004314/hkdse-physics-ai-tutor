@@ -245,6 +245,7 @@
                 renderMCOptions(question.options, answers[index]);
             } else {
                 mcOptions.hidden = true;
+                mcOptions.innerHTML = ''; // Clear old MC options to prevent residual display
                 answerSection.hidden = false;
                 document.getElementById('answerTextarea').value = answers[index] || '';
             }

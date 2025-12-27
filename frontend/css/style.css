@@ -1,19 +1,45 @@
-/* CSS Variables */
+/* CSS Variables - Green Playful Theme */
 :root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
+    /* Primary Green Palette */
+    --primary: #22c55e;
+    --primary-dark: #16a34a;
+    --primary-light: #4ade80;
     --secondary: #64748b;
+
+    /* Accent Colors for Gamification */
+    --accent: #f59e0b;
+    --accent-secondary: #8b5cf6;
     --success: #22c55e;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-card: #334155;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --border: #475569;
+
+    /* Light/Soft Backgrounds */
+    --bg-primary: #f0fdf4;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-dark: #1e293b;
+
+    /* Text Colors for Light Theme */
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+
+    /* Borders */
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+
+    /* Rounded Corners */
     --radius: 12px;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+
+    /* Shadows */
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 40px -10px rgba(34, 197, 94, 0.15);
+    --shadow-glow: 0 4px 20px rgba(34, 197, 94, 0.3);
 }
 
 /* Reset */
@@ -306,41 +332,50 @@ body {
     transform: rotate(180deg);
 }
 
-/* Buttons */
+/* Buttons - Playful Style */
 .btn-primary {
     width: 100%;
-    padding: 15px;
-    background: var(--primary);
+    padding: 16px 24px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-glow);
+    text-transform: none;
+    letter-spacing: 0.5px;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
 }
 
 .btn-primary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 .btn-secondary {
     width: 100%;
-    padding: 12px;
+    padding: 14px 20px;
     background: transparent;
     color: var(--primary);
     border: 2px solid var(--primary);
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -349,11 +384,14 @@ body {
     justify-content: center;
     gap: 10px;
     margin-top: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-secondary:hover {
     background: var(--primary);
     color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
 }
 
 /* Loading */
@@ -384,10 +422,18 @@ body {
 }
 
 .result-card {
-    background: var(--bg-secondary);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 15px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+}
+
+.result-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 .result-card h2 {
@@ -1203,4 +1249,307 @@ body {
 
 #debugLog .log-data {
     color: #d2a8ff;
+}
+
+/* ==========================================
+   GAMIFICATION COMPONENTS - Playful Theme
+   ========================================== */
+
+/* Streak Counter */
+.streak-counter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    padding: 12px 20px;
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(245, 158, 11, 0.2);
+}
+
+.streak-counter .fire-icon {
+    font-size: 1.8em;
+    animation: fireFlicker 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes fireFlicker {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.1);
+    }
+}
+
+.streak-counter .streak-number {
+    font-size: 1.5em;
+    font-weight: 800;
+    color: #f59e0b;
+}
+
+.streak-counter .streak-label {
+    color: var(--text-secondary);
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+/* Points/XP Display */
+.points-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.05));
+    padding: 12px 20px;
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(139, 92, 246, 0.2);
+}
+
+.points-display .coin-icon {
+    font-size: 1.8em;
+    color: #8b5cf6;
+}
+
+.points-display .points-number {
+    font-size: 1.5em;
+    font-weight: 800;
+    color: #8b5cf6;
+}
+
+.points-display.points-gained {
+    animation: pointsPop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pointsPop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Progress Ring */
+.progress-ring-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring__circle-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 8;
+}
+
+.progress-ring__circle {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-ring__text {
+    position: absolute;
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Level Badge */
+.level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 20px;
+    color: white;
+    font-weight: 700;
+    font-size: 0.9em;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.level-badge .level-icon {
+    font-size: 1.2em;
+}
+
+/* Achievement Toast */
+.achievement-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border-left: 5px solid var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 1000;
+    animation: slideInRight 0.4s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.achievement-toast .achievement-icon {
+    font-size: 2.5em;
+}
+
+.achievement-toast .achievement-content h4 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.achievement-toast .achievement-content p {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+}
+
+/* Celebratory Confetti Animation (for milestones) */
+@keyframes confettiFall {
+    0% {
+        transform: translateY(-100%) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    top: 0;
+    animation: confettiFall 3s ease-out forwards;
+    z-index: 1001;
+    border-radius: 2px;
+}
+
+/* Animated Checkmark */
+.checkmark-animated {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 3;
+    stroke: var(--primary);
+    stroke-miterlimit: 10;
+    animation: fillCheck 0.4s ease-in-out 0.4s forwards, scaleCheck 0.3s ease-in-out 0.9s both;
+}
+
+.checkmark-animated__circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 3;
+    stroke-miterlimit: 10;
+    stroke: var(--primary);
+    fill: none;
+    animation: strokeCheck 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-animated__check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: strokeCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes strokeCheck {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes fillCheck {
+    100% {
+        box-shadow: inset 0px 0px 0px 30px rgba(34, 197, 94, 0.1);
+    }
+}
+
+@keyframes scaleCheck {
+
+    0%,
+    100% {
+        transform: none;
+    }
+
+    50% {
+        transform: scale3d(1.1, 1.1, 1);
+    }
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, var(--border) 25%, var(--border-light) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Pulse Animation for Notifications */
+.pulse-notification {
+    position: relative;
+}
+
+.pulse-notification::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background: var(--danger);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
 }

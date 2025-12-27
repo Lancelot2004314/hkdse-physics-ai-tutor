@@ -347,7 +347,19 @@
 
             const html = questions.map((q, idx) => {
                 const userAnswer = q.userAnswer ?? (Array.isArray(data.answers) ? data.answers[idx] : '');
-                const correctAnswer = q.correctAnswer ?? q.modelAnswer ?? '';
+                // Handle different question types for correct answer
+                let correctAnswer = '';
+                if (q.type === 'mc') {
+                    correctAnswer = q.correctAnswer ?? '';
+                } else if (q.parts && Array.isArray(q.parts)) {
+                    // LONG questions with parts structure
+                    correctAnswer = q.parts.map(p =>
+                        `(${p.part}) ${p.modelAnswer || ''}`
+                    ).join('\n\n');
+                } else {
+                    // SHORT questions
+                    correctAnswer = q.modelAnswer ?? q.answer ?? '';
+                }
                 const isMC = q.type === 'mc';
                 const maxScore = q.score ?? 1;
 
@@ -379,10 +391,25 @@
                     </div>
                 `;
 
+                // Build marking scheme HTML for short/long questions
+                let markingSchemeHtml = '';
+                if (!isMC && data.status === 'completed') {
+                    if (q.parts && Array.isArray(q.parts)) {
+                        // LONG questions - show each part's marking scheme
+                        markingSchemeHtml = q.parts.map(p => {
+                            const scheme = Array.isArray(p.markingScheme) ? p.markingScheme.join('<br>') : '';
+                            return scheme ? `<div style="margin-bottom:10px;"><strong>(${p.part})</strong> [${p.marks || 0} marks]<br>${scheme}</div>` : '';
+                        }).join('');
+                    } else if (q.markingScheme && Array.isArray(q.markingScheme)) {
+                        markingSchemeHtml = q.markingScheme.join('<br>');
+                    }
+                }
+
                 const correctHtml = data.status === 'completed' ? `
                     <div class="q-block">
                         <h3>Correct Answer</h3>
-                        <div class="q-content">${isMC ? escapeHtml(String(correctAnswer || '(unknown)')) : formatMath(correctAnswer || '(unknown)')}</div>
+                        <div class="q-content" style="white-space: pre-wrap;">${isMC ? escapeHtml(String(correctAnswer || '(unknown)')) : formatMath(correctAnswer || '(unknown)')}</div>
+                        ${markingSchemeHtml ? `<div class="q-content" style="margin-top:12px; padding:12px; background:rgba(34,197,94,0.1); border-radius:8px;"><strong>Marking Scheme:</strong><br>${markingSchemeHtml}</div>` : ''}
                     </div>
                 ` : '';
 
@@ -505,6 +532,3 @@
 </body>
 
 </html>
-
-
-

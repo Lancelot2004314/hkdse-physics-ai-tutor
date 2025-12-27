@@ -96,16 +96,16 @@
                 <!-- Question Counts -->
                 <div class="config-row">
                     <div class="config-item">
-                        <label>No. of MC Questions (0 - 50)</label>
-                        <input type="number" id="mcCount" min="0" max="50" value="10">
+                        <label>MC Questions <span id="mcLimitLabel" class="limit-badge">(0 - 10)</span></label>
+                        <input type="number" id="mcCount" min="0" max="10" value="3">
                     </div>
                     <div class="config-item">
-                        <label>No. of Short Questions (0 - 20)</label>
-                        <input type="number" id="shortCount" min="0" max="20" value="0">
+                        <label>Short Questions <span id="shortLimitLabel" class="limit-badge">(0 - 5)</span></label>
+                        <input type="number" id="shortCount" min="0" max="5" value="2">
                     </div>
                     <div class="config-item">
-                        <label>No. of Long Questions (0 - 10)</label>
-                        <input type="number" id="longCount" min="0" max="10" value="0">
+                        <label>Long Questions <span id="longLimitLabel" class="limit-badge">(0 - 3)</span></label>
+                        <input type="number" id="longCount" min="0" max="3" value="1">
                     </div>
                 </div>
 
@@ -156,6 +156,8 @@
         let selectedDifficulty = 3;
         let selectedTopics = new Set();
         let isGenerating = false; // Prevent double-trigger lock
+        let poolLimits = { mc: 10, short: 5, long: 3 }; // Default limits
+        let poolAvailability = { mc: { en: 0, zh: 0 }, short: { en: 0, zh: 0 }, long: { en: 0, zh: 0 } };
 
         // Force hide loading overlay on page load (fallback)
         function hideLoadingOverlay() {
@@ -240,9 +242,55 @@
             hideLoadingOverlay();
 
             await checkAuth();
+            await fetchPoolAvailability();
             renderTopics();
             initEventListeners();
         });
+
+        async function fetchPoolAvailability() {
+            try {
+                const response = await fetch(`${API_BASE}/quiz/pool-availability`);
+                if (response.ok) {
+                    const data = await response.json();
+                    poolAvailability = data.availability;
+                    poolLimits = data.limits;
+                    updateLimitsUI();
+                }
+            } catch (err) {
+                console.error('Failed to fetch pool availability:', err);
+                // Use defaults
+                updateLimitsUI();
+            }
+        }
+
+        function updateLimitsUI() {
+            const language = document.getElementById('languageSelect').value;
+
+            // Get limits for current language
+            const mcMax = poolLimits.mc?.[language] || 10;
+            const shortMax = poolLimits.short?.[language] || 5;
+            const longMax = poolLimits.long?.[language] || 3;
+
+            // Update labels
+            document.getElementById('mcLimitLabel').textContent = `(0 - ${mcMax})`;
+            document.getElementById('shortLimitLabel').textContent = `(0 - ${shortMax})`;
+            document.getElementById('longLimitLabel').textContent = `(0 - ${longMax})`;
+
+            // Update input max values
+            const mcInput = document.getElementById('mcCount');
+            const shortInput = document.getElementById('shortCount');
+            const longInput = document.getElementById('longCount');
+
+            mcInput.max = mcMax;
+            shortInput.max = shortMax;
+            longInput.max = longMax;
+
+            // Clamp current values if exceeds new max
+            if (parseInt(mcInput.value) > mcMax) mcInput.value = mcMax;
+            if (parseInt(shortInput.value) > shortMax) shortInput.value = shortMax;
+            if (parseInt(longInput.value) > longMax) longInput.value = longMax;
+
+        }
 
         async function checkAuth() {
             try {
@@ -316,6 +364,9 @@
                     updateDifficultyStars();
                 });
             });
+
+            // Language change - update limits
+            document.getElementById('languageSelect').addEventListener('change', updateLimitsUI);
 
             // Start button
             document.getElementById('startBtn').addEventListener('click', startQuiz);

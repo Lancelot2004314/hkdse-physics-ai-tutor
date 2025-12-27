@@ -1002,8 +1002,26 @@
                     return `<li class="${isCorrect ? 'correct' : ''}">${letters[i]}. ${formatMathText(opt)}</li>`;
                 }).join('')}
                 </ul>`;
+            } else if (q.parts && Array.isArray(q.parts)) {
+                // LONG questions with parts structure
+                optionsHtml = q.parts.map(p => `
+                    <div class="question-explanation" style="margin-bottom: 16px; border-left: 3px solid #3b82f6; padding-left: 12px;">
+                        <strong>Part (${p.part}) [${p.marks || 0} marks]</strong>
+                        <div style="margin: 8px 0;">${formatMathText(p.question || '')}</div>
+                        <div style="background: #d4edda; padding: 10px; border-radius: 6px; margin-top: 8px;">
+                            <strong>📋 Model Answer:</strong><br>${formatMathText(p.modelAnswer || '(no answer)')}
+                        </div>
+                        ${p.markingScheme ? `<div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-top: 8px;"><strong>📊 Marking Scheme:</strong><br>${p.markingScheme.map(m => `• ${m}`).join('<br>')}</div>` : ''}
+                    </div>
+                `).join('');
             } else if (q.modelAnswer) {
-                optionsHtml = `<div class="question-explanation"><strong>📋 Model Answer</strong>${formatMathText(q.modelAnswer)}</div>`;
+                // SHORT questions with modelAnswer
+                optionsHtml = `
+                    <div class="question-explanation">
+                        <strong>📋 Model Answer</strong>${formatMathText(q.modelAnswer)}
+                    </div>
+                    ${q.markingScheme ? `<div class="question-explanation" style="background: #fff3cd;"><strong>📊 Marking Scheme:</strong><br>${q.markingScheme.map(m => `• ${m}`).join('<br>')}</div>` : ''}
+                `;
             }
 
             return `

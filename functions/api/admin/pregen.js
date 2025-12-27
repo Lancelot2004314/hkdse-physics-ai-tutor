@@ -18,8 +18,8 @@ import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
 import { searchKnowledgeBase, enrichKbResultsWithMetadata } from '../../../shared/embedding.js';
 import { checkVertexConfig } from '../../../shared/vertexRag.js';
 
-const REQUEST_TIMEOUT = 30000; // 30 seconds timeout
-const GEMINI_MODEL = 'gemini-3-flash-preview'; // Gemini 3 Flash - fastest and high quality (Dec 2025)
+const REQUEST_TIMEOUT = 60000; // 60 seconds
+const GEMINI_MODEL = 'gemini-3-flash-preview'; // Gemini 3 Flash - Dec 2025
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -321,17 +321,38 @@ async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty,
 
     let parsed;
     try {
+      // Try to extract JSON from code blocks first
       const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-      const jsonText = codeBlockMatch ? codeBlockMatch[1] : text;
+      const jsonText = codeBlockMatch ? codeBlockMatch[1].trim() : text;
+
+      // Try to find a JSON object
       const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         parsed = JSON.parse(jsonMatch[0]);
       }
     } catch (parseErr) {
-      return { success: false, error: 'Failed to parse response JSON' };
+      // Try alternative parsing for LONG questions that might have different format
+      try {
+        // Sometimes Gemini wraps in array instead of object
+        const arrayMatch = text.match(/\[[\s\S]*\]/);
+        if (arrayMatch) {
+          const arr = JSON.parse(arrayMatch[0]);
+          if (Array.isArray(arr) && arr.length > 0) {
+            parsed = { questions: arr };
+          }
+        }
+      } catch (e2) {
+        // Final fallback: try to find any JSON-like content
+        console.error('JSON parse error:', parseErr.message, 'Text preview:', text.slice(0, 500));
+        return { success: false, error: 'Failed to parse response JSON: ' + parseErr.message };
+      }
     }
 
-    return { success: true, questions: parsed?.questions || [] };
+    if (!parsed) {
+      return { success: false, error: 'No valid JSON found in response' };
+    }
+
+    return { success: true, questions: parsed?.questions || (Array.isArray(parsed) ? parsed : []) };
   } catch (err) {
     clearTimeout(timeoutId);
     return { success: false, error: err.message };
@@ -364,16 +385,32 @@ function validateQuestionStructure(question, qtype) {
         issues.push('correctAnswer index out of range');
       }
     }
+  } else if (qtype === 'long') {
+    // Long questions use nested "parts" structure
+    if (question.parts && Array.isArray(question.parts) && question.parts.length > 0) {
+      // Check if at least one part has an answer
+      const hasPartAnswer = question.parts.some(p =>
+        p.modelAnswer || p.markingScheme || p.answer
+      );
+      if (!hasPartAnswer) {
+        issues.push('no parts have modelAnswer/markingScheme');
+      }
+    } else if (!question.modelAnswer && !question.markingScheme && !question.answer) {
+      // Fallback check for non-parts format
+      issues.push('missing parts array or modelAnswer');
+    }
   } else {
-    // Short/Long questions need modelAnswer or markingScheme
-    if (!question.modelAnswer && !question.markingScheme) {
-      issues.push('missing modelAnswer or markingScheme');
+    // Short questions need modelAnswer or markingScheme or answer
+    if (!question.modelAnswer && !question.markingScheme && !question.answer) {
+      issues.push('missing modelAnswer/markingScheme/answer');
     }
   }
 
-  // Check explanation exists
-  if (!question.explanation || question.explanation.length < 20) {
-    issues.push('missing or too short explanation');
+  // Check explanation exists (lenient for long questions with parts)
+  if (qtype !== 'long') {
+    if (!question.explanation && !question.modelAnswer && !question.answer) {
+      issues.push('missing explanation or answer');
+    }
   }
 
   return {
