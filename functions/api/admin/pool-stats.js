@@ -132,8 +132,9 @@ export async function onRequestGet(context) {
 }
 
 function getTopicName(topicKey) {
-  // Parse topic key like "1.1.1" to find the subtopic name
-  for (const topic of PHYSICS_TOPICS) {
+  // Parse topic key like "heat_1" to find the subtopic name
+  // PHYSICS_TOPICS is an object, use Object.values() to iterate
+  for (const topic of Object.values(PHYSICS_TOPICS)) {
     for (const sub of topic.subtopics || []) {
       if (sub.id === topicKey) {
         return `${topic.name} > ${sub.name}`;
@@ -150,7 +151,8 @@ function getTopicName(topicKey) {
 
 function getAllSubtopics() {
   const result = [];
-  for (const topic of PHYSICS_TOPICS) {
+  // PHYSICS_TOPICS is an object, use Object.values() to iterate
+  for (const topic of Object.values(PHYSICS_TOPICS)) {
     for (const sub of topic.subtopics || []) {
       if (sub.subtopics && sub.subtopics.length > 0) {
         for (const subsub of sub.subtopics) {
