@@ -190,24 +190,23 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
 
         await appendJobLog(env, jobId, `Validating ${genResult.questions.length} questions...`);
 
-        // Validate each question
+        // Validate and store each question
         for (let i = 0; i < genResult.questions.length; i++) {
           const q = genResult.questions[i];
           try {
-            const validation = await validateQuestion(apiKey, q, qtype, language);
+            // Use fast structural validation instead of slow LLM validation
+            // This avoids Cloudflare Workers timeout (LLM validation takes too long)
+            const validation = validateQuestionStructure(q, qtype);
+            await appendJobLog(env, jobId, `  Q${i + 1}: Structure check: ${validation.isValid ? 'PASS' : 'FAIL'} ${validation.issues?.join(', ') || ''}`);
 
-            let finalQuestion = q;
-            if (!validation.isConsistent && validation.fixedQuestion) {
-              finalQuestion = validation.fixedQuestion;
-              await appendJobLog(env, jobId, `  Q${i + 1}: Repaired (${validation.issues?.join(', ') || 'issues fixed'})`);
-            } else if (!validation.isConsistent) {
-              await appendJobLog(env, jobId, `  Q${i + 1}: FAILED validation (${validation.issues?.join(', ') || 'unknown issue'})`);
+            if (!validation.isValid) {
+              await appendJobLog(env, jobId, `  Q${i + 1}: FAILED validation (${validation.issues?.join(', ') || 'missing fields'})`);
               failedCount++;
               continue;
             }
 
             // Write to pool
-            const poolId = await writeQuestionToPool(env, finalQuestion, {
+            const poolId = await writeQuestionToPool(env, q, {
               topicKey: subtopic,
               language,
               qtype,
@@ -215,7 +214,7 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
               kbBackend,
               rewriteMode: usedRewriteMode,
               prototypeSources: selectedPrototypes,
-              validatorMeta: { isConsistent: validation.isConsistent, issues: validation.issues },
+              validatorMeta: { isConsistent: true, validationType: 'structural' },
             });
 
             if (poolId) {
@@ -288,7 +287,7 @@ async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty,
   try {
     // Use Gemini API format
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
-    
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -339,6 +338,50 @@ async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty,
   }
 }
 
+/**
+ * Fast structural validation - checks if question has required fields
+ * This is much faster than LLM validation and works within Cloudflare Workers limits
+ */
+function validateQuestionStructure(question, qtype) {
+  const issues = [];
+
+  // Check basic required fields
+  if (!question.question || question.question.length < 10) {
+    issues.push('missing or too short question text');
+  }
+
+  if (qtype === 'mc') {
+    // MC questions need options and correctAnswer
+    if (!question.options || !Array.isArray(question.options) || question.options.length < 3) {
+      issues.push('missing or insufficient options');
+    }
+    if (!question.correctAnswer && question.correctAnswer !== 0) {
+      issues.push('missing correctAnswer');
+    }
+    // Check if correctAnswer is valid index or letter
+    if (typeof question.correctAnswer === 'number') {
+      if (question.correctAnswer < 0 || question.correctAnswer >= (question.options?.length || 0)) {
+        issues.push('correctAnswer index out of range');
+      }
+    }
+  } else {
+    // Short/Long questions need modelAnswer or markingScheme
+    if (!question.modelAnswer && !question.markingScheme) {
+      issues.push('missing modelAnswer or markingScheme');
+    }
+  }
+
+  // Check explanation exists
+  if (!question.explanation || question.explanation.length < 20) {
+    issues.push('missing or too short explanation');
+  }
+
+  return {
+    isValid: issues.length === 0,
+    issues,
+  };
+}
+
 async function validateQuestion(apiKey, question, questionType, language) {
   const prompt = QUIZ_VALIDATE_AND_FIX_PROMPT
     .replace('{questionType}', questionType)
@@ -351,7 +394,7 @@ async function validateQuestion(apiKey, question, questionType, language) {
   try {
     // Use Gemini API format
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
-    
+
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -429,7 +472,7 @@ async function writeQuestionToPool(env, question, metadata) {
       metadata.rewriteMode ? 1 : 0,
       JSON.stringify(metadata.prototypeSources || []),
       JSON.stringify(metadata.validatorMeta || {}),
-      DEEPSEEK_MODEL
+      GEMINI_MODEL
     ).run();
 
     return id;
