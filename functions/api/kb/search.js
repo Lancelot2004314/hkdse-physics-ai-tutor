@@ -105,3 +105,4 @@ function errorResponse(status, message) {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 }
+

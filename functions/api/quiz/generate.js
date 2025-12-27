@@ -20,6 +20,150 @@ import { searchKnowledgeBase, enrichKbResultsWithMetadata } from '../../../share
 import { checkVertexConfig } from '../../../shared/vertexRag.js';
 
 const REQUEST_TIMEOUT = 120000; // 2 minutes for larger requests
+const DEEPSEEK_MODEL = 'deepseek-reasoner'; // Use reasoner for better consistency
+const RESERVED_EXPIRY_MS = 30 * 60 * 1000; // 30 minutes before reserved questions are reclaimed
+
+// ==================== Question Bank Pool Functions ====================
+
+/**
+ * Pick questions from the question bank pool
+ * Returns { questions: [], pickedIds: [] }
+ */
+async function pickQuestionsFromPool(env, subtopics, qtype, language, count, userId) {
+  if (!env.DB || count <= 0 || subtopics.length === 0) {
+    return { questions: [], pickedIds: [] };
+  }
+
+  try {
+    // Build placeholders for subtopics
+    const placeholders = subtopics.map(() => '?').join(',');
+    
+    // Select ready questions matching the criteria
+    const query = `
+      SELECT id, topic_key, question_json, difficulty, kb_backend, rewrite_mode, prototype_sources, validator_meta
+      FROM question_bank
+      WHERE topic_key IN (${placeholders})
+        AND language = ?
+        AND qtype = ?
+        AND status = 'ready'
+      ORDER BY RANDOM()
+      LIMIT ?
+    `;
+    
+    const result = await env.DB.prepare(query)
+      .bind(...subtopics, language, qtype, count)
+      .all();
+    
+    if (!result.results || result.results.length === 0) {
+      return { questions: [], pickedIds: [] };
+    }
+
+    const pickedIds = result.results.map(r => r.id);
+    const now = Date.now();
+    
+    // Reserve the picked questions atomically
+    const updatePlaceholders = pickedIds.map(() => '?').join(',');
+    await env.DB.prepare(`
+      UPDATE question_bank
+      SET status = 'reserved', reserved_by = ?, reserved_at = ?
+      WHERE id IN (${updatePlaceholders}) AND status = 'ready'
+    `).bind(userId, now, ...pickedIds).run();
+
+    // Parse and return the questions
+    const questions = result.results.map(r => {
+      try {
+        const q = JSON.parse(r.question_json);
+        q._fromPool = true;
+        q._poolId = r.id;
+        q._poolTopicKey = r.topic_key;
+        return q;
+      } catch {
+        return null;
+      }
+    }).filter(Boolean);
+
+    return { questions, pickedIds };
+  } catch (err) {
+    console.error('Error picking from pool:', err);
+    return { questions: [], pickedIds: [] };
+  }
+}
+
+/**
+ * Write a question to the question bank pool
+ */
+async function writeQuestionToPool(env, question, metadata) {
+  if (!env.DB) return null;
+
+  try {
+    const id = `qb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const questionJson = JSON.stringify(question);
+    
+    await env.DB.prepare(`
+      INSERT INTO question_bank (
+        id, topic_key, language, qtype, difficulty, question_json, status,
+        kb_backend, rewrite_mode, prototype_sources, validator_meta, llm_model
+      ) VALUES (?, ?, ?, ?, ?, ?, 'ready', ?, ?, ?, ?, ?)
+    `).bind(
+      id,
+      metadata.topicKey || '',
+      metadata.language || 'zh',
+      metadata.qtype || 'mc',
+      metadata.difficulty || 3,
+      questionJson,
+      metadata.kbBackend || 'none',
+      metadata.rewriteMode ? 1 : 0,
+      JSON.stringify(metadata.prototypeSources || []),
+      JSON.stringify(metadata.validatorMeta || {}),
+      DEEPSEEK_MODEL
+    ).run();
+
+    return id;
+  } catch (err) {
+    console.error('Error writing to pool:', err);
+    return null;
+  }
+}
+
+/**
+ * Reclaim expired reserved questions back to ready state
+ */
+async function reclaimExpiredReserved(env) {
+  if (!env.DB) return 0;
+
+  try {
+    const expiryTime = Date.now() - RESERVED_EXPIRY_MS;
+    const result = await env.DB.prepare(`
+      UPDATE question_bank
+      SET status = 'ready', reserved_by = NULL, reserved_at = NULL
+      WHERE status = 'reserved' AND reserved_at < ?
+    `).bind(expiryTime).run();
+    
+    return result.meta?.changes || 0;
+  } catch (err) {
+    console.error('Error reclaiming expired reservations:', err);
+    return 0;
+  }
+}
+
+/**
+ * Mark questions as used after quiz submission
+ */
+async function markQuestionsUsed(env, poolIds, userId) {
+  if (!env.DB || !poolIds || poolIds.length === 0) return;
+
+  try {
+    const now = Date.now();
+    const placeholders = poolIds.map(() => '?').join(',');
+    await env.DB.prepare(`
+      UPDATE question_bank
+      SET status = 'used', used_by = ?, used_at = ?
+      WHERE id IN (${placeholders})
+    `).bind(userId, now, ...poolIds).run();
+  } catch (err) {
+    console.error('Error marking questions as used:', err);
+  }
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -75,6 +219,23 @@ export async function onRequestPost(context) {
 
     // Get topic names for prompt
     const topicNames = getSubtopicNames(topics, language === 'en' ? 'en' : 'zh');
+
+    // Pool stats for debug
+    const poolStats = {
+      reclaimedCount: 0,
+      mcFromPool: 0,
+      shortFromPool: 0,
+      longFromPool: 0,
+      mcGenerated: 0,
+      shortGenerated: 0,
+      longGenerated: 0,
+      mcWrittenToPool: 0,
+      shortWrittenToPool: 0,
+      longWrittenToPool: 0,
+    };
+
+    // First, reclaim any expired reserved questions
+    poolStats.reclaimedCount = await reclaimExpiredReserved(env);
 
     // Fetch prototype pack from knowledge base (real HKDSE examples)
     // Uses Vertex AI RAG Engine if configured, otherwise Vectorize
@@ -144,9 +305,12 @@ export async function onRequestPost(context) {
       console.warn('KB search for style context failed, continuing without:', err.message);
     }
 
-    // Generate questions - run all types in PARALLEL for speed
+    // ==================== Pool-First Logic ====================
+    // Try to pick questions from pool first, then generate what's missing
+    
     const allQuestions = [];
     let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+    const poolIdsUsed = []; // Track pool IDs for marking as used later
 
     // Validation stats
     const validatorStats = {
@@ -158,76 +322,103 @@ export async function onRequestPost(context) {
       sampleIssues: [],
     };
 
-    // Build parallel generation promises
-    const generationTasks = [];
-
     const mcPrompt = usedRewriteMode ? QUIZ_MC_REWRITE_PROMPT : QUIZ_MC_PROMPT;
     const shortPrompt = usedRewriteMode ? QUIZ_SHORT_REWRITE_PROMPT : QUIZ_SHORT_PROMPT;
     const longPrompt = usedRewriteMode ? QUIZ_LONG_REWRITE_PROMPT : QUIZ_LONG_PROMPT;
 
-    if (mcCount > 0) {
-      generationTasks.push(
-        generateQuestions(apiKey, mcPrompt, topicNames, difficulty, mcCount, language, prototypePack)
-          .then(result => ({ type: 'mc', result, prompt: mcPrompt }))
+    // Process each question type: pool first, then generate remainder
+    const typeConfigs = [
+      { type: 'mc', count: mcCount, prompt: mcPrompt },
+      { type: 'short', count: shortCount, prompt: shortPrompt },
+      { type: 'long', count: longCount, prompt: longPrompt },
+    ];
+
+    for (const config of typeConfigs) {
+      if (config.count <= 0) continue;
+
+      let questionsForType = [];
+      let neededCount = config.count;
+
+      // Step 1: Try to pick from pool
+      const poolResult = await pickQuestionsFromPool(
+        env, topics, config.type, language, config.count, user.id
       );
-    }
+      
+      if (poolResult.questions.length > 0) {
+        questionsForType.push(...poolResult.questions);
+        poolIdsUsed.push(...poolResult.pickedIds);
+        neededCount -= poolResult.questions.length;
+        poolStats[`${config.type}FromPool`] = poolResult.questions.length;
+      }
 
-    if (shortCount > 0) {
-      generationTasks.push(
-        generateQuestions(apiKey, shortPrompt, topicNames, difficulty, shortCount, language, prototypePack)
-          .then(result => ({ type: 'short', result, prompt: shortPrompt }))
-      );
-    }
-
-    if (longCount > 0) {
-      generationTasks.push(
-        generateQuestions(apiKey, longPrompt, topicNames, difficulty, longCount, language, prototypePack)
-          .then(result => ({ type: 'long', result, prompt: longPrompt }))
-      );
-    }
-
-    // Run all generation tasks in parallel
-    const results = await Promise.all(generationTasks);
-
-    // Process results in order: MC -> Short -> Long
-    // Now with validation for each question type
-    const typeOrder = ['mc', 'short', 'long'];
-    for (const typeKey of typeOrder) {
-      const entry = results.find(r => r.type === typeKey);
-      if (entry && entry.result.success && entry.result.questions && entry.result.questions.length > 0) {
-        // Validate and fix questions for this type
-        const { questions: validatedQs, stats } = await validateAndProcessQuestions(
-          apiKey,
-          entry.result.questions,
-          typeKey,
-          language,
-          entry.prompt,
-          topicNames,
-          difficulty,
-          prototypePack
+      // Step 2: Generate remaining if needed
+      if (neededCount > 0) {
+        const genResult = await generateQuestions(
+          apiKey, config.prompt, topicNames, difficulty, neededCount, language, prototypePack
         );
 
-        // Merge validation stats
-        validatorStats.totalProcessed += stats.totalProcessed;
-        validatorStats.passedInitial += stats.passedInitial;
-        validatorStats.repairedCount += stats.repairedCount;
-        validatorStats.regeneratedCount += stats.regeneratedCount;
-        validatorStats.droppedCount += stats.droppedCount;
-        if (stats.issues && stats.issues.length > 0) {
-          validatorStats.sampleIssues.push(...stats.issues.slice(0, 3));
-        }
+        if (genResult.success && genResult.questions && genResult.questions.length > 0) {
+          // Validate generated questions
+          const { questions: validatedQs, stats } = await validateAndProcessQuestions(
+            apiKey,
+            genResult.questions,
+            config.type,
+            language,
+            config.prompt,
+            topicNames,
+            difficulty,
+            prototypePack
+          );
 
-        // Add validated questions
-        validatedQs.forEach(q => {
-          allQuestions.push({ ...q, type: typeKey, index: allQuestions.length });
-        });
+          // Merge validation stats
+          validatorStats.totalProcessed += stats.totalProcessed;
+          validatorStats.passedInitial += stats.passedInitial;
+          validatorStats.repairedCount += stats.repairedCount;
+          validatorStats.regeneratedCount += stats.regeneratedCount;
+          validatorStats.droppedCount += stats.droppedCount;
+          if (stats.issues && stats.issues.length > 0) {
+            validatorStats.sampleIssues.push(...stats.issues.slice(0, 3));
+          }
 
-        if (entry.result.usage) {
-          totalUsage.prompt_tokens += entry.result.usage.prompt_tokens || 0;
-          totalUsage.completion_tokens += entry.result.usage.completion_tokens || 0;
-          totalUsage.total_tokens += entry.result.usage.total_tokens || 0;
+          poolStats[`${config.type}Generated`] = validatedQs.length;
+
+          // Write validated questions to pool for future use
+          for (const q of validatedQs) {
+            // Pick a random topic from the selected topics for this question
+            const assignedTopic = topics[Math.floor(Math.random() * topics.length)];
+            const poolId = await writeQuestionToPool(env, q, {
+              topicKey: assignedTopic,
+              language,
+              qtype: config.type,
+              difficulty,
+              kbBackend,
+              rewriteMode: usedRewriteMode,
+              prototypeSources: selectedPrototypes,
+              validatorMeta: {
+                passedInitial: q._validated && !q._wasRepaired,
+                wasRepaired: q._wasRepaired || false,
+                repairAttempts: q._repairAttempts || 0,
+              },
+            });
+            if (poolId) {
+              poolStats[`${config.type}WrittenToPool`]++;
+            }
+          }
+
+          questionsForType.push(...validatedQs);
+
+          if (genResult.usage) {
+            totalUsage.prompt_tokens += genResult.usage.prompt_tokens || 0;
+            totalUsage.completion_tokens += genResult.usage.completion_tokens || 0;
+            totalUsage.total_tokens += genResult.usage.total_tokens || 0;
+          }
         }
       }
+
+      // Add all questions for this type to final list
+      questionsForType.forEach(q => {
+        allQuestions.push({ ...q, type: config.type, index: allQuestions.length });
+      });
     }
 
     // Trim sample issues to max 5
@@ -286,6 +477,10 @@ export async function onRequestPost(context) {
         rewriteMode: usedRewriteMode,
         kbResultsCount,
       },
+      poolInfo: {
+        fromPool: poolStats.mcFromPool + poolStats.shortFromPool + poolStats.longFromPool,
+        generated: poolStats.mcGenerated + poolStats.shortGenerated + poolStats.longGenerated,
+      },
     };
 
     // Optional debug payload (admin only) to verify RAG usage and validation stats
@@ -299,6 +494,25 @@ export async function onRequestPost(context) {
         selectedPrototypes,
         detectedVisualInPrototype,
         prototypePackExcerpt: prototypePack ? prototypePack.slice(0, 900) : null,
+        // Pool stats
+        pool: {
+          reclaimedCount: poolStats.reclaimedCount,
+          fromPool: {
+            mc: poolStats.mcFromPool,
+            short: poolStats.shortFromPool,
+            long: poolStats.longFromPool,
+          },
+          generated: {
+            mc: poolStats.mcGenerated,
+            short: poolStats.shortGenerated,
+            long: poolStats.longGenerated,
+          },
+          writtenToPool: {
+            mc: poolStats.mcWrittenToPool,
+            short: poolStats.shortWrittenToPool,
+            long: poolStats.longWrittenToPool,
+          },
+        },
         // Validator stats
         validator: {
           totalProcessed: validatorStats.totalProcessed,
@@ -312,6 +526,8 @@ export async function onRequestPost(context) {
         questionsValidation: allQuestions.map((q, i) => ({
           index: i,
           type: q.type,
+          fromPool: q._fromPool || false,
+          poolId: q._poolId || null,
           wasRepaired: q._wasRepaired || false,
           repairAttempts: q._repairAttempts || 0,
         })),
@@ -347,7 +563,7 @@ async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty,
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: DEEPSEEK_MODEL,
         messages: [
           { role: 'system', content: 'You are an expert HKDSE Physics examiner. Generate exam-quality questions.' },
           { role: 'user', content: prompt },
@@ -442,7 +658,7 @@ async function validateQuestion(apiKey, question, questionType, language) {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: DEEPSEEK_MODEL,
         messages: [
           { role: 'system', content: 'You are a strict exam question validator. Output ONLY valid JSON.' },
           { role: 'user', content: prompt },
@@ -762,6 +978,7 @@ function errorResponse(status, message) {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 }
+
 
 
 

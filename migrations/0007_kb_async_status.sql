@@ -9,3 +9,4 @@ ALTER TABLE kb_documents ADD COLUMN error_message TEXT;
 
 -- Add processed_at timestamp
 ALTER TABLE kb_documents ADD COLUMN processed_at DATETIME;
+

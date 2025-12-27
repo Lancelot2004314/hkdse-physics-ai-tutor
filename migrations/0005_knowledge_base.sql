@@ -35,3 +35,4 @@ CREATE INDEX IF NOT EXISTS idx_kb_documents_year ON kb_documents(year);
 CREATE INDEX IF NOT EXISTS idx_kb_documents_status ON kb_documents(status);
 
 
+

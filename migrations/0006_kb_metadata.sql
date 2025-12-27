@@ -10,3 +10,4 @@ ALTER TABLE kb_documents ADD COLUMN doc_type TEXT DEFAULT 'Past Paper';
 CREATE INDEX IF NOT EXISTS idx_kb_documents_language ON kb_documents(language);
 CREATE INDEX IF NOT EXISTS idx_kb_documents_subject ON kb_documents(subject);
 CREATE INDEX IF NOT EXISTS idx_kb_documents_doc_type ON kb_documents(doc_type);
+
