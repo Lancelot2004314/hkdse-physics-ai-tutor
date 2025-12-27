@@ -64,7 +64,7 @@ export async function onRequestGet(context) {
       let parsed = {};
       try {
         parsed = JSON.parse(row.question_json);
-      } catch {}
+      } catch { }
       return {
         id: row.id,
         topicKey: row.topic_key,
