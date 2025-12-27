@@ -33,6 +33,30 @@
 </head>
 
 <body>
+    <!-- Confetti Container for Celebration -->
+    <div class="confetti-container" id="confettiContainer" hidden>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+    </div>
+
     <!-- Header with Timer -->
     <header class="working-header">
         <button class="back-btn" onclick="confirmExit()">
@@ -469,6 +493,22 @@
 
             // Store results for review
             sessionStorage.setItem('quizResults', JSON.stringify(results));
+
+            // Trigger confetti celebration for good scores (50% or above)
+            if (results.percentage >= 50) {
+                triggerConfetti();
+            }
+        }
+
+        // Confetti celebration effect
+        function triggerConfetti() {
+            const container = document.getElementById('confettiContainer');
+            container.hidden = false;
+
+            // Hide confetti after animation completes
+            setTimeout(() => {
+                container.hidden = true;
+            }, 3500);
         }
 
         function reviewAnswers() {

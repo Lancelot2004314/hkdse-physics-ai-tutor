@@ -62,14 +62,14 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <header class="page-header">
+            <header class="page-header animate-on-scroll fade-in-up">
                 <h1>Free Practice</h1>
                 <div class="header-tabs">
                     <button class="tab-btn active">SELECT CHAPTERS</button>
                 </div>
             </header>
 
-            <div class="config-section">
+            <div class="config-section animate-on-scroll fade-in-up">
                 <!-- Subject and Language -->
                 <div class="config-row">
                     <div class="config-item">
@@ -134,8 +134,8 @@
             </div>
 
             <!-- Start Button -->
-            <div class="action-section">
-                <button class="btn-start" id="startBtn">
+            <div class="action-section animate-on-scroll scale-in">
+                <button class="btn-start btn-glow ripple shine" id="startBtn">
                     <i class="fas fa-play"></i> 開始練習 START
                 </button>
             </div>
@@ -245,7 +245,32 @@
             await fetchPoolAvailability();
             renderTopics();
             initEventListeners();
+            initScrollAnimations();
         });
+
+        // Initialize scroll animations using IntersectionObserver
+        function initScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll:not(.visible)');
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                });
+
+                animatedElements.forEach(el => observer.observe(el));
+            } else {
+                // Fallback for browsers without IntersectionObserver
+                animatedElements.forEach(el => el.classList.add('visible'));
+            }
+        }
 
         async function fetchPoolAvailability() {
             try {
@@ -331,14 +356,14 @@
 
         function renderTopics() {
             const container = document.getElementById('topicsSection');
-            container.innerHTML = Object.values(PHYSICS_TOPICS).map(topic => `
-                <div class="topic-card" style="--topic-color: ${topic.color}">
+            container.innerHTML = Object.values(PHYSICS_TOPICS).map((topic, index) => `
+                <div class="topic-card card-lift animate-on-scroll fade-in-up stagger-${(index % 6) + 1}" style="--topic-color: ${topic.color}">
                     <div class="topic-header" style="border-color: ${topic.color}">
                         <span>${topic.name}</span>
                     </div>
                     <div class="topic-subtopics">
                         ${topic.subtopics.map((sub, i) => `
-                            <label class="subtopic-item">
+                            <label class="subtopic-item checkbox-animated">
                                 <input type="checkbox" value="${sub.id}" onchange="toggleTopic('${sub.id}')">
                                 <span>${i + 1}. ${sub.name}</span>
                             </label>
@@ -346,6 +371,9 @@
                     </div>
                 </div>
             `).join('');
+
+            // Re-initialize scroll animations for dynamically added elements
+            initScrollAnimations();
         }
 
         function toggleTopic(topicId) {

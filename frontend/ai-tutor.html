@@ -174,13 +174,13 @@
         <main class="main-content">
             <div class="ai-tutor-content">
                 <!-- Header -->
-                <header class="header">
+                <header class="header animate-on-scroll fade-in-up">
                     <h1><i class="fas fa-robot"></i> AI Tutor</h1>
                     <p>上傳題目照片，獲得 DSE 風格分步講解</p>
                 </header>
 
                 <!-- Upload Section -->
-                <section class="upload-section" id="uploadSection">
+                <section class="upload-section animate-on-scroll fade-in-up" id="uploadSection">
                     <!-- Input Mode Toggle -->
                     <div class="input-mode-toggle">
                         <button type="button" class="mode-btn active" id="modeImage" data-mode="image">
@@ -254,7 +254,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button class="btn-primary" id="submitBtn" disabled>
+                    <button class="btn-primary btn-glow ripple shine" id="submitBtn" disabled>
                         <i class="fas fa-paper-plane"></i> 獲取講解
                     </button>
                 </section>
@@ -267,27 +267,27 @@
 
                 <!-- Results Section -->
                 <section class="results-section" id="resultsSection" hidden>
-                    <div class="result-card">
+                    <div class="result-card card-lift animate-on-scroll fade-in-up stagger-1">
                         <h2><i class="fas fa-lightbulb"></i> 題目摘要</h2>
                         <div id="problemSummary" class="result-content"></div>
                     </div>
 
-                    <div class="result-card">
+                    <div class="result-card card-lift animate-on-scroll fade-in-up stagger-2">
                         <h2><i class="fas fa-list-ol"></i> 分步講解</h2>
                         <div id="stepsContent" class="result-content steps-list"></div>
                     </div>
 
-                    <div class="result-card">
+                    <div class="result-card card-lift animate-on-scroll fade-in-up stagger-3">
                         <h2><i class="fas fa-exclamation-triangle"></i> 常見錯誤</h2>
                         <div id="mistakesContent" class="result-content"></div>
                     </div>
 
-                    <div class="result-card">
+                    <div class="result-card card-lift animate-on-scroll fade-in-up stagger-4">
                         <h2><i class="fas fa-star"></i> Exam Tips</h2>
                         <div id="tipsContent" class="result-content"></div>
                     </div>
 
-                    <div class="result-card">
+                    <div class="result-card card-lift animate-on-scroll fade-in-up stagger-5">
                         <h2><i class="fas fa-check-circle"></i> 驗算檢查</h2>
                         <div id="verificationContent" class="result-content"></div>
                     </div>
@@ -381,6 +381,36 @@
         </main>
     </div>
 
+    <script>
+        // Initialize scroll animations using IntersectionObserver
+        function initScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll:not(.visible)');
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                });
+
+                animatedElements.forEach(el => observer.observe(el));
+            } else {
+                animatedElements.forEach(el => el.classList.add('visible'));
+            }
+        }
+
+        // Run on DOM ready
+        document.addEventListener('DOMContentLoaded', initScrollAnimations);
+
+        // Also expose for dynamic content
+        window.initScrollAnimations = initScrollAnimations;
+    </script>
     <script src="js/app.js"></script>
 </body>
 

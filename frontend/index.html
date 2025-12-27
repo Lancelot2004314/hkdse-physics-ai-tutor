@@ -12,6 +12,30 @@
 </head>
 
 <body>
+    <!-- Particles Background -->
+    <div class="particles-container">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
     <div class="app-layout">
         <!-- Sidebar -->
         <nav class="sidebar">
@@ -64,13 +88,13 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Welcome Section -->
-            <header class="dashboard-header">
+            <header class="dashboard-header gradient-bg-hero animate-on-scroll fade-in-up">
                 <div class="welcome-text">
                     <h1>Welcome back, <span id="welcomeName">Student</span>!</h1>
                     <p>Ready to master HKDSE Physics?</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-login" id="loginBtn">
+                    <button class="btn-login btn-glow ripple" id="loginBtn">
                         <i class="fas fa-sign-in-alt"></i> Login
                     </button>
                 </div>
@@ -78,28 +102,28 @@
 
             <!-- Quick Stats -->
             <section class="quick-stats" id="quickStats">
-                <div class="quick-stat-card">
+                <div class="quick-stat-card card-lift icon-bounce animate-on-scroll scale-in stagger-1">
                     <i class="fas fa-fire"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="statStreak">0</span>
                         <span class="stat-label">Day Streak</span>
                     </div>
                 </div>
-                <div class="quick-stat-card">
+                <div class="quick-stat-card card-lift icon-bounce animate-on-scroll scale-in stagger-2">
                     <i class="fas fa-star"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="statPoints">0</span>
                         <span class="stat-label">Total Points</span>
                     </div>
                 </div>
-                <div class="quick-stat-card">
+                <div class="quick-stat-card card-lift icon-bounce animate-on-scroll scale-in stagger-3">
                     <i class="fas fa-check-circle"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="statQuestions">0</span>
                         <span class="stat-label">Questions Done</span>
                     </div>
                 </div>
-                <div class="quick-stat-card">
+                <div class="quick-stat-card card-lift icon-bounce animate-on-scroll scale-in stagger-4">
                     <i class="fas fa-medal"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="statRank">#--</span>
@@ -110,8 +134,9 @@
 
             <!-- Main Feature Cards -->
             <section class="feature-cards">
-                <a href="/ai-tutor.html" class="feature-card ai-tutor-card">
-                    <div class="card-icon">
+                <a href="/ai-tutor.html"
+                    class="feature-card ai-tutor-card tilt-card shine animate-on-scroll fade-in-left">
+                    <div class="card-icon icon-bounce">
                         <i class="fas fa-robot"></i>
                     </div>
                     <div class="card-content">
@@ -128,8 +153,9 @@
                     </div>
                 </a>
 
-                <a href="/free-practice.html" class="feature-card practice-card">
-                    <div class="card-icon">
+                <a href="/free-practice.html"
+                    class="feature-card practice-card tilt-card shine animate-on-scroll fade-in-right">
+                    <div class="card-icon icon-bounce">
                         <i class="fas fa-pen"></i>
                     </div>
                     <div class="card-content">
@@ -149,22 +175,26 @@
 
             <!-- Secondary Cards -->
             <section class="secondary-cards">
-                <a href="/statistics.html" class="secondary-card">
+                <a href="/statistics.html"
+                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-1">
                     <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
                     <h3>Statistics</h3>
                     <p>查看學習統計和進度</p>
                 </a>
-                <a href="/leaderboard.html" class="secondary-card">
+                <a href="/leaderboard.html"
+                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-2">
                     <div class="card-icon"><i class="fas fa-trophy"></i></div>
                     <h3>Leaderboard</h3>
                     <p>查看排行榜</p>
                 </a>
-                <a href="/bookmarks.html" class="secondary-card">
+                <a href="/bookmarks.html"
+                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-3">
                     <div class="card-icon"><i class="fas fa-bookmark"></i></div>
                     <h3>Bookmarks</h3>
                     <p>查看收藏的題目</p>
                 </a>
-                <a href="/practice-history.html" class="secondary-card">
+                <a href="/practice-history.html"
+                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-4">
                     <div class="card-icon"><i class="fas fa-history"></i></div>
                     <h3>History</h3>
                     <p>查看練習歷史</p>
@@ -172,7 +202,7 @@
             </section>
 
             <!-- Recent Activity -->
-            <section class="recent-activity" id="recentActivity">
+            <section class="recent-activity animate-on-scroll fade-in-up" id="recentActivity">
                 <h2><i class="fas fa-clock"></i> Recent Activity</h2>
                 <div class="activity-list" id="activityList">
                     <p class="empty-state">Login to see your recent activity</p>
@@ -210,6 +240,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAuth();
             initEventListeners();
+            initScrollAnimations();
 
             // Check for login redirect - go to login page
             const urlParams = new URLSearchParams(window.location.search);
@@ -217,6 +248,30 @@
                 window.location.href = '/login.html';
             }
         });
+
+        // Initialize scroll animations using IntersectionObserver
+        function initScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                });
+
+                animatedElements.forEach(el => observer.observe(el));
+            } else {
+                // Fallback for browsers without IntersectionObserver
+                animatedElements.forEach(el => el.classList.add('visible'));
+            }
+        }
 
         async function checkAuth() {
             try {

@@ -454,3 +454,189 @@
         display: none;
     }
 }
+
+/* ==========================================
+   ENHANCED HOVER INTERACTIONS - DASHBOARD
+   ========================================== */
+
+/* Quick Stat Card 3D Effect */
+.quick-stat-card {
+    transform-style: preserve-3d;
+}
+
+.quick-stat-card:hover {
+    transform: perspective(1000px) rotateX(3deg) rotateY(-3deg) translateY(-6px);
+}
+
+.quick-stat-card:hover i {
+    animation: statIconPop 0.4s ease;
+}
+
+@keyframes statIconPop {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15) rotate(5deg);
+    }
+}
+
+/* Feature Card Enhanced Effects */
+.feature-card {
+    transform-style: preserve-3d;
+}
+
+.feature-card:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-8px);
+}
+
+.feature-card:hover .card-icon {
+    animation: featureIconBounce 0.5s ease;
+}
+
+@keyframes featureIconBounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    25% {
+        transform: translateY(-8px);
+    }
+
+    50% {
+        transform: translateY(0);
+    }
+
+    75% {
+        transform: translateY(-4px);
+    }
+}
+
+.feature-card .card-features li i {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .card-features li i {
+    animation: checkBounce 0.3s ease forwards;
+}
+
+.feature-card:hover .card-features li:nth-child(1) i {
+    animation-delay: 0.1s;
+}
+
+.feature-card:hover .card-features li:nth-child(2) i {
+    animation-delay: 0.2s;
+}
+
+.feature-card:hover .card-features li:nth-child(3) i {
+    animation-delay: 0.3s;
+}
+
+@keyframes checkBounce {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+}
+
+/* Secondary Card Icon Rotation */
+.secondary-card:hover .card-icon i {
+    animation: iconSpin 0.6s ease;
+}
+
+@keyframes iconSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Activity Item Slide Effect */
+.activity-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.activity-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: var(--primary);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.activity-item:hover::before {
+    transform: scaleY(1);
+}
+
+/* Login Button Glow Effect */
+.header-actions .btn-login {
+    position: relative;
+    overflow: hidden;
+}
+
+.header-actions .btn-login::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s ease, height 0.5s ease;
+}
+
+.header-actions .btn-login:hover::before {
+    width: 300%;
+    height: 300%;
+}
+
+/* Dashboard Header Subtle Animation */
+.dashboard-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.1) 50%,
+            transparent 70%);
+    animation: shimmerHeader 8s infinite linear;
+    pointer-events: none;
+}
+
+@keyframes shimmerHeader {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
+}

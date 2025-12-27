@@ -1553,3 +1553,991 @@ body {
         opacity: 0.7;
     }
 }
+
+/* ==========================================
+   FRONTEND EFFECTS ENHANCEMENT
+   ========================================== */
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==========================================
+   1. PARTICLES / STARS BACKGROUND
+   ========================================== */
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 50%;
+    opacity: 0;
+    animation: particleFloat 15s infinite ease-in-out;
+}
+
+.particle:nth-child(1) {
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.particle:nth-child(2) {
+    left: 20%;
+    animation-delay: 2s;
+}
+
+.particle:nth-child(3) {
+    left: 30%;
+    animation-delay: 4s;
+}
+
+.particle:nth-child(4) {
+    left: 40%;
+    animation-delay: 1s;
+}
+
+.particle:nth-child(5) {
+    left: 50%;
+    animation-delay: 3s;
+}
+
+.particle:nth-child(6) {
+    left: 60%;
+    animation-delay: 5s;
+}
+
+.particle:nth-child(7) {
+    left: 70%;
+    animation-delay: 2.5s;
+}
+
+.particle:nth-child(8) {
+    left: 80%;
+    animation-delay: 4.5s;
+}
+
+.particle:nth-child(9) {
+    left: 90%;
+    animation-delay: 1.5s;
+}
+
+.particle:nth-child(10) {
+    left: 15%;
+    animation-delay: 3.5s;
+}
+
+.particle:nth-child(11) {
+    left: 25%;
+    animation-delay: 0.5s;
+}
+
+.particle:nth-child(12) {
+    left: 35%;
+    animation-delay: 2.2s;
+}
+
+.particle:nth-child(13) {
+    left: 45%;
+    animation-delay: 4.2s;
+}
+
+.particle:nth-child(14) {
+    left: 55%;
+    animation-delay: 1.2s;
+}
+
+.particle:nth-child(15) {
+    left: 65%;
+    animation-delay: 3.2s;
+}
+
+.particle:nth-child(16) {
+    left: 75%;
+    animation-delay: 5.2s;
+}
+
+.particle:nth-child(17) {
+    left: 85%;
+    animation-delay: 2.7s;
+}
+
+.particle:nth-child(18) {
+    left: 95%;
+    animation-delay: 4.7s;
+}
+
+.particle:nth-child(19) {
+    left: 5%;
+    animation-delay: 1.7s;
+}
+
+.particle:nth-child(20) {
+    left: 12%;
+    animation-delay: 3.7s;
+}
+
+.particle:nth-child(odd) {
+    width: 3px;
+    height: 3px;
+    background: var(--primary-light);
+}
+
+.particle:nth-child(3n) {
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.6;
+    }
+
+    90% {
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translateY(-100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Twinkling effect for some particles */
+.particle:nth-child(even)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: twinkle 2s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        opacity: 0.3;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+}
+
+/* ==========================================
+   2. SCROLL ENTRANCE ANIMATIONS
+   ========================================== */
+.animate-on-scroll {
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-on-scroll.visible {
+    opacity: 1;
+}
+
+/* Fade in from below */
+.fade-in-up {
+    transform: translateY(40px);
+}
+
+.fade-in-up.visible {
+    transform: translateY(0);
+}
+
+/* Slide in from left */
+.fade-in-left {
+    transform: translateX(-40px);
+}
+
+.fade-in-left.visible {
+    transform: translateX(0);
+}
+
+/* Slide in from right */
+.fade-in-right {
+    transform: translateX(40px);
+}
+
+.fade-in-right.visible {
+    transform: translateX(0);
+}
+
+/* Scale up from small */
+.scale-in {
+    transform: scale(0.8);
+}
+
+.scale-in.visible {
+    transform: scale(1);
+}
+
+/* Staggered animation delays for lists */
+.stagger-1 {
+    transition-delay: 0.1s;
+}
+
+.stagger-2 {
+    transition-delay: 0.2s;
+}
+
+.stagger-3 {
+    transition-delay: 0.3s;
+}
+
+.stagger-4 {
+    transition-delay: 0.4s;
+}
+
+.stagger-5 {
+    transition-delay: 0.5s;
+}
+
+.stagger-6 {
+    transition-delay: 0.6s;
+}
+
+/* ==========================================
+   3. ENHANCED HOVER INTERACTIONS
+   ========================================== */
+
+/* 3D Tilt Effect for Cards */
+.tilt-card {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+.tilt-card:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-5px);
+}
+
+/* Button Pulse/Glow Animation */
+.btn-glow {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-glow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-glow:hover::before {
+    width: 300%;
+    height: 300%;
+}
+
+/* Icon Bounce on Hover */
+.icon-bounce:hover i,
+.icon-bounce:hover .fa,
+.icon-bounce:hover .fas,
+.icon-bounce:hover .far,
+.icon-bounce:hover .fab {
+    animation: iconBounce 0.5s ease;
+}
+
+@keyframes iconBounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    25% {
+        transform: translateY(-6px);
+    }
+
+    50% {
+        transform: translateY(0);
+    }
+
+    75% {
+        transform: translateY(-3px);
+    }
+}
+
+/* Icon Rotate on Hover */
+.icon-rotate:hover i,
+.icon-rotate:hover .fa,
+.icon-rotate:hover .fas {
+    animation: iconRotate 0.5s ease;
+}
+
+@keyframes iconRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Link Underline Slide Animation */
+.link-underline {
+    position: relative;
+    text-decoration: none;
+}
+
+.link-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary);
+    transition: width 0.3s ease;
+}
+
+.link-underline:hover::after {
+    width: 100%;
+}
+
+/* ==========================================
+   4. CONFETTI CELEBRATION EFFECT
+   ========================================== */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -20px;
+    animation: confettiDrop 3s ease-out forwards;
+}
+
+.confetti-piece:nth-child(1) {
+    left: 10%;
+    background: #22c55e;
+    animation-delay: 0s;
+}
+
+.confetti-piece:nth-child(2) {
+    left: 20%;
+    background: #f59e0b;
+    animation-delay: 0.1s;
+}
+
+.confetti-piece:nth-child(3) {
+    left: 30%;
+    background: #8b5cf6;
+    animation-delay: 0.2s;
+}
+
+.confetti-piece:nth-child(4) {
+    left: 40%;
+    background: #3b82f6;
+    animation-delay: 0.15s;
+}
+
+.confetti-piece:nth-child(5) {
+    left: 50%;
+    background: #ef4444;
+    animation-delay: 0.25s;
+}
+
+.confetti-piece:nth-child(6) {
+    left: 60%;
+    background: #22c55e;
+    animation-delay: 0.05s;
+}
+
+.confetti-piece:nth-child(7) {
+    left: 70%;
+    background: #f59e0b;
+    animation-delay: 0.3s;
+}
+
+.confetti-piece:nth-child(8) {
+    left: 80%;
+    background: #8b5cf6;
+    animation-delay: 0.12s;
+}
+
+.confetti-piece:nth-child(9) {
+    left: 90%;
+    background: #3b82f6;
+    animation-delay: 0.22s;
+}
+
+.confetti-piece:nth-child(10) {
+    left: 15%;
+    background: #ef4444;
+    animation-delay: 0.08s;
+}
+
+.confetti-piece:nth-child(11) {
+    left: 25%;
+    background: #22c55e;
+    animation-delay: 0.18s;
+}
+
+.confetti-piece:nth-child(12) {
+    left: 35%;
+    background: #f59e0b;
+    animation-delay: 0.28s;
+}
+
+.confetti-piece:nth-child(13) {
+    left: 45%;
+    background: #8b5cf6;
+    animation-delay: 0.03s;
+}
+
+.confetti-piece:nth-child(14) {
+    left: 55%;
+    background: #3b82f6;
+    animation-delay: 0.13s;
+}
+
+.confetti-piece:nth-child(15) {
+    left: 65%;
+    background: #ef4444;
+    animation-delay: 0.23s;
+}
+
+.confetti-piece:nth-child(16) {
+    left: 75%;
+    background: #22c55e;
+    animation-delay: 0.07s;
+}
+
+.confetti-piece:nth-child(17) {
+    left: 85%;
+    background: #f59e0b;
+    animation-delay: 0.17s;
+}
+
+.confetti-piece:nth-child(18) {
+    left: 95%;
+    background: #8b5cf6;
+    animation-delay: 0.27s;
+}
+
+.confetti-piece:nth-child(19) {
+    left: 5%;
+    background: #3b82f6;
+    animation-delay: 0.11s;
+}
+
+.confetti-piece:nth-child(20) {
+    left: 12%;
+    background: #ef4444;
+    animation-delay: 0.21s;
+}
+
+.confetti-piece:nth-child(odd) {
+    border-radius: 50%;
+}
+
+.confetti-piece:nth-child(3n) {
+    width: 8px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+@keyframes confettiDrop {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(720deg) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* ==========================================
+   5. DYNAMIC GRADIENT BACKGROUND
+   ========================================== */
+.gradient-bg {
+    background: linear-gradient(-45deg, #f0fdf4, #dcfce7, #bbf7d0, #f0fdf4, #d1fae5);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+.gradient-bg-hero {
+    background: linear-gradient(-45deg,
+            rgba(34, 197, 94, 0.1),
+            rgba(74, 222, 128, 0.08),
+            rgba(139, 92, 246, 0.05),
+            rgba(245, 158, 11, 0.05),
+            rgba(34, 197, 94, 0.1));
+    background-size: 400% 400%;
+    animation: gradientShift 20s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* ==========================================
+   6. MICRO-INTERACTIONS
+   ========================================== */
+
+/* Button Click Ripple Effect */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+}
+
+.ripple:focus:not(:active)::after {
+    animation: rippleEffect 0.6s ease-out;
+}
+
+@keyframes rippleEffect {
+    0% {
+        transform: scale(0) translate(-50%, -50%);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(40) translate(-50%, -50%);
+        opacity: 0;
+    }
+}
+
+/* Enhanced Loading Spinner */
+.spinner-enhanced {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spinEnhanced 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+@keyframes spinEnhanced {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Bouncing Dots Loader */
+.loader-dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader-dots span {
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: bounceDot 1.4s infinite ease-in-out both;
+}
+
+.loader-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loader-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+.loader-dots span:nth-child(3) {
+    animation-delay: 0s;
+}
+
+@keyframes bounceDot {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* Toast Notification Slide In */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 16px 24px;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border-left: 4px solid var(--primary);
+    z-index: 10000;
+    animation: toastSlideIn 0.4s ease-out;
+}
+
+.toast.toast-out {
+    animation: toastSlideOut 0.3s ease-in forwards;
+}
+
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Form Input Focus Animation */
+.input-animated {
+    position: relative;
+}
+
+.input-animated input,
+.input-animated textarea,
+.input-animated select {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-animated input:focus,
+.input-animated textarea:focus,
+.input-animated select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+}
+
+.input-animated label {
+    transition: all 0.3s ease;
+}
+
+/* Checkbox Custom Animation */
+.checkbox-animated {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.checkbox-animated input[type="checkbox"] {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.checkbox-animated input[type="checkbox"]:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.checkbox-animated input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    animation: checkboxCheck 0.2s ease-out;
+}
+
+@keyframes checkboxCheck {
+    from {
+        transform: rotate(45deg) scale(0);
+    }
+
+    to {
+        transform: rotate(45deg) scale(1);
+    }
+}
+
+/* Toggle Switch Animation */
+.toggle-switch {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    background: var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.toggle-switch.active {
+    background: var(--primary);
+}
+
+.toggle-switch.active::after {
+    transform: translateX(24px);
+}
+
+/* Card Hover Lift Effect */
+.card-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(34, 197, 94, 0.15);
+}
+
+/* Shine Effect for Buttons/Cards */
+.shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.shine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent);
+    transition: left 0.5s ease;
+}
+
+.shine:hover::before {
+    left: 100%;
+}
+
+/* Success Checkmark Animation */
+.success-checkmark {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+}
+
+.success-checkmark .check-icon {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    border-radius: 50%;
+    box-sizing: content-box;
+    border: 4px solid var(--primary);
+}
+
+.success-checkmark .check-icon::before {
+    top: 3px;
+    left: -2px;
+    width: 30px;
+    transform-origin: 100% 50%;
+    border-radius: 100px 0 0 100px;
+}
+
+.success-checkmark .check-icon::after {
+    top: 0;
+    left: 30px;
+    width: 60px;
+    transform-origin: 0 50%;
+    border-radius: 0 100px 100px 0;
+    animation: rotateCircle 4.25s ease-in;
+}
+
+.success-checkmark .check-icon .icon-line {
+    height: 5px;
+    background-color: var(--primary);
+    display: block;
+    border-radius: 2px;
+    position: absolute;
+    z-index: 10;
+}
+
+.success-checkmark .check-icon .icon-line.line-tip {
+    top: 46px;
+    left: 14px;
+    width: 25px;
+    transform: rotate(45deg);
+    animation: iconLineTip 0.75s;
+}
+
+.success-checkmark .check-icon .icon-line.line-long {
+    top: 38px;
+    right: 8px;
+    width: 47px;
+    transform: rotate(-45deg);
+    animation: iconLineLong 0.75s;
+}
+
+@keyframes rotateCircle {
+    0% {
+        transform: rotate(-45deg);
+    }
+
+    5% {
+        transform: rotate(-45deg);
+    }
+
+    12% {
+        transform: rotate(-405deg);
+    }
+
+    100% {
+        transform: rotate(-405deg);
+    }
+}
+
+@keyframes iconLineTip {
+    0% {
+        width: 0;
+        left: 1px;
+        top: 19px;
+    }
+
+    54% {
+        width: 0;
+        left: 1px;
+        top: 19px;
+    }
+
+    70% {
+        width: 50px;
+        left: -8px;
+        top: 37px;
+    }
+
+    84% {
+        width: 17px;
+        left: 21px;
+        top: 48px;
+    }
+
+    100% {
+        width: 25px;
+        left: 14px;
+        top: 46px;
+    }
+}
+
+@keyframes iconLineLong {
+    0% {
+        width: 0;
+        right: 46px;
+        top: 54px;
+    }
+
+    65% {
+        width: 0;
+        right: 46px;
+        top: 54px;
+    }
+
+    84% {
+        width: 55px;
+        right: 0;
+        top: 35px;
+    }
+
+    100% {
+        width: 47px;
+        right: 8px;
+        top: 38px;
+    }
+}
