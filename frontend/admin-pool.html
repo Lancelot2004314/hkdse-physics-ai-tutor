@@ -360,13 +360,16 @@
             <section class="pool-section" style="margin-bottom: 20px;">
                 <h2><i class="fas fa-heartbeat"></i> Pool Health Summary</h2>
                 <div class="health-summary" id="healthSummary">
-                    <span class="health-badge healthy"><i class="fas fa-check-circle"></i> Healthy: <span id="healthyCount">-</span></span>
-                    <span class="health-badge low"><i class="fas fa-exclamation-circle"></i> Low Stock: <span id="lowStockCount">-</span></span>
-                    <span class="health-badge empty"><i class="fas fa-times-circle"></i> Empty: <span id="emptyCount">-</span></span>
+                    <span class="health-badge healthy"><i class="fas fa-check-circle"></i> Healthy: <span
+                            id="healthyCount">-</span></span>
+                    <span class="health-badge low"><i class="fas fa-exclamation-circle"></i> Low Stock: <span
+                            id="lowStockCount">-</span></span>
+                    <span class="health-badge empty"><i class="fas fa-times-circle"></i> Empty: <span
+                            id="emptyCount">-</span></span>
                 </div>
                 <div style="font-size: 0.85rem; color: #666;">
-                    Total Ready: <strong id="totalReady">-</strong> | 
-                    Reserved: <strong id="totalReserved">-</strong> | 
+                    Total Ready: <strong id="totalReady">-</strong> |
+                    Reserved: <strong id="totalReserved">-</strong> |
                     Used: <strong id="totalUsed">-</strong>
                 </div>
             </section>
@@ -399,7 +402,9 @@
                                 </tr>
                             </thead>
                             <tbody id="inventoryTable">
-                                <tr><td colspan="7" style="text-align:center;padding:20px;">Loading...</td></tr>
+                                <tr>
+                                    <td colspan="7" style="text-align:center;padding:20px;">Loading...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -537,7 +542,7 @@
         function populateSubtopicSelect() {
             const select = document.getElementById('subtopicSelect');
             select.innerHTML = '<option value="">-- Select Subtopic --</option>';
-            
+
             for (const st of allSubtopics) {
                 const option = document.createElement('option');
                 option.value = st.id;
@@ -646,7 +651,7 @@
             // Start polling if job is running
             const response = await fetch(`/api/admin/pregen-status?jobId=${jobId}`, { credentials: 'include' });
             const data = await response.json();
-            
+
             if (data.job?.status === 'running' || data.job?.status === 'pending') {
                 startPolling(jobId);
             } else {
@@ -659,7 +664,7 @@
                 const response = await fetch(`/api/admin/pregen-status?jobId=${jobId}`, { credentials: 'include' });
                 if (!response.ok) throw new Error('Failed to load job');
                 const data = await response.json();
-                
+
                 displayLogs(data.job?.logs || 'No logs available');
                 loadJobs(); // Refresh job list too
             } catch (err) {
@@ -675,7 +680,7 @@
                 .replace(/(ERROR|FATAL|FAILED)/g, '<span class="log-error">$1</span>')
                 .replace(/(WARNING|Warning)/g, '<span class="log-warning">$1</span>')
                 .replace(/(Stored|completed|SUCCESS)/g, '<span class="log-success">$1</span>');
-            
+
             terminal.innerHTML = colorized;
             terminal.scrollTop = terminal.scrollHeight;
         }

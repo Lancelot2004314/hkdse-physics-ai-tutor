@@ -37,7 +37,7 @@ async function pickQuestionsFromPool(env, subtopics, qtype, language, count, use
   try {
     // Build placeholders for subtopics
     const placeholders = subtopics.map(() => '?').join(',');
-    
+
     // Select ready questions matching the criteria
     const query = `
       SELECT id, topic_key, question_json, difficulty, kb_backend, rewrite_mode, prototype_sources, validator_meta
@@ -49,18 +49,18 @@ async function pickQuestionsFromPool(env, subtopics, qtype, language, count, use
       ORDER BY RANDOM()
       LIMIT ?
     `;
-    
+
     const result = await env.DB.prepare(query)
       .bind(...subtopics, language, qtype, count)
       .all();
-    
+
     if (!result.results || result.results.length === 0) {
       return { questions: [], pickedIds: [] };
     }
 
     const pickedIds = result.results.map(r => r.id);
     const now = Date.now();
-    
+
     // Reserve the picked questions atomically
     const updatePlaceholders = pickedIds.map(() => '?').join(',');
     await env.DB.prepare(`
@@ -98,7 +98,7 @@ async function writeQuestionToPool(env, question, metadata) {
   try {
     const id = `qb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const questionJson = JSON.stringify(question);
-    
+
     await env.DB.prepare(`
       INSERT INTO question_bank (
         id, topic_key, language, qtype, difficulty, question_json, status,
@@ -138,7 +138,7 @@ async function reclaimExpiredReserved(env) {
       SET status = 'ready', reserved_by = NULL, reserved_at = NULL
       WHERE status = 'reserved' AND reserved_at < ?
     `).bind(expiryTime).run();
-    
+
     return result.meta?.changes || 0;
   } catch (err) {
     console.error('Error reclaiming expired reservations:', err);
@@ -307,7 +307,7 @@ export async function onRequestPost(context) {
 
     // ==================== Pool-First Logic ====================
     // Try to pick questions from pool first, then generate what's missing
-    
+
     const allQuestions = [];
     let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
     const poolIdsUsed = []; // Track pool IDs for marking as used later
@@ -343,7 +343,7 @@ export async function onRequestPost(context) {
       const poolResult = await pickQuestionsFromPool(
         env, topics, config.type, language, config.count, user.id
       );
-      
+
       if (poolResult.questions.length > 0) {
         questionsForType.push(...poolResult.questions);
         poolIdsUsed.push(...poolResult.pickedIds);

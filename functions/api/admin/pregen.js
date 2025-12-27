@@ -117,7 +117,7 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
   try {
     // Get topic names for prompt
     const topicNames = getSubtopicNames([subtopic], language === 'en' ? 'en' : 'zh');
-    
+
     // Fetch prototype pack for style consistency
     let prototypePack = '';
     let kbBackend = 'none';
@@ -195,7 +195,7 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
           const q = genResult.questions[i];
           try {
             const validation = await validateQuestion(apiKey, q, qtype, language);
-            
+
             let finalQuestion = q;
             if (!validation.isConsistent && validation.fixedQuestion) {
               finalQuestion = validation.fixedQuestion;
@@ -245,7 +245,7 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
     // Mark job as completed
     const finalStatus = failedCount === count ? 'failed' : 'completed';
     await appendJobLog(env, jobId, `\nJob ${finalStatus}: ${completedCount} stored, ${failedCount} failed`);
-    
+
     await env.DB.prepare(`
       UPDATE pregen_jobs SET status = ?, completed_count = ?, failed_count = ?, finished_at = ?, updated_at = ? WHERE id = ?
     `).bind(finalStatus, completedCount, failedCount, Date.now(), Date.now(), jobId).run();
@@ -264,7 +264,7 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
 async function appendJobLog(env, jobId, message) {
   const timestamp = new Date().toISOString();
   const logLine = `[${timestamp}] ${message}\n`;
-  
+
   try {
     await env.DB.prepare(`
       UPDATE pregen_jobs SET logs = logs || ?, updated_at = ? WHERE id = ?
@@ -399,7 +399,7 @@ async function writeQuestionToPool(env, question, metadata) {
   try {
     const id = `qb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const questionJson = JSON.stringify(question);
-    
+
     await env.DB.prepare(`
       INSERT INTO question_bank (
         id, topic_key, language, qtype, difficulty, question_json, status,
