@@ -18,8 +18,8 @@ import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
 import { searchKnowledgeBase, enrichKbResultsWithMetadata } from '../../../shared/embedding.js';
 import { checkVertexConfig } from '../../../shared/vertexRag.js';
 
-const REQUEST_TIMEOUT = 180000; // 3 minutes for reasoner model
-const DEEPSEEK_MODEL = 'deepseek-reasoner';
+const REQUEST_TIMEOUT = 30000; // 30 seconds timeout
+const GEMINI_MODEL = 'gemini-3-flash-preview'; // Gemini 3 Flash - fastest and high quality (Dec 2025)
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -64,10 +64,10 @@ export async function onRequestPost(context) {
       return errorResponse(400, 'count must be 1-50');
     }
 
-    // Check API key
-    const apiKey = env.DEEPSEEK_API_KEY;
+    // Check API key - use Gemini 3 Flash for pre-generation (fast and high quality)
+    const apiKey = env.GEMINI_API_KEY;
     if (!apiKey) {
-      return errorResponse(500, 'DEEPSEEK_API_KEY not configured');
+      return errorResponse(500, 'GEMINI_API_KEY not configured');
     }
 
     // Create a job record
@@ -161,10 +161,10 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
     }
 
     await appendJobLog(env, jobId, `Using ${usedRewriteMode ? 'prototype rewrite' : 'standard'} mode (${kbBackend})`);
-    await appendJobLog(env, jobId, `Generating ${count} questions with ${DEEPSEEK_MODEL}...`);
+    await appendJobLog(env, jobId, `Generating ${count} questions with ${GEMINI_MODEL}...`);
 
-    // Generate in batches of 5 to avoid timeout and provide progress updates
-    const batchSize = 5;
+    // Generate in batches of 2 to stay within Cloudflare Workers time limits
+    const batchSize = 2;
     const batches = Math.ceil(count / batchSize);
 
     for (let batch = 0; batch < batches; batch++) {
@@ -286,20 +286,26 @@ async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty,
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
   try {
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    // Use Gemini API format
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+    
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: DEEPSEEK_MODEL,
-        messages: [
-          { role: 'system', content: 'You are an expert HKDSE Physics examiner. Generate exam-quality questions.' },
-          { role: 'user', content: prompt },
+        contents: [
+          {
+            parts: [
+              { text: 'You are an expert HKDSE Physics examiner. Generate exam-quality questions.\n\n' + prompt }
+            ]
+          }
         ],
-        temperature: 0.7,
-        max_tokens: 4096,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 8192,
+        },
       }),
       signal: controller.signal,
     });
@@ -308,11 +314,11 @@ async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty,
 
     if (!response.ok) {
       const errText = await response.text();
-      return { success: false, error: `API error ${response.status}: ${errText.slice(0, 200)}` };
+      return { success: false, error: `Gemini API error ${response.status}: ${errText.slice(0, 200)}` };
     }
 
     const data = await response.json();
-    const text = data.choices[0]?.message?.content || '';
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     let parsed;
     try {
@@ -340,23 +346,29 @@ async function validateQuestion(apiKey, question, questionType, language) {
     .replace('{questionJson}', JSON.stringify(question, null, 2));
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 seconds for validation
 
   try {
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    // Use Gemini API format
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+    
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: DEEPSEEK_MODEL,
-        messages: [
-          { role: 'system', content: 'You are a strict exam question validator. Output ONLY valid JSON.' },
-          { role: 'user', content: prompt },
+        contents: [
+          {
+            parts: [
+              { text: 'You are a strict exam question validator. Output ONLY valid JSON.\n\n' + prompt }
+            ]
+          }
         ],
-        temperature: 0.2,
-        max_tokens: 2048,
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 4096,
+        },
       }),
       signal: controller.signal,
     });
@@ -368,7 +380,8 @@ async function validateQuestion(apiKey, question, questionType, language) {
     }
 
     const data = await response.json();
-    const text = data.choices[0]?.message?.content || '';
+    // Use Gemini response format
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     try {
       const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
