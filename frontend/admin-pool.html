@@ -321,6 +321,108 @@
             background: #3498db;
             color: white;
         }
+
+        /* Question Bank Viewer */
+        .question-bank-section {
+            margin-top: 20px;
+        }
+
+        .question-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .question-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 0.75rem;
+        }
+
+        .question-meta span {
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .question-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .question-options {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+        }
+
+        .question-options li {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .question-options li.correct {
+            background: #d4edda;
+            border-left: 3px solid #28a745;
+        }
+
+        .question-explanation {
+            background: #fff3cd;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .question-explanation strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .btn-view-bank {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-view-bank:hover {
+            opacity: 0.9;
+        }
+
+        .question-bank-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .question-bank-controls select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
     </style>
 </head>
 
@@ -483,6 +585,38 @@
                     <span class="log-timestamp">[Ready]</span> Select or start a job to view logs...
                 </div>
             </section>
+
+            <!-- Question Bank Viewer -->
+            <section class="pool-section question-bank-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-eye"></i> Question Bank Preview</h2>
+                    <button class="btn-view-bank" onclick="loadQuestionBank()">
+                        <i class="fas fa-sync-alt"></i> Load Questions
+                    </button>
+                </div>
+                <div class="question-bank-controls">
+                    <select id="bankFilterSubtopic" onchange="loadQuestionBank()">
+                        <option value="">All Subtopics</option>
+                    </select>
+                    <select id="bankFilterLang" onchange="loadQuestionBank()">
+                        <option value="">All Languages</option>
+                        <option value="zh">繁體中文</option>
+                        <option value="en">English</option>
+                    </select>
+                    <select id="bankFilterType" onchange="loadQuestionBank()">
+                        <option value="">All Types</option>
+                        <option value="mc">MC</option>
+                        <option value="short">Short</option>
+                        <option value="long">Long</option>
+                    </select>
+                </div>
+                <div id="questionBankList">
+                    <div style="text-align:center;padding:30px;color:#666;">
+                        <i class="fas fa-database" style="font-size:2rem;margin-bottom:10px;display:block;"></i>
+                        Click "Load Questions" to view stored questions
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -524,8 +658,10 @@
                 document.getElementById('adminMain').hidden = false;
 
                 populateSubtopicSelect();
+                populateBankSubtopicFilter();
                 displayPoolStats(statsData);
                 loadJobs();
+                loadQuestionBank();
 
             } catch (err) {
                 console.error('Auth error:', err);
@@ -747,6 +883,97 @@
                 btn.innerHTML = '<i class="fas fa-play"></i> Start Generation';
             }
         });
+
+        // Question Bank Viewer
+        async function loadQuestionBank() {
+            const container = document.getElementById('questionBankList');
+            container.innerHTML = '<div style="text-align:center;padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+            const subtopic = document.getElementById('bankFilterSubtopic').value;
+            const language = document.getElementById('bankFilterLang').value;
+            const qtype = document.getElementById('bankFilterType').value;
+
+            try {
+                const params = new URLSearchParams();
+                if (subtopic) params.set('subtopic', subtopic);
+                if (language) params.set('language', language);
+                if (qtype) params.set('qtype', qtype);
+                params.set('limit', '20');
+
+                const response = await fetch(`/api/admin/questions?${params}`, { credentials: 'include' });
+                if (!response.ok) throw new Error('Failed to load questions');
+
+                const data = await response.json();
+                displayQuestions(data.questions, data.total);
+            } catch (err) {
+                container.innerHTML = `<div style="text-align:center;padding:30px;color:#e74c3c;">Error: ${err.message}</div>`;
+            }
+        }
+
+        function displayQuestions(questions, total) {
+            const container = document.getElementById('questionBankList');
+
+            if (questions.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:30px;color:#666;">No questions found</div>';
+                return;
+            }
+
+            container.innerHTML = `<div style="margin-bottom:15px;font-size:0.85rem;color:#666;">Showing ${questions.length} of ${total} questions</div>` +
+                questions.map(q => renderQuestionCard(q)).join('');
+        }
+
+        function renderQuestionCard(q) {
+            const langLabel = q.language === 'en' ? 'EN' : 'ZH';
+            const typeLabel = q.qtype.toUpperCase();
+            const statusClass = q.status === 'ready' ? 'healthy' : (q.status === 'used' ? '' : 'low');
+
+            let optionsHtml = '';
+            if (q.qtype === 'mc' && q.options) {
+                optionsHtml = `<ul class="question-options">
+                    ${q.options.map((opt, i) => {
+                        const isCorrect = (q.correctAnswer === i) || 
+                                          (q.correctAnswer === String.fromCharCode(65 + i)) ||
+                                          (q.correctAnswer === opt);
+                        return `<li class="${isCorrect ? 'correct' : ''}">${opt}</li>`;
+                    }).join('')}
+                </ul>`;
+            } else if (q.modelAnswer) {
+                optionsHtml = `<div class="question-explanation"><strong>Model Answer:</strong>${escapeHtml(q.modelAnswer).slice(0, 500)}...</div>`;
+            }
+
+            return `
+                <div class="question-card">
+                    <div class="question-card-header">
+                        <div class="question-meta">
+                            <span>${q.topicKey}</span>
+                            <span>${langLabel}</span>
+                            <span>${typeLabel}</span>
+                            <span class="health-badge ${statusClass}" style="padding:2px 6px;">${q.status}</span>
+                        </div>
+                        <small style="color:#999;">${q.id}</small>
+                    </div>
+                    <div class="question-text">${escapeHtml(q.question || '').replace(/\n/g, '<br>')}</div>
+                    ${optionsHtml}
+                    ${q.explanation ? `<div class="question-explanation"><strong>Explanation:</strong> ${escapeHtml(q.explanation).slice(0, 500)}...</div>` : ''}
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function populateBankSubtopicFilter() {
+            const select = document.getElementById('bankFilterSubtopic');
+            select.innerHTML = '<option value="">All Subtopics</option>';
+            for (const st of allSubtopics) {
+                const option = document.createElement('option');
+                option.value = st.id;
+                option.textContent = `${st.id} - ${st.name}`;
+                select.appendChild(option);
+            }
+        }
     </script>
 </body>
 
