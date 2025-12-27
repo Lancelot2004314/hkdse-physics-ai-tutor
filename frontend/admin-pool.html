@@ -16,7 +16,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
     <style>
-        /* Pool-specific styles */
+        /* High Contrast Pool Styles */
         .pool-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -31,67 +31,72 @@
         }
 
         .pool-section {
-            background: var(--card-bg, #fff);
+            background: #ffffff;
+            border: 2px solid #333;
             border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 24px;
         }
 
         .pool-section h2 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
+            color: #000;
+            font-weight: 700;
         }
 
         .pool-section h2 i {
-            color: #3498db;
+            color: #2563eb;
         }
 
-        /* Inventory Table */
+        /* Inventory Table - High Contrast */
         .inventory-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
         }
 
         .inventory-table th,
         .inventory-table td {
-            padding: 8px 10px;
+            padding: 12px 14px;
             text-align: center;
-            border-bottom: 1px solid #eee;
+            border: 2px solid #333;
+            color: #000;
         }
 
         .inventory-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
+            background: #333;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
         }
 
         .inventory-table td:first-child {
             text-align: left;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            font-weight: 600;
+            background: #f5f5f5;
         }
 
         .inventory-table .count-cell {
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 1.1rem;
         }
 
         .inventory-table .count-cell.empty {
-            color: #e74c3c;
+            background: #fee2e2;
+            color: #b91c1c;
         }
 
         .inventory-table .count-cell.low {
-            color: #f39c12;
+            background: #fef3c7;
+            color: #92400e;
         }
 
         .inventory-table .count-cell.ok {
-            color: #27ae60;
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .inventory-scroll {
@@ -99,7 +104,7 @@
             overflow-y: auto;
         }
 
-        /* Health Summary */
+        /* Health Summary - High Contrast */
         .health-summary {
             display: flex;
             gap: 15px;
@@ -108,28 +113,32 @@
         }
 
         .health-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: 2px solid;
         }
 
         .health-badge.healthy {
-            background: #d4edda;
-            color: #155724;
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #065f46;
         }
 
         .health-badge.low {
-            background: #fff3cd;
-            color: #856404;
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #92400e;
         }
 
         .health-badge.empty {
-            background: #f8d7da;
-            color: #721c24;
+            background: #fee2e2;
+            color: #b91c1c;
+            border-color: #b91c1c;
         }
 
-        /* Pregen Form */
+        /* Pregen Form - High Contrast */
         .pregen-form {
             display: grid;
             gap: 15px;
@@ -144,58 +153,58 @@
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
         }
 
         .form-group label {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #555;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #000;
         }
 
         .form-group select,
         .form-group input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.9rem;
+            padding: 12px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #000;
+            background: #fff;
         }
 
         .btn-generate {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
+            background: #2563eb;
+            color: #fff;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+            background: #1d4ed8;
         }
 
         .btn-generate:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
 
-        /* Terminal/Log Viewer */
+        /* Terminal/Log Viewer - High Contrast */
         .terminal {
-            background: #1e1e1e;
-            color: #d4d4d4;
+            background: #000;
+            color: #00ff00;
             font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.8rem;
-            padding: 15px;
+            font-size: 0.9rem;
+            padding: 20px;
             border-radius: 8px;
+            border: 2px solid #333;
             height: 300px;
             overflow-y: auto;
             white-space: pre-wrap;
@@ -203,19 +212,23 @@
         }
 
         .terminal .log-timestamp {
-            color: #6a9955;
+            color: #00ff00;
+            font-weight: bold;
         }
 
         .terminal .log-error {
-            color: #f44747;
+            color: #ff4444;
+            font-weight: bold;
         }
 
         .terminal .log-warning {
-            color: #dcdcaa;
+            color: #ffff00;
+            font-weight: bold;
         }
 
         .terminal .log-success {
-            color: #4ec9b0;
+            color: #00ffff;
+            font-weight: bold;
         }
 
         /* Jobs List */
