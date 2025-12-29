@@ -187,309 +187,256 @@
 }
 
 /* ============================================
-   IDLE ANIMATION
+   PROFESSIONAL ANIMATIONS - Smooth & Centered
    ============================================ */
 
-.scene-idle .lancelot {
-    animation: knight-breathe 3s ease-in-out infinite;
+/* Base knight - all transforms relative to center */
+.stick-knight-scene .lancelot {
+    transform-origin: center center;
 }
 
-@keyframes knight-breathe {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-1px); }
-}
-
-.scene-idle .lancelot .cape {
-    animation: cape-flutter-idle 4s ease-in-out infinite;
-    transform-origin: top center;
-}
-
-@keyframes cape-flutter-idle {
-    0%, 100% { transform: skewX(0deg); }
-    25% { transform: skewX(2deg); }
-    75% { transform: skewX(-2deg); }
+.stick-knight-scene .knight-body {
+    transform-origin: 0 10px;
 }
 
 /* ============================================
-   SLEEPING ANIMATION
+   IDLE ANIMATION - Gentle breathing
    ============================================ */
 
-.scene-sleep .lancelot {
-    transform: rotate(-90deg) translateX(5px);
+.scene-idle .knight-body {
+    animation: idle-breathe 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.scene-sleep .lancelot .eye {
-    animation: eye-sleep 4s ease-in-out infinite;
+@keyframes idle-breathe {
+    0%, 100% { transform: translate(50px, 52px) scale(1); }
+    50% { transform: translate(50px, 51px) scale(1.01); }
 }
 
-@keyframes eye-sleep {
-    0%, 45%, 55%, 100% { opacity: 0; transform: scaleY(0.1); }
-    50% { opacity: 1; transform: scaleY(1); }
+.scene-idle .cape {
+    animation: idle-cape 4s ease-in-out infinite;
+    transform-origin: 0 5px;
 }
 
-.scene-sleep .lancelot .body-group {
-    animation: sleep-breathe 3s ease-in-out infinite;
+@keyframes idle-cape {
+    0%, 100% { transform: scaleX(1) skewX(0deg); }
+    50% { transform: scaleX(1.02) skewX(2deg); }
+}
+
+.scene-idle .sword-arm {
+    animation: idle-sword 5s ease-in-out infinite;
+    transform-origin: 0 6px;
+}
+
+@keyframes idle-sword {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(3deg); }
+}
+
+/* ============================================
+   SLEEPING ANIMATION - Lying down peacefully
+   ============================================ */
+
+.scene-sleep .knight-body {
+    animation: sleep-pose 0.5s ease-out forwards, sleep-breathe 4s ease-in-out 0.5s infinite;
+    transform: translate(50px, 58px) rotate(80deg) scale(0.9);
+}
+
+@keyframes sleep-pose {
+    from { transform: translate(50px, 52px) rotate(0deg) scale(1); }
+    to { transform: translate(50px, 58px) rotate(80deg) scale(0.9); }
 }
 
 @keyframes sleep-breathe {
-    0%, 100% { transform: scaleY(1); }
-    50% { transform: scaleY(1.02); }
+    0%, 100% { transform: translate(50px, 58px) rotate(80deg) scale(0.9); }
+    50% { transform: translate(50px, 58px) rotate(80deg) scale(0.92); }
 }
 
-/* ZZZ bubbles */
-.zzz-bubble {
-    font-size: 8px;
-    fill: #60a5fa;
-    opacity: 0;
-    animation: zzz-float 2s ease-in-out infinite;
+.scene-sleep .eye-l,
+.scene-sleep .eye-r {
+    animation: eyes-closed 4s ease-in-out infinite;
 }
 
-.zzz-bubble:nth-child(2) {
-    animation-delay: 0.6s;
-    font-size: 6px;
+@keyframes eyes-closed {
+    0%, 40%, 60%, 100% { transform: scaleY(0.1); opacity: 0.3; }
+    50% { transform: scaleY(0.1); opacity: 0.3; }
 }
 
-.zzz-bubble:nth-child(3) {
-    animation-delay: 1.2s;
-    font-size: 5px;
+.scene-sleep .zzz-group {
+    animation: zzz-show 0.3s ease-out 0.5s forwards;
+}
+
+@keyframes zzz-show {
+    to { opacity: 1; }
+}
+
+.scene-sleep .zzz-group text:nth-child(1) {
+    animation: zzz-float 2.5s ease-in-out infinite;
+}
+
+.scene-sleep .zzz-group text:nth-child(2) {
+    animation: zzz-float 2.5s ease-in-out 0.4s infinite;
+}
+
+.scene-sleep .zzz-group text:nth-child(3) {
+    animation: zzz-float 2.5s ease-in-out 0.8s infinite;
 }
 
 @keyframes zzz-float {
-    0% { opacity: 0; transform: translate(0, 0); }
-    20% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; transform: translate(8px, -15px); }
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-3px); }
 }
 
 /* ============================================
-   SWORD PRACTICE ANIMATION
+   SWORD PRACTICE - Skilled movements
    ============================================ */
 
-.scene-practice .lancelot .sword-arm {
-    animation: sword-swing 1.5s ease-in-out infinite;
-    transform-origin: 25px 40px;
-}
-
-@keyframes sword-swing {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-45deg); }
-    50% { transform: rotate(30deg); }
-    75% { transform: rotate(-20deg); }
-}
-
-.scene-practice .lancelot .legs {
-    animation: practice-stance 1.5s ease-in-out infinite;
+.scene-practice .knight-body {
+    animation: practice-stance 2s ease-in-out infinite;
 }
 
 @keyframes practice-stance {
+    0%, 100% { transform: translate(50px, 52px); }
+    25% { transform: translate(48px, 52px); }
+    75% { transform: translate(52px, 52px); }
+}
+
+.scene-practice .sword-arm {
+    animation: practice-swing 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transform-origin: 0 6px;
+}
+
+@keyframes practice-swing {
+    0%, 100% { transform: rotate(-10deg); }
+    20% { transform: rotate(-50deg); }
+    40% { transform: rotate(40deg); }
+    60% { transform: rotate(-30deg); }
+    80% { transform: rotate(20deg); }
+}
+
+.scene-practice .legs {
+    animation: practice-legs 1.2s ease-in-out infinite;
+}
+
+@keyframes practice-legs {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-2px); }
-    75% { transform: translateX(2px); }
+    25% { transform: translateX(-1px); }
+    75% { transform: translateX(1px); }
 }
 
-/* Sword trail effect */
-.sword-trail {
-    stroke: var(--knight-gold-light);
-    stroke-width: 2;
-    fill: none;
-    opacity: 0;
-    filter: blur(1px);
+.scene-practice .slash-effects {
+    animation: practice-slash 1.2s ease-out infinite;
 }
 
-.scene-practice .sword-trail {
-    animation: trail-fade 1.5s ease-out infinite;
-}
-
-@keyframes trail-fade {
-    0%, 20% { opacity: 0; }
-    25%, 30% { opacity: 0.8; }
-    50% { opacity: 0; }
+@keyframes practice-slash {
+    0%, 15%, 45%, 100% { opacity: 0; }
+    20%, 40% { opacity: 0.6; }
 }
 
 /* ============================================
-   EPIC COMBAT ANIMATION
+   EPIC COMBAT - Exciting battle sequence
    ============================================ */
 
-/* Combat scene container */
-.scene-combat {
-    --combat-duration: 8s;
+.scene-combat .enemy-1 {
+    animation: enemy-appear 6s ease-in-out infinite;
 }
 
-/* Enemy entrance */
-.scene-combat .enemy {
-    animation: enemy-enter 8s ease-in-out infinite;
-}
-
-.scene-combat .enemy:nth-child(1) {
-    animation-delay: 0s;
-}
-
-.scene-combat .enemy:nth-child(2) {
-    animation-delay: 0.3s;
-}
-
-@keyframes enemy-enter {
-    0% { opacity: 0; transform: translateX(30px); }
-    5% { opacity: 1; transform: translateX(10px); }
-    15%, 60% { opacity: 1; transform: translateX(10px); }
-    65% { opacity: 0; transform: translateX(-20px) rotate(-30deg); }
+@keyframes enemy-appear {
+    0%, 5% { opacity: 0; transform: translateX(15px); }
+    10%, 70% { opacity: 1; transform: translateX(0); }
+    80% { opacity: 0; transform: translateX(-10px) rotate(-20deg); }
     100% { opacity: 0; }
 }
 
-/* Lancelot combat movements */
-.scene-combat .lancelot {
-    animation: combat-move 8s ease-in-out infinite;
+.scene-combat .knight-body {
+    animation: combat-movement 6s ease-in-out infinite;
 }
 
-@keyframes combat-move {
-    0%, 5% { transform: translateX(0); }
-    10% { transform: translateX(-3px); } /* Ready stance */
-    15% { transform: translateX(8px); }  /* Dash forward */
-    20% { transform: translateX(5px); }
-    30% { transform: translateX(-2px); } /* Dodge back */
-    35% { transform: translateX(10px); } /* Attack */
-    45% { transform: translateX(3px); }
-    55% { transform: translateX(12px); } /* Final strike */
-    65%, 100% { transform: translateX(0); } /* Victory */
+@keyframes combat-movement {
+    0%, 5% { transform: translate(50px, 52px); }
+    15% { transform: translate(45px, 52px); } /* Ready */
+    25% { transform: translate(58px, 50px); } /* Lunge forward */
+    35% { transform: translate(52px, 52px); } /* Return */
+    45% { transform: translate(48px, 54px); } /* Dodge */
+    55% { transform: translate(60px, 48px); } /* Final strike */
+    70%, 100% { transform: translate(50px, 52px); } /* Victory */
 }
 
-/* Combat sword swing */
-.scene-combat .lancelot .sword-arm {
-    animation: combat-slash 8s ease-in-out infinite;
-    transform-origin: 25px 40px;
+.scene-combat .sword-arm {
+    animation: combat-slash 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transform-origin: 0 6px;
 }
 
 @keyframes combat-slash {
     0%, 10% { transform: rotate(-20deg); }
-    15%, 17% { transform: rotate(60deg); } /* Slash 1 */
-    20%, 25% { transform: rotate(-30deg); }
-    30%, 32% { transform: rotate(45deg); } /* Parry */
-    35%, 38% { transform: rotate(80deg); } /* Slash 2 */
-    45%, 50% { transform: rotate(-40deg); }
-    55%, 58% { transform: rotate(90deg); } /* Final slash */
+    20%, 25% { transform: rotate(70deg); } /* Slash 1 */
+    30%, 40% { transform: rotate(-40deg); } /* Pull back */
+    50%, 55% { transform: rotate(90deg); } /* Final slash */
     65%, 100% { transform: rotate(30deg); } /* Victory pose */
 }
 
-/* Combat effects - Sword trails */
-.combat-slash-effect {
-    stroke: #FFD700;
-    stroke-width: 3;
-    fill: none;
-    opacity: 0;
-    filter: drop-shadow(0 0 3px #FFD700) blur(1px);
+.scene-combat .slash-effects {
+    animation: combat-trail 6s ease-out infinite;
 }
 
-.scene-combat .combat-slash-effect {
-    animation: slash-effect 8s linear infinite;
+@keyframes combat-trail {
+    0%, 18% { opacity: 0; }
+    20%, 25% { opacity: 0.8; }
+    30% { opacity: 0; }
+    48% { opacity: 0; }
+    50%, 55% { opacity: 1; }
+    60%, 100% { opacity: 0; }
 }
 
-@keyframes slash-effect {
-    0%, 14% { opacity: 0; }
-    15%, 18% { opacity: 1; d: path("M 35 30 Q 50 25 55 40"); }
-    19% { opacity: 0; }
-    34% { opacity: 0; }
-    35%, 38% { opacity: 1; d: path("M 35 35 Q 55 30 60 45"); }
-    39% { opacity: 0; }
-    54% { opacity: 0; }
-    55%, 58% { opacity: 1; d: path("M 30 25 Q 55 20 65 35"); }
-    60% { opacity: 0; }
-    100% { opacity: 0; }
+.scene-combat .sparkles {
+    animation: combat-sparkle 6s ease-out infinite;
 }
 
-/* Spark effects on hit */
-.hit-spark {
-    fill: #FFF;
-    opacity: 0;
-    filter: drop-shadow(0 0 2px #FFD700);
-}
-
-.scene-combat .hit-spark {
-    animation: spark-burst 8s ease-out infinite;
-}
-
-.scene-combat .hit-spark:nth-child(1) { animation-delay: 0.15s; }
-.scene-combat .hit-spark:nth-child(2) { animation-delay: 0.35s; }
-.scene-combat .hit-spark:nth-child(3) { animation-delay: 0.55s; }
-
-@keyframes spark-burst {
-    0%, 14% { opacity: 0; transform: scale(0); }
-    15%, 17% { opacity: 1; transform: scale(1.5); }
-    20% { opacity: 0; transform: scale(0); }
-    34% { opacity: 0; transform: scale(0); }
-    35%, 37% { opacity: 1; transform: scale(1.2); }
-    40% { opacity: 0; transform: scale(0); }
-    54% { opacity: 0; transform: scale(0); }
-    55%, 58% { opacity: 1; transform: scale(2); }
-    62% { opacity: 0; transform: scale(0); }
-    100% { opacity: 0; }
-}
-
-/* Screen shake effect */
-.scene-combat .stick-knight-scene {
-    animation: screen-shake 8s linear infinite;
-}
-
-@keyframes screen-shake {
-    0%, 14%, 19%, 34%, 39%, 54%, 59%, 100% { transform: translate(0, 0); }
-    15%, 17% { transform: translate(-1px, 1px); }
-    16%, 18% { transform: translate(1px, -1px); }
-    35%, 37% { transform: translate(1px, 1px); }
-    36%, 38% { transform: translate(-1px, 0); }
-    55%, 57% { transform: translate(-2px, 1px); }
-    56%, 58% { transform: translate(2px, -1px); }
-}
-
-/* Victory sparkles */
-.victory-sparkle {
-    fill: #FFD700;
-    opacity: 0;
-}
-
-.scene-combat .victory-sparkle {
-    animation: sparkle-appear 8s ease-out infinite;
-}
-
-@keyframes sparkle-appear {
-    0%, 64% { opacity: 0; transform: scale(0) rotate(0deg); }
-    65%, 80% { opacity: 1; transform: scale(1) rotate(180deg); }
-    85%, 100% { opacity: 0; transform: scale(0.5) rotate(360deg); }
+@keyframes combat-sparkle {
+    0%, 60% { opacity: 0; transform: scale(0); }
+    65%, 85% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.5); }
 }
 
 /* ============================================
-   REST/SIT ANIMATION
+   REST - Sitting peacefully
    ============================================ */
 
-.scene-rest .lancelot {
-    transform: translateY(8px);
+.scene-rest .knight-body {
+    animation: rest-sit 0.5s ease-out forwards;
 }
 
-.scene-rest .lancelot .legs {
-    transform: rotate(90deg) translateX(5px);
+@keyframes rest-sit {
+    from { transform: translate(50px, 52px); }
+    to { transform: translate(50px, 58px) scale(0.95); }
 }
 
-.scene-rest .lancelot .sword-arm {
-    transform: rotate(-90deg);
+.scene-rest .legs {
+    animation: rest-legs 0.5s ease-out forwards;
+    transform-origin: 0 15px;
 }
 
-.scene-rest .lancelot .body-group {
-    animation: rest-breathe 4s ease-in-out infinite;
+@keyframes rest-legs {
+    to { transform: rotate(30deg) scaleY(0.7); }
 }
 
-@keyframes rest-breathe {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-0.5px); }
+.scene-rest .sword-arm {
+    animation: rest-sword 0.5s ease-out forwards;
+}
+
+@keyframes rest-sword {
+    to { transform: rotate(-60deg); }
 }
 
 /* ============================================
-   SCENE TRANSITIONS
+   SCENE TRANSITIONS - Smooth crossfade
    ============================================ */
 
 .stick-knight-scene {
-    transition: opacity 0.5s ease;
+    transition: none;
 }
 
 .scene-transition {
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 /* Ground/Arena styling */
