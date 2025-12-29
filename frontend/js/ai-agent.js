@@ -587,6 +587,21 @@ class AIAgent {
                 
                 <!-- Marvel-style Effects -->
                 <g class="effects">
+                    <!-- Full-screen impact flash (clipped in circle) -->
+                    <rect class="impact-flash" x="0" y="0" width="100" height="100" fill="#ffffff" opacity="0"/>
+
+                    <!-- Shockwave ring at hit point -->
+                    <circle class="shockwave" cx="70" cy="48" r="0" fill="none" stroke="#ffffff" stroke-width="2" opacity="0"/>
+
+                    <!-- Comic text -->
+                    <g class="comic-text" style="opacity:0;">
+                        <text class="comic-bam" x="60" y="32" font-family="Impact, Arial Black, sans-serif" font-size="10" fill="#FFD700" stroke="#111827" stroke-width="0.8">BAM</text>
+                        <text class="comic-kapow" x="55" y="62" font-family="Impact, Arial Black, sans-serif" font-size="9" fill="#FF4D4D" stroke="#111827" stroke-width="0.8">KAPOW</text>
+                    </g>
+
+                    <!-- Combo counter -->
+                    <text class="combo-counter" x="8" y="18" font-family="Arial Black, Arial, sans-serif" font-size="7" fill="#FFD700" stroke="#111827" stroke-width="0.6" opacity="0">COMBO x5</text>
+
                     <!-- Multiple slash trails -->
                     <g class="slash-effects" style="opacity:0;">
                         <path d="M 52 48 Q 65 42 72 52" stroke="#FFD700" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9"/>
@@ -646,11 +661,16 @@ class AIAgent {
             idle: 3000,      // 3 seconds
             sleep: 6000,     // 6 seconds  
             practice: 5000,  // 5 seconds
-            combat: 8000,    // 8 seconds (full combat animation)
+            // Combat animation is 10s in CSS (marvel-style), keep in sync to avoid cutting climax
+            combat: 10000,   // 10 seconds (full combat animation)
             rest: 4000       // 4 seconds
         };
         
         const duration = durations[this.currentScene] || 3000;
+
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:scheduleNextScene',message:'Scene duration scheduled',data:{scene:this.currentScene,durationMs:duration,runId:'v5'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+        // #endregion
         
         this.sceneTimer = setTimeout(() => {
             // Pick next scene (weighted random)
