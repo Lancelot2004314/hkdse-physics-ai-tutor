@@ -101,7 +101,7 @@ class AIAgent {
 
         this.createDOM();
         this.bindEvents();
-        this.initStickKnight();
+        this.initPhysicsAvatar();
         this.initWebSpeechAPI();
         this.listenForLanguageChange();
 
@@ -438,40 +438,51 @@ class AIAgent {
     }
 
     /**
-     * Initialize the Stick Knight SVG Avatar System
+     * Initialize the Physics Avatar System (Matter.js powered)
      */
-    initStickKnight() {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:initStickKnight:entry',message:'initStickKnight called',data:{hasAvatar3DEl:!!this.avatar3DEl,hasFallbackEl:!!this.avatarFallbackEl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
-        
+    initPhysicsAvatar() {
         try {
-            // Create SVG scene
-            this.createStickKnightSVG();
-            
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:initStickKnight:afterSVG',message:'SVG created',data:{hasSVG:!!this.knightSVG,hasKnight:!!this.knightEl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
-            
-            // Hide fallback
-            this.avatarFallbackEl.style.display = 'none';
-            
-            // Start scene cycling
-            this.startSceneCycle();
-            
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:initStickKnight:complete',message:'Stick Knight initialized successfully',data:{currentScene:this.currentScene},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D,E'})}).catch(()=>{});
-            // #endregion
-            
-            console.log('Stick Knight initialized!');
+            // Check if PhysicsAvatar class is available
+            if (typeof PhysicsAvatar !== 'undefined') {
+                this.physicsAvatar = new PhysicsAvatar(this.avatar3DEl, {
+                    size: 80
+                });
+                this.avatarFallbackEl.style.display = 'none';
+                console.log('PhysicsAvatar initialized!');
+            } else {
+                // Fallback to loading script dynamically
+                this.loadPhysicsAvatarScript().then(() => {
+                    this.physicsAvatar = new PhysicsAvatar(this.avatar3DEl, {
+                        size: 80
+                    });
+                    this.avatarFallbackEl.style.display = 'none';
+                    console.log('PhysicsAvatar initialized (dynamic load)!');
+                }).catch(err => {
+                    console.error('Failed to load PhysicsAvatar:', err);
+                    this.avatarFallbackEl.style.display = 'flex';
+                });
+            }
         } catch (err) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:initStickKnight:error',message:'Stick Knight failed',data:{error:err.message,stack:err.stack},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
-            
-            console.error('Stick Knight setup failed:', err);
+            console.error('PhysicsAvatar setup failed:', err);
             this.avatarFallbackEl.style.display = 'flex';
         }
+    }
+
+    /**
+     * Load PhysicsAvatar script dynamically
+     */
+    loadPhysicsAvatarScript() {
+        return new Promise((resolve, reject) => {
+            if (typeof PhysicsAvatar !== 'undefined') {
+                resolve();
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = '/js/physics-avatar.js?v=6.0';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
     }
 
     /**
@@ -1053,8 +1064,8 @@ class AIAgent {
         if (this.mediaRecorder && this.isRecording) {
             this.mediaRecorder.stop();
         }
-        if (this.sceneTimer) {
-            clearTimeout(this.sceneTimer);
+        if (this.physicsAvatar) {
+            this.physicsAvatar.destroy();
         }
         if (this.container) {
             this.container.remove();
@@ -1064,9 +1075,7 @@ class AIAgent {
 
 // Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:DOMContentLoaded',message:'AI Agent JS loaded - STICK KNIGHT VERSION',data:{version:'2.0-stick-knight',timestamp:new Date().toISOString()},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
-    // #endregion
+    console.log('AI Agent JS loaded - PHYSICS AVATAR VERSION 6.0');
     
     // Initialize AI Agent (translations loaded from i18n system)
     window.aiAgent = new AIAgent({

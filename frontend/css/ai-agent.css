@@ -46,7 +46,7 @@
     }
 }
 
-/* Stick Knight Avatar Container */
+/* Physics Avatar Container */
 .ai-agent-avatar-3d {
     width: 100%;
     height: 100%;
@@ -57,7 +57,14 @@
     justify-content: center;
 }
 
-/* The stick knight SVG scene */
+/* Physics avatar canvas */
+.physics-avatar-canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+/* Legacy: The stick knight SVG scene (kept for fallback) */
 .stick-knight-scene {
     width: 100%;
     height: 100%;
