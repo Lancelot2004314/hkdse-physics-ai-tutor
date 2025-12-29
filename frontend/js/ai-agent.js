@@ -491,123 +491,104 @@ class AIAgent {
                     <stop offset="0%" style="stop-color:#1e3a5f;stop-opacity:0.2" />
                     <stop offset="100%" style="stop-color:#1e3a5f;stop-opacity:0.8" />
                 </radialGradient>
-                <filter id="glow">
-                    <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                <filter id="goldGlow">
+                    <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
                     <feMerge>
                         <feMergeNode in="coloredBlur"/>
                         <feMergeNode in="SourceGraphic"/>
                     </feMerge>
                 </filter>
+                <linearGradient id="swordGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#FFFFFF"/>
+                    <stop offset="100%" style="stop-color:#C0C0C0"/>
+                </linearGradient>
             </defs>
             
             <!-- Arena ground line -->
-            <ellipse class="arena-ground" cx="40" cy="68" rx="32" ry="6"/>
+            <ellipse class="arena-ground" cx="40" cy="72" rx="30" ry="4" stroke="#FFD700" stroke-opacity="0.3"/>
             
             <!-- Effects Layer (behind characters) -->
             <g class="effects-back">
-                <!-- Sword slash trails -->
-                <path class="combat-slash-effect" d="M 35 30 Q 50 25 55 40"/>
+                <path class="combat-slash-effect" d="M 45 30 Q 60 25 65 40"/>
             </g>
             
             <!-- Enemies Group -->
             <g class="enemies">
-                <!-- Enemy 1 -->
-                <g class="enemy" transform="translate(55, 28)">
-                    <circle class="head" cx="0" cy="0" r="5"/>
-                    <line class="body" x1="0" y1="5" x2="0" y2="20"/>
-                    <line class="arm" x1="0" y1="8" x2="-8" y2="14"/>
-                    <line class="arm" x1="0" y1="8" x2="8" y2="12"/>
-                    <line class="leg" x1="0" y1="20" x2="-5" y2="32"/>
-                    <line class="leg" x1="0" y1="20" x2="5" y2="32"/>
-                    <line class="weapon" x1="-8" y1="14" x2="-15" y2="8"/>
-                </g>
-                <!-- Enemy 2 -->
-                <g class="enemy" transform="translate(65, 32)">
-                    <circle class="head" cx="0" cy="0" r="4"/>
-                    <line class="body" x1="0" y1="4" x2="0" y2="16"/>
-                    <line class="arm" x1="0" y1="7" x2="-6" y2="12"/>
-                    <line class="arm" x1="0" y1="7" x2="6" y2="10"/>
-                    <line class="leg" x1="0" y1="16" x2="-4" y2="26"/>
-                    <line class="leg" x1="0" y1="16" x2="4" y2="26"/>
-                    <line class="weapon" x1="-6" y1="12" x2="-12" y2="6"/>
+                <g class="enemy" transform="translate(62, 30)">
+                    <circle class="head" cx="0" cy="0" r="4" fill="#FFFFFF" stroke="#CCCCCC" stroke-width="1"/>
+                    <line class="body" x1="0" y1="4" x2="0" y2="16" stroke="#FFFFFF" stroke-width="2.5"/>
+                    <line class="arm" x1="0" y1="7" x2="-7" y2="12" stroke="#FFFFFF" stroke-width="2"/>
+                    <line class="arm" x1="0" y1="7" x2="5" y2="11" stroke="#FFFFFF" stroke-width="2"/>
+                    <line class="leg" x1="0" y1="16" x2="-4" y2="26" stroke="#FFFFFF" stroke-width="2"/>
+                    <line class="leg" x1="0" y1="16" x2="4" y2="26" stroke="#FFFFFF" stroke-width="2"/>
+                    <line class="weapon" x1="-7" y1="12" x2="-12" y2="6" stroke="#CCCCCC" stroke-width="1.5"/>
                 </g>
             </g>
             
-            <!-- Lancelot - The Gold Knight -->
-            <g class="lancelot" transform="translate(25, 28)">
-                <!-- Cape (behind body) -->
-                <path class="cape" d="M -2 8 Q -8 20 -6 35 Q 0 38 6 35 Q 8 20 2 8"/>
+            <!-- Lancelot - The Gold Knight (CENTERED & BIGGER) -->
+            <g class="lancelot" transform="translate(32, 22)" filter="url(#goldGlow)">
+                <!-- Cape (behind body) - RED -->
+                <path class="cape" d="M -3 10 Q -10 25 -7 42 Q 0 46 7 42 Q 10 25 3 10" fill="#DC143C" stroke="#8B0000" stroke-width="1"/>
                 
-                <!-- Armor chest piece -->
-                <path class="armor-chest" d="M -6 8 L 6 8 L 8 18 L -8 18 Z"/>
+                <!-- Armor chest piece - GOLD -->
+                <path class="armor-chest" d="M -7 10 L 7 10 L 9 22 L -9 22 Z" fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
                 
-                <!-- Body group for animations -->
+                <!-- Body group -->
                 <g class="body-group">
-                    <!-- Body -->
-                    <line class="body" x1="0" y1="5" x2="0" y2="22"/>
-                    
-                    <!-- Legs -->
+                    <line class="body" x1="0" y1="8" x2="0" y2="28" stroke="#FFD700" stroke-width="4"/>
                     <g class="legs">
-                        <line class="leg" x1="0" y1="22" x2="-6" y2="38"/>
-                        <line class="leg" x1="0" y1="22" x2="6" y2="38"/>
+                        <line class="leg" x1="0" y1="28" x2="-8" y2="46" stroke="#FFD700" stroke-width="3.5"/>
+                        <line class="leg" x1="0" y1="28" x2="8" y2="46" stroke="#FFD700" stroke-width="3.5"/>
                     </g>
                 </g>
                 
-                <!-- Shield arm -->
+                <!-- Shield arm - GOLD -->
                 <g class="shield-arm">
-                    <line class="arm" x1="0" y1="10" x2="-10" y2="18"/>
-                    <ellipse class="shield" cx="-12" cy="18" rx="5" ry="7"/>
+                    <line class="arm" x1="0" y1="12" x2="-12" y2="22" stroke="#FFD700" stroke-width="3"/>
+                    <ellipse class="shield" cx="-14" cy="22" rx="6" ry="8" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
+                    <line x1="-14" y1="16" x2="-14" y2="28" stroke="#B8860B" stroke-width="1"/>
                 </g>
                 
-                <!-- Sword arm -->
+                <!-- Sword arm - GOLD -->
                 <g class="sword-arm">
-                    <line class="arm" x1="0" y1="10" x2="10" y2="6"/>
-                    <!-- Sword -->
-                    <g class="sword" transform="translate(10, 6)">
-                        <rect class="sword-hilt" x="-2" y="-1" width="4" height="3" rx="0.5"/>
-                        <rect class="sword-blade" x="2" y="-0.5" width="14" height="1.5" rx="0.5" fill="#E8E8E8" stroke="#808080" stroke-width="0.3"/>
-                        <circle class="sword-hilt" cx="0" cy="0.5" r="1.5"/>
+                    <line class="arm" x1="0" y1="12" x2="12" y2="6" stroke="#FFD700" stroke-width="3"/>
+                    <!-- Sword - SILVER with GOLD hilt -->
+                    <g class="sword" transform="translate(12, 6)">
+                        <rect class="sword-hilt" x="-3" y="-2" width="6" height="4" rx="1" fill="#FFD700" stroke="#B8860B"/>
+                        <rect class="sword-blade" x="3" y="-1" width="18" height="2" rx="0.5" fill="url(#swordGradient)" stroke="#808080" stroke-width="0.5"/>
+                        <circle class="sword-guard" cx="0" cy="0" r="2.5" fill="#FFD700" stroke="#B8860B"/>
                     </g>
                 </g>
                 
-                <!-- Head with Helmet -->
+                <!-- Head with Helmet - GOLD -->
                 <g class="head-group">
-                    <!-- Helmet base -->
-                    <ellipse class="helmet" cx="0" cy="0" rx="7" ry="6"/>
-                    <!-- Helmet top -->
-                    <path class="helmet" d="M -5 -4 Q 0 -10 5 -4"/>
-                    <!-- Plume -->
-                    <path class="helmet-plume" d="M 0 -8 Q 8 -12 6 -4 Q 4 -8 0 -6"/>
-                    <!-- Visor slit -->
-                    <rect class="visor" x="-5" y="-1" width="10" height="3" rx="1"/>
-                    <!-- Glowing eyes -->
-                    <circle class="eye" cx="-2.5" cy="0.5" r="1.2"/>
-                    <circle class="eye" cx="2.5" cy="0.5" r="1.2"/>
+                    <ellipse class="helmet" cx="0" cy="0" rx="9" ry="8" fill="#FFD700" stroke="#B8860B" stroke-width="1.5"/>
+                    <path class="helmet-top" d="M -6 -5 Q 0 -12 6 -5" fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
+                    <path class="helmet-plume" d="M 0 -10 Q 10 -16 8 -5 Q 5 -10 0 -8" fill="#DC143C" stroke="#8B0000" stroke-width="0.8"/>
+                    <rect class="visor" x="-6" y="-1" width="12" height="4" rx="1.5" fill="#1a1a2e" stroke="#B8860B" stroke-width="0.5"/>
+                    <circle class="eye" cx="-3" cy="1" r="1.5" fill="#60a5fa"/>
+                    <circle class="eye" cx="3" cy="1" r="1.5" fill="#60a5fa"/>
                 </g>
             </g>
             
             <!-- Effects Layer (in front) -->
             <g class="effects-front">
-                <!-- Hit sparks -->
                 <g class="hit-sparks">
-                    <polygon class="hit-spark" points="50,25 52,28 55,25 52,22" transform="translate(0,0)"/>
-                    <polygon class="hit-spark" points="50,25 52,28 55,25 52,22" transform="translate(5,10)"/>
-                    <polygon class="hit-spark" points="50,25 52,28 55,25 52,22" transform="translate(-3,5)"/>
+                    <polygon class="hit-spark" points="55,28 58,32 62,28 58,24" fill="#FFF"/>
+                    <polygon class="hit-spark" points="60,38 63,42 67,38 63,34" fill="#FFF"/>
                 </g>
-                
-                <!-- Victory sparkles -->
                 <g class="victory-sparkles">
-                    <polygon class="victory-sparkle" points="20,15 22,20 27,20 23,24 25,29 20,26 15,29 17,24 13,20 18,20"/>
-                    <polygon class="victory-sparkle" points="50,10 51,13 54,13 52,15 53,18 50,16 47,18 48,15 46,13 49,13" transform="scale(0.7)"/>
-                    <polygon class="victory-sparkle" points="60,20 61,22 63,22 62,24 62,26 60,25 58,26 58,24 57,22 59,22"/>
+                    <polygon class="victory-sparkle" points="20,12 22,17 27,17 23,21 25,26 20,23 15,26 17,21 13,17 18,17" fill="#FFD700"/>
+                    <polygon class="victory-sparkle" points="55,8 56,11 59,11 57,13 58,16 55,14 52,16 53,13 51,11 54,11" fill="#FFD700"/>
+                    <polygon class="victory-sparkle" points="65,18 66,20 68,20 67,22 67,24 65,23 63,24 63,22 62,20 64,20" fill="#FFD700"/>
                 </g>
             </g>
             
             <!-- Sleep ZZZ bubbles -->
             <g class="zzz-group" style="display:none;">
-                <text class="zzz-bubble" x="35" y="20">Z</text>
-                <text class="zzz-bubble" x="42" y="15">z</text>
-                <text class="zzz-bubble" x="48" y="12">z</text>
+                <text class="zzz-bubble" x="45" y="15" fill="#60a5fa" font-size="10" font-weight="bold">Z</text>
+                <text class="zzz-bubble" x="52" y="10" fill="#60a5fa" font-size="8" font-weight="bold">z</text>
+                <text class="zzz-bubble" x="58" y="6" fill="#60a5fa" font-size="6" font-weight="bold">z</text>
             </g>
         `;
         
