@@ -162,11 +162,29 @@ async function callCloudflareAI(ai, message, history, systemPrompt, language) {
             { role: 'user', content: message }
         ];
 
-        // Use Qwen model for better Chinese support
-        const result = await ai.run('@cf/qwen/qwen1.5-14b-chat-awq', {
-            messages,
-            max_tokens: 200
-        });
+        // Try multiple models for better compatibility
+        let result;
+        const models = [
+            '@cf/meta/llama-3.1-8b-instruct',  // Latest Llama, good multilingual
+            '@cf/meta/llama-2-7b-chat-int8',   // Fallback
+        ];
+        
+        for (const model of models) {
+            try {
+                result = await ai.run(model, { messages, max_tokens: 256 });
+                if (result && result.response) {
+                    console.log('Used model:', model);
+                    break;
+                }
+            } catch (modelErr) {
+                console.warn(`Model ${model} failed:`, modelErr.message);
+                continue;
+            }
+        }
+        
+        if (!result) {
+            throw new Error('All models failed');
+        }
 
         const reply = result.response || '';
 
