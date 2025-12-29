@@ -18,8 +18,12 @@ class AIAgent {
         this.mediaRecorder = null;
         this.audioChunks = [];
         this.currentAudio = null;
-        this.threeRenderer = null;
-        this.avatar = null;
+        
+        // Stick Knight Scene System
+        this.currentScene = 'idle';
+        this.sceneTimer = null;
+        this.scenes = ['idle', 'sleep', 'practice', 'combat', 'rest'];
+        this.sceneWeights = { idle: 1, sleep: 1, practice: 1.5, combat: 2.5, rest: 1 };
         
         // Web Speech API recognition instance
         this.recognition = null;
@@ -97,7 +101,7 @@ class AIAgent {
 
         this.createDOM();
         this.bindEvents();
-        this.initThreeJS();
+        this.initStickKnight();
         this.initWebSpeechAPI();
         this.listenForLanguageChange();
 
@@ -433,156 +437,271 @@ class AIAgent {
         });
     }
 
-    initThreeJS() {
-        // Load Three.js dynamically if not already loaded
-        if (typeof THREE === 'undefined') {
-            this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js')
-                .then(() => this.loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js'))
-                .then(() => this.setup3DAvatar())
-                .catch(err => {
-                    console.warn('Failed to load Three.js, using fallback avatar:', err);
-                    this.avatarFallbackEl.style.display = 'flex';
-                });
-        } else {
-            this.setup3DAvatar();
-        }
-    }
-
-    loadScript(src) {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    }
-
-    setup3DAvatar() {
+    /**
+     * Initialize the Stick Knight SVG Avatar System
+     */
+    initStickKnight() {
         try {
-            const width = 80;
-            const height = 80;
-
-            // Create scene
-            this.scene = new THREE.Scene();
-            this.scene.background = null; // Transparent
-
-            // Create camera
-            this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-            this.camera.position.z = 3;
-            this.camera.position.y = 0.5;
-
-            // Create renderer
-            this.threeRenderer = new THREE.WebGLRenderer({
-                alpha: true,
-                antialias: true
-            });
-            this.threeRenderer.setSize(width, height);
-            this.threeRenderer.setPixelRatio(window.devicePixelRatio);
-            this.avatar3DEl.appendChild(this.threeRenderer.domElement);
-
-            // Add lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            this.scene.add(ambientLight);
-
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(2, 2, 2);
-            this.scene.add(directionalLight);
-
-            // Create a simple knight character (placeholder)
-            this.createKnightPlaceholder();
-
+            // Create SVG scene
+            this.createStickKnightSVG();
+            
             // Hide fallback
             this.avatarFallbackEl.style.display = 'none';
-
-            // Start animation loop
-            this.animate();
-
+            
+            // Start scene cycling
+            this.startSceneCycle();
+            
+            console.log('Stick Knight initialized!');
         } catch (err) {
-            console.error('3D Avatar setup failed:', err);
+            console.error('Stick Knight setup failed:', err);
             this.avatarFallbackEl.style.display = 'flex';
         }
     }
 
-    createKnightPlaceholder() {
-        // Create a stylized knight head
-        const group = new THREE.Group();
-
-        // Helmet
-        const helmetGeometry = new THREE.SphereGeometry(0.6, 32, 32);
-        const helmetMaterial = new THREE.MeshStandardMaterial({
-            color: 0x4a5568,
-            metalness: 0.8,
-            roughness: 0.2
-        });
-        const helmet = new THREE.Mesh(helmetGeometry, helmetMaterial);
-        helmet.scale.set(1, 1.1, 0.9);
-        group.add(helmet);
-
-        // Visor
-        const visorGeometry = new THREE.BoxGeometry(0.8, 0.15, 0.5);
-        const visorMaterial = new THREE.MeshStandardMaterial({
-            color: 0x1a202c,
-            metalness: 0.9,
-            roughness: 0.1
-        });
-        const visor = new THREE.Mesh(visorGeometry, visorMaterial);
-        visor.position.set(0, 0.1, 0.3);
-        group.add(visor);
-
-        // Plume (decorative)
-        const plumeGeometry = new THREE.ConeGeometry(0.15, 0.8, 8);
-        const plumeMaterial = new THREE.MeshStandardMaterial({
-            color: 0x9f1239,
-            metalness: 0.2,
-            roughness: 0.8
-        });
-        const plume = new THREE.Mesh(plumeGeometry, plumeMaterial);
-        plume.position.set(0, 0.8, 0);
-        plume.rotation.z = 0.2;
-        group.add(plume);
-
-        // Eyes (glowing effect)
-        const eyeGeometry = new THREE.SphereGeometry(0.08, 16, 16);
-        const eyeMaterial = new THREE.MeshBasicMaterial({
-            color: 0x60a5fa,
-            emissive: 0x60a5fa
-        });
-
-        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        leftEye.position.set(-0.18, 0.15, 0.45);
-        group.add(leftEye);
-
-        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-        rightEye.position.set(0.18, 0.15, 0.45);
-        group.add(rightEye);
-
-        this.avatar = group;
-        this.scene.add(group);
+    /**
+     * Create the SVG Stick Knight scene
+     */
+    createStickKnightSVG() {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'stick-knight-scene scene-idle');
+        svg.setAttribute('viewBox', '0 0 80 80');
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+        
+        svg.innerHTML = `
+            <!-- Background Arena -->
+            <defs>
+                <radialGradient id="arenaGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" style="stop-color:#1e3a5f;stop-opacity:0.2" />
+                    <stop offset="100%" style="stop-color:#1e3a5f;stop-opacity:0.8" />
+                </radialGradient>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+            
+            <!-- Arena ground line -->
+            <ellipse class="arena-ground" cx="40" cy="68" rx="32" ry="6"/>
+            
+            <!-- Effects Layer (behind characters) -->
+            <g class="effects-back">
+                <!-- Sword slash trails -->
+                <path class="combat-slash-effect" d="M 35 30 Q 50 25 55 40"/>
+            </g>
+            
+            <!-- Enemies Group -->
+            <g class="enemies">
+                <!-- Enemy 1 -->
+                <g class="enemy" transform="translate(55, 28)">
+                    <circle class="head" cx="0" cy="0" r="5"/>
+                    <line class="body" x1="0" y1="5" x2="0" y2="20"/>
+                    <line class="arm" x1="0" y1="8" x2="-8" y2="14"/>
+                    <line class="arm" x1="0" y1="8" x2="8" y2="12"/>
+                    <line class="leg" x1="0" y1="20" x2="-5" y2="32"/>
+                    <line class="leg" x1="0" y1="20" x2="5" y2="32"/>
+                    <line class="weapon" x1="-8" y1="14" x2="-15" y2="8"/>
+                </g>
+                <!-- Enemy 2 -->
+                <g class="enemy" transform="translate(65, 32)">
+                    <circle class="head" cx="0" cy="0" r="4"/>
+                    <line class="body" x1="0" y1="4" x2="0" y2="16"/>
+                    <line class="arm" x1="0" y1="7" x2="-6" y2="12"/>
+                    <line class="arm" x1="0" y1="7" x2="6" y2="10"/>
+                    <line class="leg" x1="0" y1="16" x2="-4" y2="26"/>
+                    <line class="leg" x1="0" y1="16" x2="4" y2="26"/>
+                    <line class="weapon" x1="-6" y1="12" x2="-12" y2="6"/>
+                </g>
+            </g>
+            
+            <!-- Lancelot - The Gold Knight -->
+            <g class="lancelot" transform="translate(25, 28)">
+                <!-- Cape (behind body) -->
+                <path class="cape" d="M -2 8 Q -8 20 -6 35 Q 0 38 6 35 Q 8 20 2 8"/>
+                
+                <!-- Armor chest piece -->
+                <path class="armor-chest" d="M -6 8 L 6 8 L 8 18 L -8 18 Z"/>
+                
+                <!-- Body group for animations -->
+                <g class="body-group">
+                    <!-- Body -->
+                    <line class="body" x1="0" y1="5" x2="0" y2="22"/>
+                    
+                    <!-- Legs -->
+                    <g class="legs">
+                        <line class="leg" x1="0" y1="22" x2="-6" y2="38"/>
+                        <line class="leg" x1="0" y1="22" x2="6" y2="38"/>
+                    </g>
+                </g>
+                
+                <!-- Shield arm -->
+                <g class="shield-arm">
+                    <line class="arm" x1="0" y1="10" x2="-10" y2="18"/>
+                    <ellipse class="shield" cx="-12" cy="18" rx="5" ry="7"/>
+                </g>
+                
+                <!-- Sword arm -->
+                <g class="sword-arm">
+                    <line class="arm" x1="0" y1="10" x2="10" y2="6"/>
+                    <!-- Sword -->
+                    <g class="sword" transform="translate(10, 6)">
+                        <rect class="sword-hilt" x="-2" y="-1" width="4" height="3" rx="0.5"/>
+                        <rect class="sword-blade" x="2" y="-0.5" width="14" height="1.5" rx="0.5" fill="#E8E8E8" stroke="#808080" stroke-width="0.3"/>
+                        <circle class="sword-hilt" cx="0" cy="0.5" r="1.5"/>
+                    </g>
+                </g>
+                
+                <!-- Head with Helmet -->
+                <g class="head-group">
+                    <!-- Helmet base -->
+                    <ellipse class="helmet" cx="0" cy="0" rx="7" ry="6"/>
+                    <!-- Helmet top -->
+                    <path class="helmet" d="M -5 -4 Q 0 -10 5 -4"/>
+                    <!-- Plume -->
+                    <path class="helmet-plume" d="M 0 -8 Q 8 -12 6 -4 Q 4 -8 0 -6"/>
+                    <!-- Visor slit -->
+                    <rect class="visor" x="-5" y="-1" width="10" height="3" rx="1"/>
+                    <!-- Glowing eyes -->
+                    <circle class="eye" cx="-2.5" cy="0.5" r="1.2"/>
+                    <circle class="eye" cx="2.5" cy="0.5" r="1.2"/>
+                </g>
+            </g>
+            
+            <!-- Effects Layer (in front) -->
+            <g class="effects-front">
+                <!-- Hit sparks -->
+                <g class="hit-sparks">
+                    <polygon class="hit-spark" points="50,25 52,28 55,25 52,22" transform="translate(0,0)"/>
+                    <polygon class="hit-spark" points="50,25 52,28 55,25 52,22" transform="translate(5,10)"/>
+                    <polygon class="hit-spark" points="50,25 52,28 55,25 52,22" transform="translate(-3,5)"/>
+                </g>
+                
+                <!-- Victory sparkles -->
+                <g class="victory-sparkles">
+                    <polygon class="victory-sparkle" points="20,15 22,20 27,20 23,24 25,29 20,26 15,29 17,24 13,20 18,20"/>
+                    <polygon class="victory-sparkle" points="50,10 51,13 54,13 52,15 53,18 50,16 47,18 48,15 46,13 49,13" transform="scale(0.7)"/>
+                    <polygon class="victory-sparkle" points="60,20 61,22 63,22 62,24 62,26 60,25 58,26 58,24 57,22 59,22"/>
+                </g>
+            </g>
+            
+            <!-- Sleep ZZZ bubbles -->
+            <g class="zzz-group" style="display:none;">
+                <text class="zzz-bubble" x="35" y="20">Z</text>
+                <text class="zzz-bubble" x="42" y="15">z</text>
+                <text class="zzz-bubble" x="48" y="12">z</text>
+            </g>
+        `;
+        
+        this.avatar3DEl.appendChild(svg);
+        this.knightSVG = svg;
+        this.knightEl = svg.querySelector('.lancelot');
+        this.enemiesEl = svg.querySelector('.enemies');
+        this.zzzGroup = svg.querySelector('.zzz-group');
     }
 
-    animate() {
-        requestAnimationFrame(() => this.animate());
+    /**
+     * Start the scene cycling loop
+     */
+    startSceneCycle() {
+        // Start with idle for a few seconds
+        this.setScene('idle');
+        
+        // Then start cycling
+        this.scheduleNextScene();
+    }
 
-        if (this.avatar) {
-            // Idle animation - gentle floating
-            const time = Date.now() * 0.001;
-            this.avatar.rotation.y = Math.sin(time * 0.5) * 0.1;
-            this.avatar.position.y = Math.sin(time * 2) * 0.02;
+    /**
+     * Schedule the next scene change
+     */
+    scheduleNextScene() {
+        // Get duration based on current scene
+        const durations = {
+            idle: 3000,      // 3 seconds
+            sleep: 6000,     // 6 seconds  
+            practice: 5000,  // 5 seconds
+            combat: 8000,    // 8 seconds (full combat animation)
+            rest: 4000       // 4 seconds
+        };
+        
+        const duration = durations[this.currentScene] || 3000;
+        
+        this.sceneTimer = setTimeout(() => {
+            // Pick next scene (weighted random)
+            const nextScene = this.pickNextScene();
+            this.setScene(nextScene);
+            this.scheduleNextScene();
+        }, duration);
+    }
 
-            // Speaking animation - more movement
-            if (this.isSpeaking) {
-                this.avatar.rotation.x = Math.sin(time * 8) * 0.05;
-                this.avatar.scale.setScalar(1 + Math.sin(time * 10) * 0.02);
-            } else {
-                this.avatar.rotation.x = 0;
-                this.avatar.scale.setScalar(1);
+    /**
+     * Pick next scene with weighted randomness
+     */
+    pickNextScene() {
+        // Don't repeat the same scene (except idle can follow anything)
+        const availableScenes = this.scenes.filter(s => s !== this.currentScene || s === 'idle');
+        
+        // Calculate total weight
+        let totalWeight = 0;
+        for (const scene of availableScenes) {
+            totalWeight += this.sceneWeights[scene] || 1;
+        }
+        
+        // Pick random weighted scene
+        let random = Math.random() * totalWeight;
+        for (const scene of availableScenes) {
+            random -= this.sceneWeights[scene] || 1;
+            if (random <= 0) {
+                return scene;
             }
         }
+        
+        return 'idle';
+    }
 
-        if (this.threeRenderer && this.scene && this.camera) {
-            this.threeRenderer.render(this.scene, this.camera);
+    /**
+     * Set the current scene
+     */
+    setScene(sceneName) {
+        if (!this.knightSVG) return;
+        
+        // Remove all scene classes
+        this.knightSVG.classList.remove('scene-idle', 'scene-sleep', 'scene-practice', 'scene-combat', 'scene-rest');
+        
+        // Add transition class briefly
+        this.knightSVG.classList.add('scene-transition');
+        
+        setTimeout(() => {
+            this.knightSVG.classList.remove('scene-transition');
+            this.knightSVG.classList.add(`scene-${sceneName}`);
+            
+            // Handle ZZZ for sleep
+            if (this.zzzGroup) {
+                this.zzzGroup.style.display = sceneName === 'sleep' ? 'block' : 'none';
+            }
+            
+            this.currentScene = sceneName;
+            console.log('Scene changed to:', sceneName);
+        }, 200);
+    }
+
+    /**
+     * Force a specific scene (e.g., when speaking)
+     */
+    forceScene(sceneName) {
+        if (this.sceneTimer) {
+            clearTimeout(this.sceneTimer);
         }
+        this.setScene(sceneName);
+    }
+
+    /**
+     * Resume normal scene cycling
+     */
+    resumeSceneCycle() {
+        this.scheduleNextScene();
     }
 
     toggle() {
@@ -886,8 +1005,8 @@ class AIAgent {
         if (this.mediaRecorder && this.isRecording) {
             this.mediaRecorder.stop();
         }
-        if (this.threeRenderer) {
-            this.threeRenderer.dispose();
+        if (this.sceneTimer) {
+            clearTimeout(this.sceneTimer);
         }
         if (this.container) {
             this.container.remove();
