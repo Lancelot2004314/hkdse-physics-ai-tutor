@@ -215,12 +215,12 @@ export async function onRequestPost(context) {
  */
 async function saveTextQuestion(db, questionText, aiAnswer) {
   const id = crypto.randomUUID();
-  
+
   await db.prepare(`
     INSERT INTO text_questions (id, question_text, ai_answer, created_at)
     VALUES (?, ?, ?, datetime('now'))
   `).bind(id, questionText, aiAnswer).run();
-  
+
   console.log(`Saved text question to DB: ${id}`);
   return id;
 }
