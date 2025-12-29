@@ -511,17 +511,29 @@ class AIAgent {
                 <!-- Ground indicator -->
                 <ellipse cx="50" cy="85" rx="35" ry="5" fill="none" stroke="rgba(255,215,0,0.2)" stroke-width="1" stroke-dasharray="3,3"/>
                 
-                <!-- Enemies (hidden by default, shown in combat) -->
+                <!-- Enemies - Multiple for Marvel-style combat -->
                 <g class="enemies">
+                    <!-- Enemy 1 - Main opponent -->
                     <g class="enemy enemy-1" style="opacity:0;">
-                        <g transform="translate(72, 45)">
-                            <circle r="3" fill="#FFF" stroke="#DDD"/>
-                            <line y1="3" y2="12" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
-                            <line y1="5" x2="-5" y2="9" stroke="#FFF" stroke-width="1.5" stroke-linecap="round"/>
-                            <line y1="5" x2="4" y2="8" stroke="#FFF" stroke-width="1.5" stroke-linecap="round"/>
-                            <line y1="12" x2="-3" y2="20" stroke="#FFF" stroke-width="1.5" stroke-linecap="round"/>
-                            <line y1="12" x2="3" y2="20" stroke="#FFF" stroke-width="1.5" stroke-linecap="round"/>
-                            <line x1="-5" y1="9" x2="-9" y2="5" stroke="#CCC" stroke-width="1.2"/>
+                        <g transform="translate(72, 48)">
+                            <circle r="3.5" fill="#FFF" stroke="#AAA" stroke-width="0.5"/>
+                            <line y1="3.5" y2="14" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/>
+                            <line y1="6" x2="-6" y2="11" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
+                            <line y1="6" x2="5" y2="10" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
+                            <line y1="14" x2="-4" y2="23" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
+                            <line y1="14" x2="4" y2="23" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="-6" y1="11" x2="-11" y2="6" stroke="#CCC" stroke-width="1.5"/>
+                        </g>
+                    </g>
+                    <!-- Enemy 2 - Background enemy -->
+                    <g class="enemy enemy-2" style="opacity:0;">
+                        <g transform="translate(80, 42) scale(0.8)">
+                            <circle r="3" fill="#EEE" stroke="#BBB" stroke-width="0.5"/>
+                            <line y1="3" y2="12" stroke="#EEE" stroke-width="2" stroke-linecap="round"/>
+                            <line y1="5" x2="-5" y2="9" stroke="#EEE" stroke-width="1.5" stroke-linecap="round"/>
+                            <line y1="5" x2="4" y2="8" stroke="#EEE" stroke-width="1.5" stroke-linecap="round"/>
+                            <line y1="12" x2="-3" y2="20" stroke="#EEE" stroke-width="1.5" stroke-linecap="round"/>
+                            <line y1="12" x2="3" y2="20" stroke="#EEE" stroke-width="1.5" stroke-linecap="round"/>
                         </g>
                     </g>
                 </g>
@@ -573,15 +585,27 @@ class AIAgent {
                     </g>
                 </g>
                 
-                <!-- Effects -->
+                <!-- Marvel-style Effects -->
                 <g class="effects">
+                    <!-- Multiple slash trails -->
                     <g class="slash-effects" style="opacity:0;">
-                        <path d="M 55 45 Q 70 40 75 50" stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <path d="M 52 48 Q 65 42 72 52" stroke="#FFD700" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9"/>
+                        <path d="M 50 50 Q 68 45 75 48" stroke="#FFA500" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+                        <path d="M 54 52 Q 70 48 78 55" stroke="#FFFF00" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/>
                     </g>
+                    <!-- Impact sparkles -->
                     <g class="sparkles" style="opacity:0;">
-                        <circle cx="30" cy="35" r="2" fill="#FFD700"/>
-                        <circle cx="70" cy="30" r="1.5" fill="#FFD700"/>
-                        <circle cx="55" cy="25" r="1" fill="#FFD700"/>
+                        <circle cx="70" cy="48" r="4" fill="#FFF"/>
+                        <circle cx="68" cy="45" r="2.5" fill="#FFD700"/>
+                        <circle cx="72" cy="50" r="2" fill="#FFA500"/>
+                        <circle cx="66" cy="52" r="1.5" fill="#FFD700"/>
+                        <circle cx="74" cy="46" r="1" fill="#FFF"/>
+                    </g>
+                    <!-- Speed lines for motion -->
+                    <g class="speed-lines" style="opacity:0;">
+                        <line x1="30" y1="50" x2="45" y2="50" stroke="#FFD700" stroke-width="1" opacity="0.6"/>
+                        <line x1="28" y1="54" x2="42" y2="54" stroke="#FFD700" stroke-width="0.8" opacity="0.4"/>
+                        <line x1="32" y1="46" x2="44" y2="46" stroke="#FFD700" stroke-width="0.8" opacity="0.4"/>
                     </g>
                 </g>
                 
