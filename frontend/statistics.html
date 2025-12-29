@@ -24,20 +24,19 @@
                 </div>
             </div>
             <ul class="nav-menu">
-                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
-                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
-                <li class="nav-item active"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a>
-                </li>
-                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> History</a></li>
-                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
-                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
-                <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
-                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i
-                            class="fas fa-cog"></i> Admin Panel</a></li>
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a></li>
+                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> <span data-i18n="nav.freePractice">Free Practice</span></a></li>
+                <li class="nav-item active"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.statistics">Statistics</span></a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> <span data-i18n="nav.history">History</span></a></li>
+                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span data-i18n="nav.bookmarks">Bookmarks</span></a></li>
+                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span data-i18n="nav.leaderboard">Leaderboard</span></a></li>
+                <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> <span data-i18n="nav.profile">Profile</span></a></li>
+                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a></li>
             </ul>
             <div class="sidebar-footer">
-                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                <div class="language-switcher-container" id="langSwitcherContainer"></div>
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.signOut">Sign Out</span></button>
             </div>
         </nav>
 
@@ -140,6 +139,10 @@
         let scoreChart = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            await window.i18n.initI18n();
+            window.i18n.createLanguageSwitcher('langSwitcherContainer');
+            
             await checkAuth();
             await loadStats();
             initEventListeners();

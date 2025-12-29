@@ -220,6 +220,11 @@
         const API_BASE = '/api';
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            if (window.i18n) {
+                await window.i18n.initI18n();
+            }
+            
             const sessionId = new URLSearchParams(window.location.search).get('session');
             if (!sessionId) {
                 alert('Missing session id');

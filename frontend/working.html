@@ -154,6 +154,11 @@
         let timerInterval = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            if (window.i18n) {
+                await window.i18n.initI18n();
+            }
+            
             // Get session data
             const sessionData = sessionStorage.getItem('quizSession');
             if (sessionData) {

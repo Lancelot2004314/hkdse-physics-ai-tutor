@@ -137,36 +137,37 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="/"><i class="fas fa-home"></i> Dashboard</a>
+                    <a href="/"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
                 </li>
                 <li class="nav-item active">
-                    <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+                    <a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a>
+                    <a href="/free-practice.html"><i class="fas fa-pen"></i> <span data-i18n="nav.freePractice">Free Practice</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a>
+                    <a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.statistics">Statistics</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/practice-history.html"><i class="fas fa-history"></i> History</a>
+                    <a href="/practice-history.html"><i class="fas fa-history"></i> <span data-i18n="nav.history">History</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a>
+                    <a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span data-i18n="nav.bookmarks">Bookmarks</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a>
+                    <a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span data-i18n="nav.leaderboard">Leaderboard</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/profile.html"><i class="fas fa-user"></i> Profile</a>
+                    <a href="/profile.html"><i class="fas fa-user"></i> <span data-i18n="nav.profile">Profile</span></a>
                 </li>
                 <li class="nav-item admin-only" id="adminNavItem" hidden>
-                    <a href="/admin.html"><i class="fas fa-cog"></i> Admin Panel</a>
+                    <a href="/admin.html"><i class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a>
                 </li>
             </ul>
             <div class="sidebar-footer">
+                <div class="language-switcher-container" id="langSwitcherContainer"></div>
                 <button class="btn-logout" id="sidebarLogoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.signOut">Sign Out</span>
                 </button>
             </div>
         </nav>
@@ -407,7 +408,13 @@
         }
 
         // Run on DOM ready
-        document.addEventListener('DOMContentLoaded', initScrollAnimations);
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            await window.i18n.initI18n();
+            window.i18n.createLanguageSwitcher('langSwitcherContainer');
+            
+            initScrollAnimations();
+        });
 
         // Also expose for dynamic content
         window.initScrollAnimations = initScrollAnimations;
