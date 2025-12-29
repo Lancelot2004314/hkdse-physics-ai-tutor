@@ -441,9 +441,17 @@ class AIAgent {
      * Initialize the Stick Knight SVG Avatar System
      */
     initStickKnight() {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:initStickKnight:entry',message:'initStickKnight called',data:{hasAvatar3DEl:!!this.avatar3DEl,hasFallbackEl:!!this.avatarFallbackEl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
+        // #endregion
+        
         try {
             // Create SVG scene
             this.createStickKnightSVG();
+            
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:initStickKnight:afterSVG',message:'SVG created',data:{hasSVG:!!this.knightSVG,hasKnight:!!this.knightEl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
             
             // Hide fallback
             this.avatarFallbackEl.style.display = 'none';
@@ -451,8 +459,16 @@ class AIAgent {
             // Start scene cycling
             this.startSceneCycle();
             
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:initStickKnight:complete',message:'Stick Knight initialized successfully',data:{currentScene:this.currentScene},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D,E'})}).catch(()=>{});
+            // #endregion
+            
             console.log('Stick Knight initialized!');
         } catch (err) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:initStickKnight:error',message:'Stick Knight failed',data:{error:err.message,stack:err.stack},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+            
             console.error('Stick Knight setup failed:', err);
             this.avatarFallbackEl.style.display = 'flex';
         }
@@ -666,6 +682,10 @@ class AIAgent {
      */
     setScene(sceneName) {
         if (!this.knightSVG) return;
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:setScene',message:'Scene changing',data:{from:this.currentScene,to:sceneName},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
+        // #endregion
         
         // Remove all scene classes
         this.knightSVG.classList.remove('scene-idle', 'scene-sleep', 'scene-practice', 'scene-combat', 'scene-rest');
@@ -1016,6 +1036,10 @@ class AIAgent {
 
 // Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:DOMContentLoaded',message:'AI Agent JS loaded - STICK KNIGHT VERSION',data:{version:'2.0-stick-knight',timestamp:new Date().toISOString()},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
+    // #endregion
+    
     // Initialize AI Agent (translations loaded from i18n system)
     window.aiAgent = new AIAgent({
         theme: 'knight'
