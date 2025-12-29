@@ -226,10 +226,11 @@ async function saveTextQuestion(db, questionText, aiAnswer) {
 }
 
 /**
- * Google Gemini 2.0/3 Flash - Primary model (fast, globally available, no VPN needed)
+ * Google Gemini 3 Flash - Primary model (fast, globally available, no VPN needed)
+ * Released December 2025 - faster than 2.5 Flash with PhD-level reasoning
  */
 async function callGeminiFlash(apiKey, systemPrompt, userPrompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key=${apiKey}`;
 
   const requestBody = {
     contents: [

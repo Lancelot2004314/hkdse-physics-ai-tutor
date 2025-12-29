@@ -240,7 +240,7 @@ export async function onRequestPost(context) {
  * Check if image contains figures/graphs/diagrams, and extract text if it's text-only
  */
 async function extractTextIfNoFigures(apiKey, base64Data, mimeType) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key=${apiKey}`;
 
   const requestBody = {
     contents: [
@@ -326,12 +326,12 @@ async function saveTextQuestion(db, questionText, aiAnswer) {
   }
 
   const id = crypto.randomUUID();
-  
+
   await db.prepare(`
     INSERT INTO text_questions (id, question_text, ai_answer, created_at)
     VALUES (?, ?, ?, datetime('now'))
   `).bind(id, questionText, aiAnswer).run();
-  
+
   console.log(`Saved text question to DB: ${id}`);
   return id;
 }
@@ -513,9 +513,9 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
 }
 
 // Google Gemini 3 Flash - Primary model (fast, multimodal, globally available)
+// Released December 2025 - faster than 2.5 Flash with PhD-level reasoning
 async function callGeminiFlash(apiKey, base64Data, mimeType, systemPrompt, userPrompt) {
-  // Use gemini-2.0-flash which is the latest stable flash model
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key=${apiKey}`;
 
   const requestBody = {
     contents: [
