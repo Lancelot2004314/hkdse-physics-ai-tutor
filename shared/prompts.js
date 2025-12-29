@@ -1,5 +1,33 @@
 // HKDSE Physics AI Tutor - Agent Prompts
 
+/**
+ * Get language instruction for AI prompts
+ * @param {string} language - Language code (en, zh-HK, zh-CN)
+ * @returns {string} Language instruction for the AI
+ */
+export function getLanguageInstruction(language) {
+  const instructions = {
+    'en': 'Respond ONLY in English. All text must be in English.',
+    'zh-HK': '請使用繁體中文回答。所有文字必須使用繁體中文。',
+    'zh-CN': '请使用简体中文回答。所有文字必须使用简体中文。'
+  };
+  return instructions[language] || instructions['en'];
+}
+
+/**
+ * Get language name for display
+ * @param {string} language - Language code
+ * @returns {string} Language display name
+ */
+export function getLanguageName(language) {
+  const names = {
+    'en': 'English',
+    'zh-HK': '繁體中文',
+    'zh-CN': '简体中文'
+  };
+  return names[language] || 'English';
+}
+
 export const TEACHER_EXPLAINER_PROMPT = `You are an expert HKDSE Physics teacher. Explain physics problems clearly.
 
 ## CRITICAL RULES

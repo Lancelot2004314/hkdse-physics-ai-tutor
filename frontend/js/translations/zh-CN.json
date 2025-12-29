@@ -1,0 +1,240 @@
+{
+  "nav": {
+    "dashboard": "主页",
+    "aiTutor": "AI 导师",
+    "freePractice": "自由练习",
+    "statistics": "统计",
+    "history": "历史记录",
+    "bookmarks": "收藏",
+    "leaderboard": "排行榜",
+    "profile": "个人资料",
+    "adminPanel": "管理面板",
+    "signOut": "退出登录"
+  },
+  "common": {
+    "login": "登录",
+    "logout": "退出",
+    "save": "保存",
+    "saveChanges": "保存更改",
+    "submit": "提交",
+    "cancel": "取消",
+    "continue": "继续",
+    "start": "开始",
+    "next": "下一个",
+    "previous": "上一个",
+    "back": "返回",
+    "close": "关闭",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "confirm": "确认",
+    "delete": "删除",
+    "edit": "编辑",
+    "view": "查看",
+    "search": "搜索",
+    "filter": "筛选",
+    "reset": "重置",
+    "refresh": "刷新",
+    "download": "下载",
+    "upload": "上传",
+    "yes": "是",
+    "no": "否",
+    "or": "或",
+    "and": "和",
+    "guest": "访客",
+    "user": "用户",
+    "language": "语言"
+  },
+  "dashboard": {
+    "welcome": "欢迎回来，{name}！",
+    "welcomeGuest": "欢迎，同学！",
+    "readyToMaster": "准备好攻克 DSE 物理了吗？",
+    "dayStreak": "连续天数",
+    "totalPoints": "总积分",
+    "questionsDone": "已完成题目",
+    "globalRank": "全球排名",
+    "recentActivity": "最近活动",
+    "noActivity": "暂无活动记录，快开始练习吧！",
+    "loginToSeeActivity": "登录以查看你的活动记录"
+  },
+  "features": {
+    "aiTutor": {
+      "title": "AI 导师",
+      "description": "上传题目照片或输入文字，获得 DSE 风格分步讲解",
+      "feature1": "图片/文字问答",
+      "feature2": "多种 AI 模型",
+      "feature3": "苏格拉底引导模式"
+    },
+    "freePractice": {
+      "title": "自由练习",
+      "description": "选择章节和难度，开始练习测验",
+      "feature1": "MC / 简答 / 长答题",
+      "feature2": "AI 自动生成题目",
+      "feature3": "即时评分和反馈"
+    }
+  },
+  "login": {
+    "title": "登录账户",
+    "subtitle": "登录后可同步历史记录到云端，跨设备使用",
+    "googleLogin": "用 Google 账号登录",
+    "continueAsGuest": "以访客身份继续",
+    "welcomeBack": "欢迎回来！",
+    "loginRequired": "请登录以继续"
+  },
+  "profile": {
+    "title": "个人资料",
+    "userProfile": "用户资料",
+    "name": "姓名",
+    "email": "邮箱",
+    "language": "语言",
+    "role": "我是...",
+    "roles": {
+      "student": "学生",
+      "teacher": "老师",
+      "parent": "家长",
+      "other": "其他"
+    },
+    "changePhoto": "更换头像",
+    "removePhoto": "移除",
+    "photoUploaded": "头像上传成功！",
+    "photoRemoved": "头像已移除",
+    "profileSaved": "个人资料保存成功！",
+    "payment": "付款",
+    "currentPlan": "当前方案"
+  },
+  "plans": {
+    "free": {
+      "name": "免费版",
+      "price": "$0",
+      "perMonth": "/月",
+      "feature1": "每次练习 5 题",
+      "feature2": "每日 3 次练习",
+      "feature3": "基础统计"
+    },
+    "premium": {
+      "name": "高级版",
+      "price": "$40",
+      "originalPrice": "$59",
+      "perMonth": "/月",
+      "discount": "限首 1,000 名用户优惠！",
+      "feature1": "无限题目练习",
+      "feature2": "无限练习次数",
+      "feature3": "高级统计",
+      "feature4": "30 天退款保证",
+      "upgrade": "升级至高级版"
+    }
+  },
+  "aiTutor": {
+    "title": "AI 物理导师",
+    "uploadImage": "上传图片",
+    "enterText": "在此输入你的物理问题...",
+    "dragDrop": "拖放图片到这里，或点击选择",
+    "supportedFormats": "支持格式：JPG、PNG、GIF、WebP",
+    "selectModel": "选择 AI 模型",
+    "askQuestion": "提问",
+    "analyzing": "分析中...",
+    "explanation": "解释",
+    "followUp": "追问",
+    "askFollowUp": "输入追问...",
+    "noImageOrText": "请上传图片或输入问题"
+  },
+  "practice": {
+    "title": "自由练习",
+    "selectTopics": "选择主题",
+    "selectAll": "全选",
+    "deselectAll": "取消全选",
+    "questionType": "题目类型",
+    "mc": "选择题",
+    "short": "简答题",
+    "long": "长答题",
+    "difficulty": "难度",
+    "easy": "简单",
+    "medium": "中等",
+    "hard": "困难",
+    "numQuestions": "题目数量",
+    "startPractice": "开始练习",
+    "generating": "正在生成题目...",
+    "noTopicsSelected": "请选择至少一个主题"
+  },
+  "quiz": {
+    "question": "题目",
+    "of": "/",
+    "timeRemaining": "剩余时间",
+    "submitAnswer": "提交答案",
+    "nextQuestion": "下一题",
+    "finishQuiz": "完成测验",
+    "yourAnswer": "你的答案",
+    "correctAnswer": "正确答案",
+    "explanation": "解释",
+    "correct": "正确！",
+    "incorrect": "错误",
+    "partial": "部分正确",
+    "score": "得分",
+    "results": "结果",
+    "reviewAnswers": "查看答案",
+    "tryAgain": "再试一次",
+    "backToHome": "返回主页"
+  },
+  "statistics": {
+    "title": "统计",
+    "overview": "概览",
+    "totalQuestions": "总题目数",
+    "correctRate": "正确率",
+    "averageScore": "平均分",
+    "studyTime": "学习时间",
+    "progressByTopic": "各主题进度",
+    "weeklyActivity": "每周活动",
+    "performanceTrend": "表现趋势"
+  },
+  "history": {
+    "title": "练习历史",
+    "noHistory": "暂无练习记录",
+    "startPracticing": "开始练习以查看历史记录",
+    "date": "日期",
+    "topic": "主题",
+    "score": "分数",
+    "questions": "题目数",
+    "viewDetails": "查看详情"
+  },
+  "bookmarks": {
+    "title": "收藏",
+    "noBookmarks": "暂无收藏",
+    "saveQuestions": "收藏想稍后复习的题目",
+    "removeBookmark": "取消收藏"
+  },
+  "leaderboard": {
+    "title": "排行榜",
+    "rank": "排名",
+    "player": "玩家",
+    "points": "积分",
+    "streak": "连续天数",
+    "yourRank": "你的排名",
+    "topPlayers": "顶尖玩家"
+  },
+  "topics": {
+    "heat": "热学与气体",
+    "mechanics": "力学",
+    "waves": "波动",
+    "electricity": "电学与磁学",
+    "radioactivity": "放射性与核能",
+    "astronomy": "天文学与太空科学",
+    "energy": "能量及其应用",
+    "motion": "运动与力"
+  },
+  "errors": {
+    "networkError": "网络错误，请检查你的连接。",
+    "serverError": "服务器错误，请稍后再试。",
+    "unauthorized": "请登录以继续。",
+    "notFound": "找不到。",
+    "invalidInput": "输入无效，请检查后重试。",
+    "uploadFailed": "上传失败，请重试。",
+    "saveFailed": "保存失败，请重试。"
+  },
+  "toast": {
+    "saved": "保存成功！",
+    "deleted": "删除成功！",
+    "copied": "已复制到剪贴板！",
+    "uploading": "上传中...",
+    "processing": "处理中..."
+  }
+}

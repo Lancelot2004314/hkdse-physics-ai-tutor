@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/thinka.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/i18n.js"></script>
 </head>
 
 <body>
@@ -50,36 +51,37 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item active">
-                    <a href="/"><i class="fas fa-home"></i> Dashboard</a>
+                    <a href="/"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+                    <a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a>
+                    <a href="/free-practice.html"><i class="fas fa-pen"></i> <span data-i18n="nav.freePractice">Free Practice</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a>
+                    <a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.statistics">Statistics</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/practice-history.html"><i class="fas fa-history"></i> History</a>
+                    <a href="/practice-history.html"><i class="fas fa-history"></i> <span data-i18n="nav.history">History</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a>
+                    <a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span data-i18n="nav.bookmarks">Bookmarks</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a>
+                    <a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span data-i18n="nav.leaderboard">Leaderboard</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/profile.html"><i class="fas fa-user"></i> Profile</a>
+                    <a href="/profile.html"><i class="fas fa-user"></i> <span data-i18n="nav.profile">Profile</span></a>
                 </li>
                 <li class="nav-item admin-only" id="adminNavItem" hidden>
-                    <a href="/admin.html"><i class="fas fa-cog"></i> Admin Panel</a>
+                    <a href="/admin.html"><i class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a>
                 </li>
             </ul>
             <div class="sidebar-footer">
+                <div class="language-switcher-container" id="langSwitcherContainer"></div>
                 <button class="btn-logout" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.signOut">Sign Out</span>
                 </button>
                 <div class="version">v2.0.0</div>
             </div>
@@ -90,12 +92,12 @@
             <!-- Welcome Section -->
             <header class="dashboard-header gradient-bg-hero animate-on-scroll fade-in-up">
                 <div class="welcome-text">
-                    <h1>Welcome back, <span id="welcomeName">Student</span>!</h1>
-                    <p>Ready to master HKDSE Physics?</p>
+                    <h1 id="welcomeTitle">Welcome back, <span id="welcomeName">Student</span>!</h1>
+                    <p data-i18n="dashboard.readyToMaster">Ready to master HKDSE Physics?</p>
                 </div>
                 <div class="header-actions">
                     <button class="btn-login btn-glow ripple" id="loginBtn">
-                        <i class="fas fa-sign-in-alt"></i> Login
+                        <i class="fas fa-sign-in-alt"></i> <span data-i18n="common.login">Login</span>
                     </button>
                 </div>
             </header>
@@ -106,28 +108,28 @@
                     <i class="fas fa-fire"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="statStreak">0</span>
-                        <span class="stat-label">Day Streak</span>
+                        <span class="stat-label" data-i18n="dashboard.dayStreak">Day Streak</span>
                     </div>
                 </div>
                 <div class="quick-stat-card card-lift icon-bounce animate-on-scroll scale-in stagger-2">
                     <i class="fas fa-star"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="statPoints">0</span>
-                        <span class="stat-label">Total Points</span>
+                        <span class="stat-label" data-i18n="dashboard.totalPoints">Total Points</span>
                     </div>
                 </div>
                 <div class="quick-stat-card card-lift icon-bounce animate-on-scroll scale-in stagger-3">
                     <i class="fas fa-check-circle"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="statQuestions">0</span>
-                        <span class="stat-label">Questions Done</span>
+                        <span class="stat-label" data-i18n="dashboard.questionsDone">Questions Done</span>
                     </div>
                 </div>
                 <div class="quick-stat-card card-lift icon-bounce animate-on-scroll scale-in stagger-4">
                     <i class="fas fa-medal"></i>
                     <div class="stat-info">
                         <span class="stat-value" id="statRank">#--</span>
-                        <span class="stat-label">Global Rank</span>
+                        <span class="stat-label" data-i18n="dashboard.globalRank">Global Rank</span>
                     </div>
                 </div>
             </section>
@@ -140,12 +142,12 @@
                         <i class="fas fa-robot"></i>
                     </div>
                     <div class="card-content">
-                        <h2>AI Tutor</h2>
-                        <p>上傳題目照片或輸入文字，獲得 DSE 風格分步講解</p>
+                        <h2 data-i18n="features.aiTutor.title">AI Tutor</h2>
+                        <p data-i18n="features.aiTutor.description">Upload question photos or enter text for DSE-style step-by-step explanations</p>
                         <ul class="card-features">
-                            <li><i class="fas fa-check"></i> 圖片/文字問答</li>
-                            <li><i class="fas fa-check"></i> 多種 AI 模型</li>
-                            <li><i class="fas fa-check"></i> 蘇格拉底引導模式</li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="features.aiTutor.feature1">Image/Text Q&A</span></li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="features.aiTutor.feature2">Multiple AI Models</span></li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="features.aiTutor.feature3">Socratic Guidance Mode</span></li>
                         </ul>
                     </div>
                     <div class="card-arrow">
@@ -159,12 +161,12 @@
                         <i class="fas fa-pen"></i>
                     </div>
                     <div class="card-content">
-                        <h2>Free Practice</h2>
-                        <p>選擇章節和難度，開始練習測驗</p>
+                        <h2 data-i18n="features.freePractice.title">Free Practice</h2>
+                        <p data-i18n="features.freePractice.description">Select chapters and difficulty, start practice quizzes</p>
                         <ul class="card-features">
-                            <li><i class="fas fa-check"></i> MC / 簡答 / 長答題</li>
-                            <li><i class="fas fa-check"></i> AI 自動生成題目</li>
-                            <li><i class="fas fa-check"></i> 即時評分和反饋</li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="features.freePractice.feature1">MC / Short / Long Questions</span></li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="features.freePractice.feature2">AI Auto-generated Questions</span></li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="features.freePractice.feature3">Instant Scoring and Feedback</span></li>
                         </ul>
                     </div>
                     <div class="card-arrow">
@@ -178,34 +180,34 @@
                 <a href="/statistics.html"
                     class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-1">
                     <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
-                    <h3>Statistics</h3>
-                    <p>查看學習統計和進度</p>
+                    <h3 data-i18n="nav.statistics">Statistics</h3>
+                    <p data-i18n="statistics.overview">Overview</p>
                 </a>
                 <a href="/leaderboard.html"
                     class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-2">
                     <div class="card-icon"><i class="fas fa-trophy"></i></div>
-                    <h3>Leaderboard</h3>
-                    <p>查看排行榜</p>
+                    <h3 data-i18n="nav.leaderboard">Leaderboard</h3>
+                    <p data-i18n="leaderboard.topPlayers">Top Players</p>
                 </a>
                 <a href="/bookmarks.html"
                     class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-3">
                     <div class="card-icon"><i class="fas fa-bookmark"></i></div>
-                    <h3>Bookmarks</h3>
-                    <p>查看收藏的題目</p>
+                    <h3 data-i18n="nav.bookmarks">Bookmarks</h3>
+                    <p data-i18n="bookmarks.saveQuestions">Save questions you want to review later</p>
                 </a>
                 <a href="/practice-history.html"
                     class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-4">
                     <div class="card-icon"><i class="fas fa-history"></i></div>
-                    <h3>History</h3>
-                    <p>查看練習歷史</p>
+                    <h3 data-i18n="nav.history">History</h3>
+                    <p data-i18n="history.viewDetails">View Details</p>
                 </a>
             </section>
 
             <!-- Recent Activity -->
             <section class="recent-activity animate-on-scroll fade-in-up" id="recentActivity">
-                <h2><i class="fas fa-clock"></i> Recent Activity</h2>
+                <h2><i class="fas fa-clock"></i> <span data-i18n="dashboard.recentActivity">Recent Activity</span></h2>
                 <div class="activity-list" id="activityList">
-                    <p class="empty-state">Login to see your recent activity</p>
+                    <p class="empty-state" data-i18n="dashboard.loginToSeeActivity">Login to see your recent activity</p>
                 </div>
             </section>
         </main>
@@ -238,6 +240,10 @@
         let currentUser = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            await window.i18n.initI18n();
+            window.i18n.createLanguageSwitcher('langSwitcherContainer');
+
             await checkAuth();
             initEventListeners();
             initScrollAnimations();
@@ -301,8 +307,14 @@
             document.getElementById('userName').textContent = name;
             document.getElementById('userEmail').textContent = currentUser.email || '';
             document.getElementById('welcomeName').textContent = name;
+            document.getElementById('welcomeTitle').innerHTML = window.i18n.t('dashboard.welcome', { name: `<span id="welcomeName">${name}</span>` });
             document.getElementById('loginBtn').hidden = true;
             document.getElementById('logoutBtn').hidden = false;
+
+            // Set language from user preference if logged in
+            if (currentUser.language && currentUser.language !== window.i18n.getLanguage()) {
+                window.i18n.setLanguage(currentUser.language);
+            }
 
             // Check if user is admin (lightweight check)
             checkAdminAccess();
@@ -325,9 +337,9 @@
         }
 
         function updateUIForGuest() {
-            document.getElementById('userName').textContent = 'Guest';
+            document.getElementById('userName').textContent = window.i18n.t('common.guest');
             document.getElementById('userEmail').textContent = '';
-            document.getElementById('welcomeName').textContent = 'Student';
+            document.getElementById('welcomeTitle').textContent = window.i18n.t('dashboard.welcomeGuest');
             document.getElementById('loginBtn').hidden = false;
             document.getElementById('logoutBtn').hidden = true;
         }

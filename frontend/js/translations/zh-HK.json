@@ -1,0 +1,240 @@
+{
+  "nav": {
+    "dashboard": "主頁",
+    "aiTutor": "AI 導師",
+    "freePractice": "自由練習",
+    "statistics": "統計",
+    "history": "歷史記錄",
+    "bookmarks": "收藏",
+    "leaderboard": "排行榜",
+    "profile": "個人資料",
+    "adminPanel": "管理面板",
+    "signOut": "登出"
+  },
+  "common": {
+    "login": "登入",
+    "logout": "登出",
+    "save": "儲存",
+    "saveChanges": "儲存變更",
+    "submit": "提交",
+    "cancel": "取消",
+    "continue": "繼續",
+    "start": "開始",
+    "next": "下一個",
+    "previous": "上一個",
+    "back": "返回",
+    "close": "關閉",
+    "loading": "載入中...",
+    "error": "錯誤",
+    "success": "成功",
+    "confirm": "確認",
+    "delete": "刪除",
+    "edit": "編輯",
+    "view": "查看",
+    "search": "搜尋",
+    "filter": "篩選",
+    "reset": "重置",
+    "refresh": "重新整理",
+    "download": "下載",
+    "upload": "上傳",
+    "yes": "是",
+    "no": "否",
+    "or": "或",
+    "and": "和",
+    "guest": "訪客",
+    "user": "用戶",
+    "language": "語言"
+  },
+  "dashboard": {
+    "welcome": "歡迎回來，{name}！",
+    "welcomeGuest": "歡迎，同學！",
+    "readyToMaster": "準備好攻克 DSE 物理了嗎？",
+    "dayStreak": "連續天數",
+    "totalPoints": "總積分",
+    "questionsDone": "已完成題目",
+    "globalRank": "全球排名",
+    "recentActivity": "最近活動",
+    "noActivity": "暫無活動記錄，快開始練習吧！",
+    "loginToSeeActivity": "登入以查看你的活動記錄"
+  },
+  "features": {
+    "aiTutor": {
+      "title": "AI 導師",
+      "description": "上傳題目照片或輸入文字，獲得 DSE 風格分步講解",
+      "feature1": "圖片/文字問答",
+      "feature2": "多種 AI 模型",
+      "feature3": "蘇格拉底引導模式"
+    },
+    "freePractice": {
+      "title": "自由練習",
+      "description": "選擇章節和難度，開始練習測驗",
+      "feature1": "MC / 簡答 / 長答題",
+      "feature2": "AI 自動生成題目",
+      "feature3": "即時評分和反饋"
+    }
+  },
+  "login": {
+    "title": "登入帳戶",
+    "subtitle": "登入後可同步歷史記錄到雲端，跨設備使用",
+    "googleLogin": "用 Google 帳號登入",
+    "continueAsGuest": "以訪客身份繼續",
+    "welcomeBack": "歡迎回來！",
+    "loginRequired": "請登入以繼續"
+  },
+  "profile": {
+    "title": "個人資料",
+    "userProfile": "用戶資料",
+    "name": "姓名",
+    "email": "電郵",
+    "language": "語言",
+    "role": "我是...",
+    "roles": {
+      "student": "學生",
+      "teacher": "老師",
+      "parent": "家長",
+      "other": "其他"
+    },
+    "changePhoto": "更換頭像",
+    "removePhoto": "移除",
+    "photoUploaded": "頭像上傳成功！",
+    "photoRemoved": "頭像已移除",
+    "profileSaved": "個人資料儲存成功！",
+    "payment": "付款",
+    "currentPlan": "目前方案"
+  },
+  "plans": {
+    "free": {
+      "name": "免費版",
+      "price": "$0",
+      "perMonth": "/月",
+      "feature1": "每次練習 5 題",
+      "feature2": "每日 3 次練習",
+      "feature3": "基礎統計"
+    },
+    "premium": {
+      "name": "高級版",
+      "price": "$40",
+      "originalPrice": "$59",
+      "perMonth": "/月",
+      "discount": "限首 1,000 名用戶優惠！",
+      "feature1": "無限題目練習",
+      "feature2": "無限練習次數",
+      "feature3": "進階統計",
+      "feature4": "30 天退款保證",
+      "upgrade": "升級至高級版"
+    }
+  },
+  "aiTutor": {
+    "title": "AI 物理導師",
+    "uploadImage": "上傳圖片",
+    "enterText": "在此輸入你的物理問題...",
+    "dragDrop": "拖放圖片到這裡，或點擊選擇",
+    "supportedFormats": "支援格式：JPG、PNG、GIF、WebP",
+    "selectModel": "選擇 AI 模型",
+    "askQuestion": "提問",
+    "analyzing": "分析中...",
+    "explanation": "解釋",
+    "followUp": "追問",
+    "askFollowUp": "輸入追問...",
+    "noImageOrText": "請上傳圖片或輸入問題"
+  },
+  "practice": {
+    "title": "自由練習",
+    "selectTopics": "選擇主題",
+    "selectAll": "全選",
+    "deselectAll": "取消全選",
+    "questionType": "題目類型",
+    "mc": "選擇題",
+    "short": "簡答題",
+    "long": "長答題",
+    "difficulty": "難度",
+    "easy": "簡單",
+    "medium": "中等",
+    "hard": "困難",
+    "numQuestions": "題目數量",
+    "startPractice": "開始練習",
+    "generating": "正在生成題目...",
+    "noTopicsSelected": "請選擇至少一個主題"
+  },
+  "quiz": {
+    "question": "題目",
+    "of": "/",
+    "timeRemaining": "剩餘時間",
+    "submitAnswer": "提交答案",
+    "nextQuestion": "下一題",
+    "finishQuiz": "完成測驗",
+    "yourAnswer": "你的答案",
+    "correctAnswer": "正確答案",
+    "explanation": "解釋",
+    "correct": "正確！",
+    "incorrect": "錯誤",
+    "partial": "部分正確",
+    "score": "得分",
+    "results": "結果",
+    "reviewAnswers": "查看答案",
+    "tryAgain": "再試一次",
+    "backToHome": "返回主頁"
+  },
+  "statistics": {
+    "title": "統計",
+    "overview": "概覽",
+    "totalQuestions": "總題目數",
+    "correctRate": "正確率",
+    "averageScore": "平均分",
+    "studyTime": "學習時間",
+    "progressByTopic": "各主題進度",
+    "weeklyActivity": "每週活動",
+    "performanceTrend": "表現趨勢"
+  },
+  "history": {
+    "title": "練習歷史",
+    "noHistory": "暫無練習記錄",
+    "startPracticing": "開始練習以查看歷史記錄",
+    "date": "日期",
+    "topic": "主題",
+    "score": "分數",
+    "questions": "題目數",
+    "viewDetails": "查看詳情"
+  },
+  "bookmarks": {
+    "title": "收藏",
+    "noBookmarks": "暫無收藏",
+    "saveQuestions": "收藏想稍後複習的題目",
+    "removeBookmark": "取消收藏"
+  },
+  "leaderboard": {
+    "title": "排行榜",
+    "rank": "排名",
+    "player": "玩家",
+    "points": "積分",
+    "streak": "連續天數",
+    "yourRank": "你的排名",
+    "topPlayers": "頂尖玩家"
+  },
+  "topics": {
+    "heat": "熱學與氣體",
+    "mechanics": "力學",
+    "waves": "波動",
+    "electricity": "電學與磁學",
+    "radioactivity": "放射性與核能",
+    "astronomy": "天文學與太空科學",
+    "energy": "能量及其應用",
+    "motion": "運動與力"
+  },
+  "errors": {
+    "networkError": "網絡錯誤，請檢查你的連接。",
+    "serverError": "伺服器錯誤，請稍後再試。",
+    "unauthorized": "請登入以繼續。",
+    "notFound": "找不到。",
+    "invalidInput": "輸入無效，請檢查後重試。",
+    "uploadFailed": "上傳失敗，請重試。",
+    "saveFailed": "儲存失敗，請重試。"
+  },
+  "toast": {
+    "saved": "儲存成功！",
+    "deleted": "刪除成功！",
+    "copied": "已複製到剪貼板！",
+    "uploading": "上傳中...",
+    "processing": "處理中..."
+  }
+}

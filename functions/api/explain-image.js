@@ -38,7 +38,8 @@ export async function onRequestPost(context) {
       studentLevel = 'standard',
       mode = 'direct',
       studentAttempt,
-      visionModel = 'auto'  // 'auto', 'gpt4o', 'gpt4o-mini', 'qwen-vl', 'gemini'
+      visionModel = 'auto',  // 'auto', 'gpt4o', 'gpt4o-mini', 'qwen-vl', 'gemini'
+      language = 'auto'      // 'auto', 'en', 'zh-HK', 'zh-CN'
     } = body;
 
     // Validate image
@@ -82,8 +83,19 @@ export async function onRequestPost(context) {
       }
     }
 
-    // User prompt - let model detect the language from the image and question
-    let userPrompt = 'Analyze this HKDSE Physics problem and provide a detailed explanation. Detect the language of the problem and respond in the same language.';
+    // User prompt - use specified language or let model detect
+    let userPrompt;
+    if (language === 'auto') {
+      userPrompt = 'Analyze this HKDSE Physics problem and provide a detailed explanation. Detect the language of the problem and respond in the same language.';
+    } else if (language === 'en') {
+      userPrompt = 'Analyze this HKDSE Physics problem and provide a detailed explanation. Respond ONLY in English.';
+    } else if (language === 'zh-HK') {
+      userPrompt = '分析這道 HKDSE 物理題目，並提供詳細解釋。請使用繁體中文回答。';
+    } else if (language === 'zh-CN') {
+      userPrompt = '分析这道 HKDSE 物理题目，并提供详细解释。请使用简体中文回答。';
+    } else {
+      userPrompt = 'Analyze this HKDSE Physics problem and provide a detailed explanation.';
+    }
     if (question) {
       userPrompt += `\n\nStudent's question: ${question}`;
     }

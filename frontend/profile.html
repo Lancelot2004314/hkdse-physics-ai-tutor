@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/thinka.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/i18n.js"></script>
 </head>
 
 <body>
@@ -41,26 +42,26 @@
                 </div>
             </div>
             <ul class="nav-menu">
-                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a></li>
-                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> Free Practice</a></li>
-                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a></li>
-                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> History</a></li>
-                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> Bookmarks</a></li>
-                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> Leaderboard</a></li>
-                <li class="nav-item active"><a href="/profile.html"><i class="fas fa-user"></i> Profile</a></li>
-                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i
-                            class="fas fa-cog"></i> Admin Panel</a></li>
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a></li>
+                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> <span data-i18n="nav.freePractice">Free Practice</span></a></li>
+                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.statistics">Statistics</span></a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> <span data-i18n="nav.history">History</span></a></li>
+                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span data-i18n="nav.bookmarks">Bookmarks</span></a></li>
+                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span data-i18n="nav.leaderboard">Leaderboard</span></a></li>
+                <li class="nav-item active"><a href="/profile.html"><i class="fas fa-user"></i> <span data-i18n="nav.profile">Profile</span></a></li>
+                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a></li>
             </ul>
             <div class="sidebar-footer">
-                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                <div class="language-switcher-container" id="langSwitcherContainer"></div>
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.signOut">Sign Out</span></button>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="main-content">
             <header class="page-header animate-on-scroll fade-in-up">
-                <h1><i class="fas fa-user-circle"></i> Profile</h1>
+                <h1><i class="fas fa-user-circle"></i> <span data-i18n="profile.title">Profile</span></h1>
             </header>
 
             <!-- User Profile Section -->
@@ -72,24 +73,24 @@
                     </div>
                     <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
                     <button class="avatar-edit btn-glow" id="avatarEditBtn">
-                        <i class="fas fa-camera"></i> Change Photo
+                        <i class="fas fa-camera"></i> <span data-i18n="profile.changePhoto">Change Photo</span>
                     </button>
                     <button class="avatar-remove" id="avatarRemoveBtn" style="display: none;">
-                        <i class="fas fa-trash"></i> Remove
+                        <i class="fas fa-trash"></i> <span data-i18n="profile.removePhoto">Remove</span>
                     </button>
                 </div>
                 <div class="profile-form">
-                    <h2>User Profile</h2>
+                    <h2 data-i18n="profile.userProfile">User Profile</h2>
                     <div class="form-group">
-                        <label><i class="fas fa-user"></i> Name</label>
-                        <input type="text" id="profileName" placeholder="Your name" class="input-glow">
+                        <label><i class="fas fa-user"></i> <span data-i18n="profile.name">Name</span></label>
+                        <input type="text" id="profileName" data-i18n-placeholder="profile.name" placeholder="Your name" class="input-glow">
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <label><i class="fas fa-envelope"></i> <span data-i18n="profile.email">Email</span></label>
                         <input type="email" id="profileEmail" disabled>
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-globe"></i> Language</label>
+                        <label><i class="fas fa-globe"></i> <span data-i18n="profile.language">Language</span></label>
                         <select id="profileLanguage" class="input-glow">
                             <option value="en">English</option>
                             <option value="zh-HK">繁體中文</option>
@@ -97,45 +98,45 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-id-badge"></i> I am a...</label>
+                        <label><i class="fas fa-id-badge"></i> <span data-i18n="profile.role">I am a...</span></label>
                         <select id="profileRole" class="input-glow">
-                            <option value="student">Student</option>
-                            <option value="teacher">Teacher</option>
-                            <option value="parent">Parent</option>
-                            <option value="other">Other</option>
+                            <option value="student" data-i18n="profile.roles.student">Student</option>
+                            <option value="teacher" data-i18n="profile.roles.teacher">Teacher</option>
+                            <option value="parent" data-i18n="profile.roles.parent">Parent</option>
+                            <option value="other" data-i18n="profile.roles.other">Other</option>
                         </select>
                     </div>
                     <button class="btn-primary btn-glow ripple" id="saveProfileBtn">
-                        <i class="fas fa-save"></i> Save Changes
+                        <i class="fas fa-save"></i> <span data-i18n="common.saveChanges">Save Changes</span>
                     </button>
                 </div>
             </div>
 
             <!-- Payment Section -->
             <div class="payment-section animate-on-scroll fade-in-up stagger-2">
-                <h2><i class="fas fa-credit-card"></i> Payment</h2>
+                <h2><i class="fas fa-credit-card"></i> <span data-i18n="profile.payment">Payment</span></h2>
                 <div class="plans-grid">
                     <div class="plan-card free card-lift tilt-card">
-                        <h3>Free</h3>
-                        <div class="plan-price">$0<span>/month</span></div>
+                        <h3 data-i18n="plans.free.name">Free</h3>
+                        <div class="plan-price">$0<span data-i18n="plans.free.perMonth">/month</span></div>
                         <ul class="plan-features">
-                            <li><i class="fas fa-check"></i> 5 questions per practice</li>
-                            <li><i class="fas fa-check"></i> 3 practices per day</li>
-                            <li><i class="fas fa-check"></i> Basic statistics</li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature1">5 questions per practice</span></li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature2">3 practices per day</span></li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature3">Basic statistics</span></li>
                         </ul>
-                        <button class="btn-secondary" disabled>Current Plan</button>
+                        <button class="btn-secondary" disabled data-i18n="profile.currentPlan">Current Plan</button>
                     </div>
                     <div class="plan-card premium card-lift tilt-card shine">
-                        <div class="plan-badge">Discount limited to first 1,000 users!</div>
-                        <h3>Premium</h3>
+                        <div class="plan-badge" data-i18n="plans.premium.discount">Discount limited to first 1,000 users!</div>
+                        <h3 data-i18n="plans.premium.name">Premium</h3>
                         <div class="plan-price">
-                            <span class="original">$59</span> $40<span>/month</span>
+                            <span class="original">$59</span> $40<span data-i18n="plans.premium.perMonth">/month</span>
                         </div>
                         <ul class="plan-features">
-                            <li><i class="fas fa-star"></i> <strong>Unlimited</strong> questions per practice</li>
-                            <li><i class="fas fa-star"></i> <strong>Unlimited</strong> practices per day</li>
-                            <li><i class="fas fa-star"></i> Advanced statistics</li>
-                            <li><i class="fas fa-star"></i> 30 days money back guarantee</li>
+                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature1"><strong>Unlimited</strong> questions per practice</span></li>
+                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature2"><strong>Unlimited</strong> practices per day</span></li>
+                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature3">Advanced statistics</span></li>
+                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature4">30 days money back guarantee</span></li>
                         </ul>
                         <button class="btn-primary btn-glow">Upgrade to Premium</button>
                     </div>
@@ -454,6 +455,10 @@
         let currentUser = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            await window.i18n.initI18n();
+            window.i18n.createLanguageSwitcher('langSwitcherContainer');
+
             await loadProfile();
             initEventListeners();
             initScrollAnimations();
@@ -581,11 +586,15 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    showToast('Profile saved successfully!', 'success');
+                    showToast(window.i18n.t('profile.profileSaved'), 'success');
                     // Update sidebar name
                     document.getElementById('sideUserName').textContent = name || currentUser.email?.split('@')[0] || 'User';
+                    // Update language if changed
+                    if (language !== window.i18n.getLanguage()) {
+                        await window.i18n.setLanguage(language);
+                    }
                 } else {
-                    showToast(data.error || 'Failed to save profile', 'error');
+                    showToast(data.error || window.i18n.t('errors.saveFailed'), 'error');
                 }
             } catch (err) {
                 console.error('Failed to save profile:', err);

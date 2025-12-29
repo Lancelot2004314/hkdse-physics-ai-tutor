@@ -28,7 +28,7 @@ export async function onRequestPost(context) {
   try {
     // Parse request body
     const body = await request.json();
-    const { problemText, question, studentLevel = 'standard', mode = 'direct', studentAttempt } = body;
+    const { problemText, question, studentLevel = 'standard', mode = 'direct', studentAttempt, language = 'auto' } = body;
 
     // Validate problemText
     if (!problemText || problemText.trim().length === 0) {
@@ -69,8 +69,21 @@ export async function onRequestPost(context) {
       }
     }
 
-    // Build user prompt - language neutral to allow detection
-    let userPrompt = `Analyze the following HKDSE Physics problem and provide a detailed explanation. Detect the language of the problem and respond in the same language.\n\nProblem:\n${problemText.trim()}`;
+    // Build user prompt - use specified language or detect from content
+    let languageInstruction;
+    if (language === 'auto') {
+      languageInstruction = 'Detect the language of the problem and respond in the same language.';
+    } else if (language === 'en') {
+      languageInstruction = 'Respond ONLY in English.';
+    } else if (language === 'zh-HK') {
+      languageInstruction = '請使用繁體中文回答。';
+    } else if (language === 'zh-CN') {
+      languageInstruction = '请使用简体中文回答。';
+    } else {
+      languageInstruction = 'Respond in the same language as the problem.';
+    }
+    
+    let userPrompt = `Analyze the following HKDSE Physics problem and provide a detailed explanation. ${languageInstruction}\n\nProblem:\n${problemText.trim()}`;
 
     if (question) {
       userPrompt += `\n\nStudent's question: ${question}`;
