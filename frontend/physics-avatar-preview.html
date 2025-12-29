@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Physics Avatar Preview (Local)</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 24px; }
+    .row { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+    .panel { width: 320px; }
+    .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; }
+    label { display: block; margin: 10px 0 6px; font-size: 13px; color: #111827; }
+    input, select { width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 8px; }
+    button { padding: 10px 12px; border: 0; border-radius: 10px; background: #111827; color: #fff; cursor: pointer; }
+    button.secondary { background: #374151; }
+    .stage { width: 240px; height: 240px; border-radius: 999px; overflow: hidden; background: radial-gradient(circle at 50% 50%, #2d4a6f, #1a2f4a); display:flex; align-items:center; justify-content:center; }
+    .hint { font-size: 12px; color: #6b7280; margin-top: 8px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <h2>Physics Avatar Preview (Local)</h2>
+  <div class="row">
+    <div class="card">
+      <div class="stage">
+        <div id="stageRoot" style="width:240px;height:240px;"></div>
+      </div>
+      <div class="hint">
+        这里不会上传。你改一次我改一次，你满意后再上线上线。
+      </div>
+    </div>
+
+    <div class="panel card">
+      <label>Mode</label>
+      <select id="mode">
+        <option value="combatOnly">Combat only (recommended)</option>
+        <option value="allScenes">All scenes</option>
+      </select>
+
+      <label>Enemy count (alive)</label>
+      <input id="enemyCount" type="number" step="1" value="1" />
+
+      <label>Gravity Y (0.1 = float, 1.0 = normal)</label>
+      <input id="gravity" type="number" step="0.1" value="1.0" />
+
+      <label>Canvas Size</label>
+      <input id="size" type="number" step="10" value="240" />
+
+      <div style="display:flex; gap: 10px; margin-top: 12px;">
+        <button id="apply">Apply</button>
+        <button id="spawn" class="secondary">Spawn enemy</button>
+      </div>
+      <div class="hint">
+        目标：不漂浮、贴地、更像动画。你看完告诉我：动作是否顺、敌人生成/死亡是否符合预期。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Always load latest physics-avatar.js in local preview (avoid browser cache)
+    (function loadDevScript() {
+      const s = document.createElement('script');
+      s.src = '/js/physics-avatar.js?dev=' + Date.now();
+      document.head.appendChild(s);
+    })();
+  </script>
+  <script>
+    let avatar = null;
+
+    function mount() {
+      const root = document.getElementById('stageRoot');
+      const mode = document.getElementById('mode').value;
+      const enemyCount = Math.max(1, Number(document.getElementById('enemyCount').value || 1));
+      const gravityY = Number(document.getElementById('gravity').value || 1);
+      const size = Number(document.getElementById('size').value || 240);
+
+      root.style.width = size + 'px';
+      root.style.height = size + 'px';
+
+      const boot = () => {
+        if (avatar) avatar.destroy();
+        avatar = new PhysicsAvatar(root, {
+          size,
+          combatOnly: mode === 'combatOnly',
+          gravityY,
+          enemyCount
+        });
+      };
+
+      // PhysicsAvatar may not be ready yet because we load it dynamically above
+      if (typeof PhysicsAvatar === 'undefined') {
+        setTimeout(boot, 30);
+      } else {
+        boot();
+      }
+    }
+
+    document.getElementById('apply').addEventListener('click', mount);
+    document.getElementById('spawn').addEventListener('click', () => {
+      if (!avatar) return;
+      avatar.createEnemy(avatar.options.size - 24, avatar.options.size / 2);
+    });
+
+    mount();
+  </script>
+</body>
+</html>
+
+

@@ -445,7 +445,10 @@ class AIAgent {
             // Check if PhysicsAvatar class is available
             if (typeof PhysicsAvatar !== 'undefined') {
                 this.physicsAvatar = new PhysicsAvatar(this.avatar3DEl, {
-                    size: 80
+                    size: 80,
+                    combatOnly: true,
+                    enemyCount: 1,
+                    enemyMaxAliveMs: 6000
                 });
                 this.avatarFallbackEl.style.display = 'none';
                 console.log('PhysicsAvatar initialized!');
@@ -453,7 +456,10 @@ class AIAgent {
                 // Fallback to loading script dynamically
                 this.loadPhysicsAvatarScript().then(() => {
                     this.physicsAvatar = new PhysicsAvatar(this.avatar3DEl, {
-                        size: 80
+                        size: 80,
+                        combatOnly: true,
+                        enemyCount: 1,
+                        enemyMaxAliveMs: 6000
                     });
                     this.avatarFallbackEl.style.display = 'none';
                     console.log('PhysicsAvatar initialized (dynamic load)!');
@@ -478,7 +484,7 @@ class AIAgent {
                 return;
             }
             const script = document.createElement('script');
-            script.src = '/js/physics-avatar.js?v=6.1';
+            script.src = '/js/physics-avatar.js?v=6.2';
             script.onload = resolve;
             script.onerror = reject;
             document.head.appendChild(script);

@@ -8,6 +8,10 @@ class PhysicsAvatar {
         this.container = container;
         this.options = {
             size: 80,
+            combatOnly: false,
+            gravityY: 1.0,
+            enemyCount: 1,
+            enemyMaxAliveMs: 6000,
             ...options
         };
 
@@ -21,6 +25,7 @@ class PhysicsAvatar {
         this.sword = null;
         this.enemies = [];
         this.walls = [];
+        this.ground = null;
 
         // Rendering
         this.canvas = null;
@@ -47,6 +52,29 @@ class PhysicsAvatar {
         this.frameCount = 0;
         this.lastTime = 0;
         this.nowMs = 0;
+        this.accumulatorMs = 0;
+        this.fixedStepMs = 1000 / 60;
+
+        // AI / combat timing (for animation-like behavior)
+        this.targetEnemy = null;
+        this.lastAttackAt = 0;
+        this.attackCooldownMs = 280;
+        this.manualHitCooldownMs = 90;
+        this.lastManualHitAt = 0;
+        this.walkPhase = 0;
+
+        // Combo (animation-like timeline)
+        this.combo = { active: false, step: 0, nextAt: 0, dir: 1 };
+        this.comboStepIntervalMs = 120; // fast combo
+        this.comboSteps = 3;
+
+        // Enemy spawn alternation (right/left)
+        // 1 => spawn right, -1 => spawn left
+        this.spawnSide = 1;
+
+        // Debug overlay
+        this.debug = { alive: 0, dead: 0, total: 0 };
+        this.spawnStats = { totalSpawned: 0, lastSpawnAt: 0, lastSpawnSide: 1 };
 
         this.init();
     }
@@ -60,9 +88,15 @@ class PhysicsAvatar {
         this.createCanvas();
         this.createPhysicsWorld();
         this.createCircularBoundary();
+        this.createGround();
         this.createKnight();
         this.startRenderLoop();
-        this.startStateCycle();
+        // If combatOnly, stay in combat forever (no sleep/practice)
+        if (this.options.combatOnly) {
+            this.setState('combat');
+        } else {
+            this.startStateCycle();
+        }
 
         console.log('PhysicsAvatar initialized!');
     }
@@ -96,8 +130,14 @@ class PhysicsAvatar {
 
         this.engine = Engine.create();
         this.world = this.engine.world;
-        this.world.gravity.y = 0.15; // Very light gravity for floating feel
+        // Default: normal-ish gravity so it doesn't look like floating
+        this.world.gravity.y = this.options.gravityY;
         this.world.gravity.x = 0;
+
+        // Make simulation more stable (less jitter)
+        this.engine.positionIterations = 8;
+        this.engine.velocityIterations = 6;
+        this.engine.constraintIterations = 4;
 
         // Collision events
         Matter.Events.on(this.engine, 'collisionStart', (event) => {
@@ -141,6 +181,25 @@ class PhysicsAvatar {
         Composite.add(this.world, this.walls);
     }
 
+    /**
+     * Create a simple ground platform inside the circle so the knight isn't floating
+     */
+    createGround() {
+        const { Bodies, Composite } = Matter;
+        const size = this.options.size;
+        const cx = size / 2;
+        const y = size - 14;
+        // Slightly curved/flat ground approximation
+        this.ground = Bodies.rectangle(cx, y, size * 0.7, 6, {
+            isStatic: true,
+            label: 'ground',
+            restitution: 0.0,
+            friction: 0.95,
+            render: { visible: false }
+        });
+        Composite.add(this.world, this.ground);
+    }
+
     createKnight() {
         const { Bodies, Body, Composite, Constraint } = Matter;
         const cx = this.options.size / 2;
@@ -159,7 +218,7 @@ class PhysicsAvatar {
         this.sword = Bodies.rectangle(cx + 12, cy - 5, 14, 2, {
             label: 'sword',
             density: 0.001,
-            frictionAir: 0.1,
+            frictionAir: 0.05, // allow faster slashes
             restitution: 0.1,
             render: { fillStyle: '#C0C0C0' }
         });
@@ -171,7 +230,7 @@ class PhysicsAvatar {
             bodyB: this.sword,
             pointB: { x: -5, y: 0 },
             stiffness: 0.9,
-            damping: 0.3,
+            damping: 0.15,
             length: 0
         });
 
@@ -194,6 +253,7 @@ class PhysicsAvatar {
         enemy.plugin.hp = 2;
         enemy.plugin.dead = false;
         enemy.plugin.deadAt = null; // ms
+        enemy.plugin.spawnedAt = this.nowMs || performance.now();
 
         this.enemies.push(enemy);
         Composite.add(this.world, enemy);
@@ -240,19 +300,21 @@ class PhysicsAvatar {
             enemy.plugin.hp -= 1;
         }
 
-        // Apply knockback (reduced to stay in bounds)
-        const force = { x: 0.003, y: -0.001 };
+        // Apply knockback (stronger + direction-aware)
+        const dir = enemy.position.x >= this.knight.position.x ? 1 : -1;
+        const force = { x: 0.010 * dir, y: -0.004 };
         Body.applyForce(enemy, enemy.position, force);
 
         // Hit effects
-        this.triggerHitStop(2);
-        this.triggerCameraShake(3);
+        this.triggerHitStop(3);
+        this.triggerCameraShake(7);
         this.spawnEffect('impact', enemy.position.x, enemy.position.y);
         this.spawnEffect('shockwave', enemy.position.x, enemy.position.y);
+        this.spawnEffect('flash', 0, 0);
 
         this.comboCount++;
         if (this.comboCount >= 2) {
-            this.spawnEffect('comicText', enemy.position.x - 10, enemy.position.y - 10, 'BAM!');
+            this.spawnEffect('comicText', enemy.position.x - 10, enemy.position.y - 10, this.comboCount >= 4 ? 'KAPOW!' : 'BAM!');
         }
 
         // Death: fade out then remove after 1.5s
@@ -269,6 +331,11 @@ class PhysicsAvatar {
             Body.applyForce(enemy, enemy.position, { x: 0.002, y: 0.001 });
 
             this.spawnEffect('comicText', enemy.position.x - 14, enemy.position.y - 14, 'K.O!');
+
+            // Immediately ensure new enemies if we're in combat (or combatOnly)
+            if (this.options.combatOnly || this.currentState === 'combat') {
+                this.ensureEnemyCount(this.options.enemyCount || 1);
+            }
         }
     }
 
@@ -280,18 +347,32 @@ class PhysicsAvatar {
         if (alive.length >= targetAlive) return;
 
         const size = this.options.size;
-        const cx = size / 2;
         const cy = size / 2;
-        const spawnX = size - 16;
-        const spawnY = cy + (Math.random() * 18 - 9);
+        const spawnYBase = cy + (Math.random() * 18 - 9);
 
-        // Avoid spawning too close to knight
-        const dx = spawnX - this.knight.position.x;
-        const dy = spawnY - this.knight.position.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const safeY = dist < 18 ? (cy - 14) : spawnY;
+        // Spawn enough to reach target
+        const missing = Math.max(0, targetAlive - alive.length);
+        for (let i = 0; i < missing; i++) {
+            // Alternate spawn side each enemy
+            const spawnX = this.spawnSide === 1 ? (size - 16) : 16;
+            const usedSide = this.spawnSide;
+            this.spawnSide *= -1;
 
-        this.createEnemy(spawnX, safeY);
+            const spawnY = spawnYBase + (Math.random() * 10 - 5);
+
+            // Avoid spawning too close to knight
+            const dx = spawnX - this.knight.position.x;
+            const dy = spawnY - this.knight.position.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const safeY = dist < 18 ? (cy - 14) : spawnY;
+
+            this.createEnemy(spawnX, safeY);
+
+            // Track spawn stats for on-screen debugging
+            this.spawnStats.totalSpawned += 1;
+            this.spawnStats.lastSpawnAt = this.nowMs || performance.now();
+            this.spawnStats.lastSpawnSide = usedSide;
+        }
     }
 
     /**
@@ -304,6 +385,11 @@ class PhysicsAvatar {
             e.plugin && e.plugin.dead && e.plugin.deadAt && (now - e.plugin.deadAt) >= fadeMs
         );
         toRemove.forEach(e => this.removeEnemy(e));
+
+        // After removals, if we're fighting, keep spawning to target count
+        if (toRemove.length > 0 && (this.options.combatOnly || this.currentState === 'combat')) {
+            this.ensureEnemyCount(this.options.enemyCount || 1);
+        }
     }
 
     triggerHitStop(frames) {
@@ -321,7 +407,7 @@ class PhysicsAvatar {
             y,
             text,
             life: 1,
-            maxLife: type === 'shockwave' ? 20 : 15,
+            maxLife: type === 'shockwave' ? 20 : (type === 'slash' ? 10 : (type === 'flash' ? 6 : 15)),
             frame: 0
         });
     }
@@ -390,31 +476,33 @@ class PhysicsAvatar {
 
     startIdle() {
         this.clearEnemies();
-        this.world.gravity.y = 0.1;
+        this.world.gravity.y = this.options.gravityY;
     }
 
     startSleep() {
         this.clearEnemies();
-        this.world.gravity.y = 0.2;
+        this.world.gravity.y = this.options.gravityY;
         // Knight sinks and tilts
         Matter.Body.setAngle(this.knight, 0.3);
     }
 
     startPractice() {
         this.clearEnemies();
-        this.world.gravity.y = 0.15;
+        this.world.gravity.y = this.options.gravityY;
     }
 
     startRest() {
         this.clearEnemies();
-        this.world.gravity.y = 0.2;
+        this.world.gravity.y = this.options.gravityY;
     }
 
     startCombat() {
-        this.world.gravity.y = 0.08;
+        this.world.gravity.y = this.options.gravityY;
         // Ensure at least 1 enemy exists
         this.ensureEnemyCount(1);
         this.combatPhase = 0;
+        this.targetEnemy = null;
+        this.lastAttackAt = this.nowMs || performance.now();
     }
 
     // ========== UPDATE LOOP ==========
@@ -425,8 +513,14 @@ class PhysicsAvatar {
             return; // Freeze physics during hit stop
         }
 
-        // Step physics
-        Matter.Engine.update(this.engine, dt * this.timeScale);
+        // Step physics with fixed timestep (prevents \"weird\" motion on variable FPS)
+        this.accumulatorMs += Math.min(dt, 50);
+        let steps = 0;
+        while (this.accumulatorMs >= this.fixedStepMs && steps < 3) {
+            Matter.Engine.update(this.engine, this.fixedStepMs * this.timeScale);
+            this.accumulatorMs -= this.fixedStepMs;
+            steps++;
+        }
 
         // IMPORTANT: Keep knight inside bounds
         this.constrainKnightPosition();
@@ -434,11 +528,19 @@ class PhysicsAvatar {
         // Clean up dead enemies (fade out then remove)
         this.cleanupDeadEnemies();
 
+        // HARD GUARANTEE: always maintain enemies while in combat / combatOnly
+        if (this.options.combatOnly || this.currentState === 'combat') {
+            this.ensureEnemyCount(this.options.enemyCount || 1);
+        }
+
+        // If an enemy refuses to die (no hits) for too long, auto-expire it so the fight keeps going
+        this.expireOldEnemies();
+
         // Update camera shake
         if (this.cameraShake.intensity > 0) {
             this.cameraShake.x = (Math.random() - 0.5) * this.cameraShake.intensity;
             this.cameraShake.y = (Math.random() - 0.5) * this.cameraShake.intensity;
-            this.cameraShake.intensity *= 0.85;
+            this.cameraShake.intensity *= 0.9; // longer/stronger
             if (this.cameraShake.intensity < 0.1) {
                 this.cameraShake.intensity = 0;
                 this.cameraShake.x = 0;
@@ -463,6 +565,27 @@ class PhysicsAvatar {
         this.updateState(dt);
 
         this.frameCount++;
+    }
+
+    expireOldEnemies() {
+        const now = this.nowMs || performance.now();
+        const maxAlive = this.options.enemyMaxAliveMs || 6000;
+        const { Body } = Matter;
+
+        for (const e of this.enemies) {
+            if (!e.plugin) continue;
+            if (e.plugin.dead) continue;
+            if (!e.plugin.spawnedAt) continue;
+
+            if (now - e.plugin.spawnedAt >= maxAlive) {
+                // Mark as dead and fade out
+                e.plugin.dead = true;
+                e.plugin.deadAt = now;
+                e.collisionFilter.mask = 0;
+                e.collisionFilter.category = 0;
+                Body.setAngularVelocity(e, (Math.random() - 0.5) * 0.4);
+            }
+        }
     }
 
     /**
@@ -515,8 +638,9 @@ class PhysicsAvatar {
         switch (this.currentState) {
             case 'idle':
                 // Gentle floating/breathing
-                const breathe = Math.sin(time) * 0.0002;
-                Body.applyForce(this.knight, this.knight.position, { x: 0, y: breathe });
+                // With gravity on, just do a subtle "idle sway" instead of floating
+                const sway = Math.sin(time) * 0.00015;
+                Body.applyForce(this.knight, this.knight.position, { x: sway, y: 0 });
                 break;
 
             case 'sleep':
@@ -527,8 +651,9 @@ class PhysicsAvatar {
 
             case 'practice':
                 // Periodic sword swings
-                const swing = Math.sin(time * 2) * 0.003;
-                Body.applyForce(this.sword, this.sword.position, { x: swing, y: -Math.abs(swing) * 0.5 });
+                // Smaller swing force so it reads like an animation, not physics explosion
+                const swing = Math.sin(time * 2) * 0.0012;
+                Body.applyForce(this.sword, this.sword.position, { x: swing, y: -Math.abs(swing) * 0.2 });
                 break;
 
             case 'combat':
@@ -544,53 +669,100 @@ class PhysicsAvatar {
 
     updateCombat(dt) {
         const { Body } = Matter;
-        const phaseTime = this.frameCount % 160; // 8 second loop at 20fps
+        const now = this.nowMs || performance.now();
 
-        // Combat choreography phases - reduced forces to stay in bounds
-        if (phaseTime < 20) {
-            // Phase 0: Ready stance - gentle center pull
-            this.combatPhase = 0;
-            this.pullToCenter(0.0001);
-        } else if (phaseTime < 40) {
-            // Phase 1: Dash forward (small)
-            if (this.combatPhase !== 1) {
-                this.combatPhase = 1;
-                Body.applyForce(this.knight, this.knight.position, { x: 0.0015, y: -0.0005 });
+        // 1) Pick a target (nearest alive)
+        const alive = this.enemies.filter(e => !(e.plugin && e.plugin.dead));
+        if (!this.targetEnemy || (this.targetEnemy.plugin && this.targetEnemy.plugin.dead)) {
+            this.targetEnemy = alive[0] || null;
+        }
+        if (!this.targetEnemy) return;
+
+        // 2) Enemy AI: drift toward knight (so it looks like a fight, not random)
+        this.enemyApproach(this.targetEnemy);
+
+        // 3) Knight AI: move to a \"fighting distance\" and attack on a timed cadence
+        const dx = this.targetEnemy.position.x - this.knight.position.x;
+        const absDx = Math.abs(dx);
+        const dir = dx >= 0 ? 1 : -1;
+
+        // Walk/run toward target
+        const desiredSpeed = absDx > 18 ? 1.2 : (absDx > 10 ? 0.7 : 0.2);
+        const vx = Math.max(-desiredSpeed, Math.min(desiredSpeed, dx * 0.05));
+        Body.setVelocity(this.knight, { x: vx, y: this.knight.velocity.y });
+
+        // Keep knight mostly upright (animation-like)
+        Body.setAngularVelocity(this.knight, this.knight.angularVelocity * 0.5);
+        Body.setAngle(this.knight, this.knight.angle * 0.9);
+
+        // Start a fast combo when close enough and cooldown passed
+        if (!this.combo.active && absDx < 16 && (now - this.lastAttackAt) >= this.attackCooldownMs) {
+            this.startCombo(dir, now);
+        }
+
+        // Progress combo steps
+        if (this.combo.active && now >= this.combo.nextAt) {
+            this.performSlash(this.combo.dir, this.combo.step);
+            this.combo.step += 1;
+            this.combo.nextAt = now + this.comboStepIntervalMs;
+
+            if (this.combo.step >= this.comboSteps) {
+                this.combo.active = false;
+                this.lastAttackAt = now;
             }
-        } else if (phaseTime < 60) {
-            // Phase 2: Slash!
-            if (this.combatPhase !== 2) {
-                this.combatPhase = 2;
-                Body.applyForce(this.sword, this.sword.position, { x: 0.002, y: -0.001 });
-                Body.setAngularVelocity(this.sword, 0.2);
+        }
+
+        // Manual hit check (so hits feel consistent even if collision misses)
+        this.manualSwordHitCheck(now);
+    }
+
+    enemyApproach(enemy) {
+        const { Body } = Matter;
+        const dx = this.knight.position.x - enemy.position.x;
+        const vx = Math.max(-0.6, Math.min(0.6, dx * 0.02));
+        Body.setVelocity(enemy, { x: vx, y: enemy.velocity.y });
+        Body.setAngularVelocity(enemy, enemy.angularVelocity * 0.6);
+    }
+
+    startCombo(dir, now) {
+        this.combo.active = true;
+        this.combo.step = 0;
+        this.combo.dir = dir;
+        this.combo.nextAt = now; // immediate
+    }
+
+    performSlash(dir, step = 0) {
+        const { Body } = Matter;
+        // Visible slash: bigger sword whip + small lunge, plus a slash arc effect
+        const lunge = 0.0012 + step * 0.0002;
+        const swordForce = 0.0035 + step * 0.0006;
+        const swordSpin = 1.2 + step * 0.25;
+
+        Body.applyForce(this.knight, this.knight.position, { x: lunge * dir, y: -0.00035 });
+        Body.setAngularVelocity(this.sword, swordSpin * dir);
+        Body.applyForce(this.sword, this.sword.position, { x: swordForce * dir, y: -0.0012 });
+
+        const tip = this.getSwordTip();
+        this.spawnEffect('slash', tip.x, tip.y, dir > 0 ? 'R' : 'L');
+
+        // Force a damage check right at slash timing (more \"he is cutting\" feeling)
+        const now = this.nowMs || performance.now();
+        this.manualSwordHitCheck(now, true);
+    }
+
+    manualSwordHitCheck(now, force = false) {
+        if (!force && (now - this.lastManualHitAt) < this.manualHitCooldownMs) return;
+        const tip = this.getSwordTip();
+        const alive = this.enemies.filter(e => !(e.plugin && e.plugin.dead));
+        for (const enemy of alive) {
+            const dx = enemy.position.x - tip.x;
+            const dy = enemy.position.y - tip.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < 14 * 14) {
+                this.lastManualHitAt = now;
+                this.onSwordHitEnemy(enemy);
+                break;
             }
-        } else if (phaseTime < 80) {
-            // Phase 3: Return to center
-            this.combatPhase = 3;
-            this.pullToCenter(0.0003);
-        } else if (phaseTime < 100) {
-            // Phase 4: Jump attack! (smaller jump)
-            if (this.combatPhase !== 4) {
-                this.combatPhase = 4;
-                Body.applyForce(this.knight, this.knight.position, { x: 0.001, y: -0.002 });
-                Body.applyForce(this.sword, this.sword.position, { x: 0.0015, y: -0.001 });
-            }
-        } else if (phaseTime < 120) {
-            // Phase 5: FINISHER (moderate force)
-            if (this.combatPhase !== 5) {
-                this.combatPhase = 5;
-                Body.applyForce(this.knight, this.knight.position, { x: 0.002, y: -0.001 });
-                Body.setAngularVelocity(this.sword, 0.3);
-                this.triggerCameraShake(4);
-            }
-        } else {
-            // Phase 6: Victory - pull back to center
-            this.combatPhase = 6;
-            this.pullToCenter(0.0005);
-            Body.setVelocity(this.knight, {
-                x: this.knight.velocity.x * 0.9,
-                y: this.knight.velocity.y * 0.9
-            });
         }
     }
 
@@ -679,7 +851,33 @@ class PhysicsAvatar {
                 alpha = 0.8 * (1 - t);
             }
             this.renderStickFigure(ctx, enemy.position.x, enemy.position.y, enemy.angle, '#FFFFFF', '#CCCCCC', 0.8, alpha);
+
+            // HP label (so you can see if it is actually dying)
+            if (enemy.plugin && !enemy.plugin.dead) {
+                ctx.save();
+                ctx.globalAlpha = 0.9;
+                ctx.font = 'bold 9px Arial';
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#111';
+                ctx.lineWidth = 2;
+                const hp = typeof enemy.plugin.hp === 'number' ? enemy.plugin.hp : '?';
+                ctx.strokeText(String(hp), enemy.position.x - 3, enemy.position.y - 12);
+                ctx.fillText(String(hp), enemy.position.x - 3, enemy.position.y - 12);
+                ctx.restore();
+            }
         });
+
+        // Debug overlay (top-left)
+        const alive = this.enemies.filter(e => !(e.plugin && e.plugin.dead)).length;
+        const dead = this.enemies.filter(e => (e.plugin && e.plugin.dead)).length;
+        this.debug = { alive, dead, total: this.enemies.length };
+        ctx.font = 'bold 9px Arial';
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        const sinceSpawn = this.spawnStats.lastSpawnAt ? Math.max(0, (this.nowMs - this.spawnStats.lastSpawnAt)) : 0;
+        const sideChar = this.spawnStats.lastSpawnSide === 1 ? 'R' : 'L';
+        ctx.fillText(`A:${alive} D:${dead} T:${this.enemies.length}`, 6, 10);
+        ctx.fillText(`spawned:${this.spawnStats.totalSpawned} last:${sideChar} ${Math.round(sinceSpawn)}ms`, 6, 22);
+        ctx.fillText(`target:${this.options.enemyCount || 1} combatOnly:${!!this.options.combatOnly}`, 6, 34);
 
         // Render knight
         this.renderKnight(ctx);
@@ -711,6 +909,9 @@ class PhysicsAvatar {
         const x = k.position.x;
         const y = k.position.y;
         const angle = k.angle;
+        const speedX = Math.abs(k.velocity.x || 0);
+        this.walkPhase += speedX * 0.25;
+        const legSwing = Math.sin(this.walkPhase) * Math.min(1, speedX / 1.2) * 3;
 
         ctx.save();
         ctx.translate(x, y);
@@ -742,9 +943,9 @@ class PhysicsAvatar {
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(0, 12);
-        ctx.lineTo(-4, 22);
+        ctx.lineTo(-4, 22 + legSwing);
         ctx.moveTo(0, 12);
-        ctx.lineTo(4, 22);
+        ctx.lineTo(4, 22 - legSwing);
         ctx.stroke();
 
         // Left arm + shield
@@ -886,6 +1087,12 @@ class PhysicsAvatar {
                 case 'comicText':
                     this.renderComicText(ctx, e);
                     break;
+                case 'slash':
+                    this.renderSlash(ctx, e);
+                    break;
+                case 'flash':
+                    this.renderFlash(ctx, e);
+                    break;
             }
         });
     }
@@ -934,6 +1141,34 @@ class PhysicsAvatar {
         ctx.lineWidth = 2;
         ctx.strokeText(e.text, 0, 0);
         ctx.fillText(e.text, 0, 0);
+        ctx.restore();
+    }
+
+    renderSlash(ctx, e) {
+        // A fast glowing arc near the hit position
+        const t = 1 - e.life;
+        const r = 10 + t * 18;
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, e.life * 1.2);
+        ctx.strokeStyle = `rgba(255, 215, 0, ${0.9 * e.life})`;
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        const start = e.text === 'R' ? -0.6 : Math.PI + 0.6;
+        const end = e.text === 'R' ? 0.6 : Math.PI - 0.6;
+        ctx.arc(e.x, e.y, r, start, end);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    renderFlash(ctx, e) {
+        // Quick white overlay flash for impact
+        ctx.save();
+        ctx.globalAlpha = 0.18 * e.life;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, this.options.size, this.options.size);
         ctx.restore();
     }
 
