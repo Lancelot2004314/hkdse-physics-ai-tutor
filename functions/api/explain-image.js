@@ -12,8 +12,8 @@ import { searchKnowledgeBase, formatKnowledgeContext } from '../../shared/embedd
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 const REQUEST_TIMEOUT = 90000; // 90 seconds for vision model
 
-// Model priority for auto-fallback - Gemini 3 Flash is primary (globally available, no VPN needed)
-const MODEL_PRIORITY = ['gemini-flash', 'gpt4o', 'gpt4o-mini', 'qwen-vl', 'gemini'];
+// Model priority for auto-fallback - Qwen-VL-Max is primary (globally available, no VPN needed, best for China)
+const MODEL_PRIORITY = ['qwen-vl', 'gemini-flash', 'gpt4o', 'gpt4o-mini', 'gemini'];
 
 // CORS headers
 const corsHeaders = {
@@ -207,10 +207,10 @@ export async function onRequestPost(context) {
     };
 
     // Save to D1 if image is text-only (no figures/graphs)
-    // We do a quick check using Gemini to detect if there are diagrams
-    if (env.DB && env.GEMINI_API_KEY) {
+    // We do a quick check using Qwen-VL to detect if there are diagrams (globally available)
+    if (env.DB && env.QWEN_API_KEY) {
       try {
-        const textExtraction = await extractTextIfNoFigures(env.GEMINI_API_KEY, base64Data, mimeType);
+        const textExtraction = await extractTextIfNoFigures(env.QWEN_API_KEY, base64Data, mimeType);
         if (textExtraction.isTextOnly && textExtraction.extractedText) {
           await saveTextQuestion(env.DB, textExtraction.extractedText, JSON.stringify(finalResult));
           console.log('Saved text-only image question to DB');
@@ -238,44 +238,47 @@ export async function onRequestPost(context) {
 
 /**
  * Check if image contains figures/graphs/diagrams, and extract text if it's text-only
+ * Uses Qwen-VL (globally available, no VPN needed)
  */
 async function extractTextIfNoFigures(apiKey, base64Data, mimeType) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key=${apiKey}`;
+  const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
 
-  const requestBody = {
-    contents: [
-      {
-        parts: [
-          {
-            inline_data: {
-              mime_type: mimeType,
-              data: base64Data
-            }
-          },
-          {
-            text: `Analyze this image and respond with JSON only:
+  const promptText = `Analyze this image and respond with JSON only:
 {
-  "hasFigures": true/false,  // Does this image contain any diagrams, graphs, charts, illustrations, or figures? 
-  "extractedText": "..."     // If hasFigures is false, extract ALL the text from the image. If hasFigures is true, leave empty.
+  "hasFigures": true/false,
+  "extractedText": "..."
 }
 
-A "figure" includes: graphs, charts, diagrams, circuit diagrams, force diagrams, illustrations, drawings, plots, tables with visual elements.
-Pure text (printed or handwritten) with no visual diagrams should have hasFigures=false.`
-          }
-        ]
-      }
-    ],
-    generationConfig: {
+hasFigures should be true if image contains: graphs, charts, diagrams, circuit diagrams, force diagrams, illustrations, drawings, plots, tables with visual elements.
+hasFigures should be false if image only contains pure text (printed or handwritten) with no visual diagrams.
+If hasFigures is false, extract ALL the text from the image into extractedText. If hasFigures is true, leave extractedText empty.`;
+
+  const requestBody = {
+    model: 'qwen-vl-max',
+    input: {
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { image: `data:${mimeType};base64,${base64Data}` },
+            { text: promptText }
+          ]
+        }
+      ]
+    },
+    parameters: {
       temperature: 0.1,
-      maxOutputTokens: 2048,
-      responseMimeType: 'application/json'
+      max_tokens: 2048
     }
   };
 
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
       body: JSON.stringify(requestBody),
     });
 
@@ -285,7 +288,7 @@ Pure text (printed or handwritten) with no visual diagrams should have hasFigure
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data.output?.choices?.[0]?.message?.content?.[0]?.text;
 
     if (!text) {
       return { isTextOnly: false, extractedText: null };
@@ -449,7 +452,7 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
   const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
 
   const requestBody = {
-    model: 'qwen-vl-plus',
+    model: 'qwen-vl-max',  // Best Qwen-VL model - superior visual reasoning
     input: {
       messages: [
         {

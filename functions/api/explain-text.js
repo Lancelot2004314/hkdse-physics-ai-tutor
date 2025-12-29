@@ -89,19 +89,19 @@ export async function onRequestPost(context) {
     // Get user from session (if logged in)
     const user = await getUserFromSession(request, env);
 
-    // Try Gemini Flash first (globally available, no VPN needed), fallback to DeepSeek
+    // Try DeepSeek first (globally available, no VPN needed), fallback to Gemini
     let result;
-    let usedModel = 'gemini-flash';
+    let usedModel = 'deepseek';
 
-    if (env.GEMINI_API_KEY) {
-      result = await callGeminiFlash(env.GEMINI_API_KEY, systemPrompt, userPrompt);
+    if (env.DEEPSEEK_API_KEY) {
+      result = await callDeepSeek(env.DEEPSEEK_API_KEY, systemPrompt, userPrompt);
     }
 
-    // Fallback to DeepSeek if Gemini fails or not configured
-    if (!result?.success && env.DEEPSEEK_API_KEY) {
-      console.log('Gemini Flash failed or not configured, falling back to DeepSeek');
-      result = await callDeepSeek(env.DEEPSEEK_API_KEY, systemPrompt, userPrompt);
-      usedModel = 'deepseek';
+    // Fallback to Gemini if DeepSeek fails or not configured
+    if (!result?.success && env.GEMINI_API_KEY) {
+      console.log('DeepSeek failed or not configured, falling back to Gemini');
+      result = await callGeminiFlash(env.GEMINI_API_KEY, systemPrompt, userPrompt);
+      usedModel = 'gemini-flash';
     }
 
     if (!result?.success) {
