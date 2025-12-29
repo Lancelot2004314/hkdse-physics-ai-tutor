@@ -224,7 +224,7 @@
             if (window.i18n) {
                 await window.i18n.initI18n();
             }
-            
+
             const sessionId = new URLSearchParams(window.location.search).get('session');
             if (!sessionId) {
                 alert('Missing session id');
@@ -258,9 +258,12 @@
             try {
                 const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
                 if (response.ok) {
-                    const user = await response.json();
-                    document.getElementById('userName').textContent = user.name || user.email?.split('@')[0] || 'User';
-                    document.getElementById('userEmail').textContent = user.email || '';
+                    const data = await response.json();
+                    const user = data.user;
+                    if (user) {
+                        document.getElementById('userName').textContent = user.name || user.email?.split('@')[0] || 'User';
+                        document.getElementById('userEmail').textContent = user.email || '';
+                    }
                     checkAdminAccess();
                 } else {
                     window.location.href = '/?login=true';

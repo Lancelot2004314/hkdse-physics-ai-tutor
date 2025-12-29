@@ -140,28 +140,35 @@
                     <a href="/"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
                 </li>
                 <li class="nav-item active">
-                    <a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a>
+                    <a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI
+                            Tutor</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/free-practice.html"><i class="fas fa-pen"></i> <span data-i18n="nav.freePractice">Free Practice</span></a>
+                    <a href="/free-practice.html"><i class="fas fa-pen"></i> <span data-i18n="nav.freePractice">Free
+                            Practice</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.statistics">Statistics</span></a>
+                    <a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span
+                            data-i18n="nav.statistics">Statistics</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/practice-history.html"><i class="fas fa-history"></i> <span data-i18n="nav.history">History</span></a>
+                    <a href="/practice-history.html"><i class="fas fa-history"></i> <span
+                            data-i18n="nav.history">History</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span data-i18n="nav.bookmarks">Bookmarks</span></a>
+                    <a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span
+                            data-i18n="nav.bookmarks">Bookmarks</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span data-i18n="nav.leaderboard">Leaderboard</span></a>
+                    <a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span
+                            data-i18n="nav.leaderboard">Leaderboard</span></a>
                 </li>
                 <li class="nav-item">
                     <a href="/profile.html"><i class="fas fa-user"></i> <span data-i18n="nav.profile">Profile</span></a>
                 </li>
                 <li class="nav-item admin-only" id="adminNavItem" hidden>
-                    <a href="/admin.html"><i class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a>
+                    <a href="/admin.html"><i class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin
+                            Panel</span></a>
                 </li>
             </ul>
             <div class="sidebar-footer">
@@ -177,8 +184,8 @@
             <div class="ai-tutor-content">
                 <!-- Header -->
                 <header class="header animate-on-scroll fade-in-up">
-                    <h1><i class="fas fa-robot"></i> AI Tutor</h1>
-                    <p>上傳題目照片，獲得 DSE 風格分步講解</p>
+                    <h1><i class="fas fa-robot"></i> <span data-i18n="aiTutor.title">AI Tutor</span></h1>
+                    <p data-i18n="aiTutor.subtitle">Upload question photos for DSE-style step-by-step explanations</p>
                 </header>
 
                 <!-- Upload Section -->
@@ -186,10 +193,10 @@
                     <!-- Input Mode Toggle -->
                     <div class="input-mode-toggle">
                         <button type="button" class="mode-btn active" id="modeImage" data-mode="image">
-                            <i class="fas fa-image"></i> 圖片題
+                            <i class="fas fa-image"></i> <span data-i18n="aiTutor.imageMode">Image Question</span>
                         </button>
                         <button type="button" class="mode-btn" id="modeText" data-mode="text">
-                            <i class="fas fa-keyboard"></i> 文字題
+                            <i class="fas fa-keyboard"></i> <span data-i18n="aiTutor.textMode">Text Question</span>
                         </button>
                     </div>
 
@@ -198,8 +205,8 @@
                         <input type="file" id="imageInput" accept="image/*" capture="environment" hidden>
                         <div class="upload-placeholder" id="uploadPlaceholder">
                             <i class="fas fa-cloud-upload-alt"></i>
-                            <p>點擊或拖放上傳題目照片</p>
-                            <span>支援 JPG, PNG, WebP（最大 3MB）</span>
+                            <p data-i18n="aiTutor.uploadPrompt">Click or drag to upload question photo</p>
+                            <span data-i18n="aiTutor.uploadFormats">Supports JPG, PNG, WebP (max 3MB)</span>
                         </div>
                         <div class="image-preview" id="imagePreview" hidden>
                         </div>
@@ -207,41 +214,41 @@
 
                     <!-- Text Input Area (for text mode) -->
                     <div class="input-group text-input-area" id="textInputArea" hidden>
-                        <label for="problemText">題目內容（純文字）</label>
-                        <textarea id="problemText" rows="6"
-                            placeholder="在此輸入或貼上題目內容...&#10;&#10;例如：&#10;一個質量為 2 kg 的物體從 10 m 高處自由下落，求落地時的速度。（設 g = 10 m/s²）"></textarea>
+                        <label for="problemText" data-i18n="aiTutor.problemContent">Problem Content (text)</label>
+                        <textarea id="problemText" rows="6" data-i18n-placeholder="aiTutor.enterText"
+                            placeholder="Enter problem content here..."></textarea>
                     </div>
 
                     <!-- Question Input -->
                     <div class="input-group">
-                        <label for="questionInput">你的問題（可選但建議填寫）</label>
-                        <textarea id="questionInput" placeholder="例如：點解要用 F=ma？我唔明白第二步..."></textarea>
+                        <label for="questionInput" data-i18n="aiTutor.yourQuestion">Your Question (optional but recommended)</label>
+                        <textarea id="questionInput" data-i18n-placeholder="aiTutor.questionPlaceholder" placeholder="e.g. Why use F=ma? I don't understand step 2..."></textarea>
                     </div>
 
                     <!-- Options -->
                     <div class="options-row">
                         <div class="option-group">
-                            <label for="levelSelect">程度</label>
+                            <label for="levelSelect" data-i18n="aiTutor.level">Level</label>
                             <select id="levelSelect">
-                                <option value="basic">基礎</option>
-                                <option value="standard" selected>標準 DSE</option>
-                                <option value="advanced">進階/衝星</option>
+                                <option value="basic" data-i18n="aiTutor.levelBasic">Basic</option>
+                                <option value="standard" selected data-i18n="aiTutor.levelStandard">Standard DSE</option>
+                                <option value="advanced" data-i18n="aiTutor.levelAdvanced">Advanced</option>
                             </select>
                         </div>
                         <div class="option-group">
-                            <label for="modeSelect">模式</label>
+                            <label for="modeSelect" data-i18n="aiTutor.mode">Mode</label>
                             <select id="modeSelect">
-                                <option value="direct" selected>直接講解</option>
-                                <option value="socratic">蘇格拉底引導</option>
+                                <option value="direct" selected data-i18n="aiTutor.modeDirect">Direct Explanation</option>
+                                <option value="socratic" data-i18n="aiTutor.modeSocratic">Socratic Guidance</option>
                             </select>
                         </div>
                         <div class="option-group" id="visionModelGroup">
-                            <label for="visionModelSelect">AI 模型</label>
+                            <label for="visionModelSelect" data-i18n="aiTutor.aiModel">AI Model</label>
                             <select id="visionModelSelect">
-                                <option value="auto" selected>自動 (失敗自動切換)</option>
-                                <option value="gpt4o">GPT-4o (最強)</option>
-                                <option value="gpt4o-mini">GPT-4o-mini (快速)</option>
-                                <option value="qwen-vl">通義千問 VL</option>
+                                <option value="auto" selected data-i18n="aiTutor.modelAuto">Auto (fallback on failure)</option>
+                                <option value="gpt4o">GPT-4o</option>
+                                <option value="gpt4o-mini">GPT-4o-mini</option>
+                                <option value="qwen-vl">Qwen VL</option>
                                 <option value="gemini">Gemini 1.5 Flash</option>
                             </select>
                         </div>
@@ -250,87 +257,87 @@
                     <!-- Student Attempt (Optional) -->
                     <div class="input-group collapsible">
                         <button class="collapse-toggle" id="toggleAttempt">
-                            <i class="fas fa-chevron-down"></i> 填寫你的答案/思路（可選）
+                            <i class="fas fa-chevron-down"></i> <span data-i18n="aiTutor.yourAttempt">Your attempt/thinking (optional)</span>
                         </button>
-                        <textarea id="studentAttempt" placeholder="你的答案或卡住的地方..." hidden></textarea>
+                        <textarea id="studentAttempt" placeholder="Your answer or where you got stuck..." hidden></textarea>
                     </div>
 
                     <!-- Submit Button -->
                     <button class="btn-primary btn-glow ripple shine" id="submitBtn" disabled>
-                        <i class="fas fa-paper-plane"></i> 獲取講解
+                        <i class="fas fa-paper-plane"></i> <span data-i18n="aiTutor.getExplanation">Get Explanation</span>
                     </button>
                 </section>
 
                 <!-- Loading -->
                 <div class="loading" id="loading" hidden>
                     <div class="spinner"></div>
-                    <p>AI 正在分析題目...</p>
+                    <p data-i18n="aiTutor.analyzing">AI is analyzing...</p>
                 </div>
 
                 <!-- Results Section -->
                 <section class="results-section" id="resultsSection" hidden>
                     <div class="result-card card-lift animate-on-scroll fade-in-up stagger-1">
-                        <h2><i class="fas fa-lightbulb"></i> 題目摘要</h2>
+                        <h2><i class="fas fa-lightbulb"></i> <span data-i18n="aiTutor.problemSummary">Problem Summary</span></h2>
                         <div id="problemSummary" class="result-content"></div>
                     </div>
 
                     <div class="result-card card-lift animate-on-scroll fade-in-up stagger-2">
-                        <h2><i class="fas fa-list-ol"></i> 分步講解</h2>
+                        <h2><i class="fas fa-list-ol"></i> <span data-i18n="aiTutor.stepByStep">Step-by-Step Explanation</span></h2>
                         <div id="stepsContent" class="result-content steps-list"></div>
                     </div>
 
                     <div class="result-card card-lift animate-on-scroll fade-in-up stagger-3">
-                        <h2><i class="fas fa-exclamation-triangle"></i> 常見錯誤</h2>
+                        <h2><i class="fas fa-exclamation-triangle"></i> <span data-i18n="aiTutor.commonMistakes">Common Mistakes</span></h2>
                         <div id="mistakesContent" class="result-content"></div>
                     </div>
 
                     <div class="result-card card-lift animate-on-scroll fade-in-up stagger-4">
-                        <h2><i class="fas fa-star"></i> Exam Tips</h2>
+                        <h2><i class="fas fa-star"></i> <span data-i18n="aiTutor.examTips">Exam Tips</span></h2>
                         <div id="tipsContent" class="result-content"></div>
                     </div>
 
                     <div class="result-card card-lift animate-on-scroll fade-in-up stagger-5">
-                        <h2><i class="fas fa-check-circle"></i> 驗算檢查</h2>
+                        <h2><i class="fas fa-check-circle"></i> <span data-i18n="aiTutor.verification">Verification</span></h2>
                         <div id="verificationContent" class="result-content"></div>
                     </div>
 
                     <div class="result-card collapsible">
                         <button class="collapse-toggle" id="toggleAnswer">
-                            <i class="fas fa-eye"></i> 顯示最終答案
+                            <i class="fas fa-eye"></i> <span data-i18n="aiTutor.showAnswer">Show Final Answer</span>
                         </button>
                         <div id="finalAnswer" class="result-content final-answer" hidden></div>
                     </div>
 
                     <div class="result-card">
-                        <h2><i class="fas fa-book"></i> 術語對照</h2>
+                        <h2><i class="fas fa-book"></i> <span data-i18n="aiTutor.glossary">Glossary</span></h2>
                         <div id="glossaryContent" class="result-content glossary"></div>
                     </div>
 
                     <!-- Practice Section -->
                     <div class="result-card practice-card" id="practiceSection" hidden>
-                        <h2><i class="fas fa-dumbbell"></i> 練習時間 Practice Time!</h2>
+                        <h2><i class="fas fa-dumbbell"></i> <span data-i18n="aiTutor.practiceTime">Practice Time!</span></h2>
                         <div class="practice-content">
                             <div class="practice-question" id="practiceQuestion">
                                 <p class="practice-loading">
-                                    <i class="fas fa-spinner fa-spin"></i> 正在生成練習題...
+                                    <i class="fas fa-spinner fa-spin"></i> <span data-i18n="aiTutor.generatingPractice">Generating practice question...</span>
                                 </p>
                             </div>
                             <div class="practice-options" id="practiceOptions"></div>
                             <div class="practice-actions">
                                 <button class="btn-primary" id="submitPractice" disabled>
-                                    <i class="fas fa-check"></i> 提交答案 Submit
+                                    <i class="fas fa-check"></i> <span data-i18n="aiTutor.submitAnswer">Submit</span>
                                 </button>
                                 <button class="btn-secondary" id="skipPractice">
-                                    <i class="fas fa-forward"></i> 跳過 Skip
+                                    <i class="fas fa-forward"></i> <span data-i18n="aiTutor.skip">Skip</span>
                                 </button>
                                 <button class="btn-secondary" id="nextPractice" hidden>
-                                    <i class="fas fa-redo"></i> 再來一題 Next
+                                    <i class="fas fa-redo"></i> <span data-i18n="aiTutor.nextQuestion">Next</span>
                                 </button>
                             </div>
                             <div class="practice-result" id="practiceResult" hidden></div>
                             <div class="practice-stats" id="practiceStats">
-                                <span class="stat-item">🔥 連續: <span id="currentStreak">0</span></span>
-                                <span class="stat-item">🎯 積分: <span id="totalPoints">0</span></span>
+                                <span class="stat-item">🔥 <span data-i18n="aiTutor.streak">Streak</span>: <span id="currentStreak">0</span></span>
+                                <span class="stat-item">🎯 <span data-i18n="aiTutor.points">Points</span>: <span id="totalPoints">0</span></span>
                             </div>
                         </div>
                     </div>
@@ -338,17 +345,17 @@
 
                 <!-- Chat Box -->
                 <section class="chat-section" id="chatSection" hidden>
-                    <h2><i class="fas fa-comments"></i> 繼續追問</h2>
+                    <h2><i class="fas fa-comments"></i> <span data-i18n="aiTutor.followUp">Continue Asking</span></h2>
                     <div class="chat-messages" id="chatMessages"></div>
                     <div class="chat-input-area">
                         <div class="chat-options">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="needsVision">
-                                <span>需要看圖</span>
+                                <span data-i18n="aiTutor.needsImage">Needs image</span>
                             </label>
                         </div>
                         <div class="chat-input-row">
-                            <textarea id="chatInput" placeholder="繼續問關於這道題的問題..."></textarea>
+                            <textarea id="chatInput" placeholder="Ask more questions about this problem..."></textarea>
                             <button class="btn-send" id="sendChat">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
@@ -358,18 +365,18 @@
 
                 <!-- New Question Button -->
                 <button class="btn-secondary" id="newQuestionBtn" hidden>
-                    <i class="fas fa-plus"></i> 問新題目
+                    <i class="fas fa-plus"></i> <span data-i18n="aiTutor.newQuestion">New Question</span>
                 </button>
 
                 <!-- Debug Log Panel -->
                 <section class="debug-section" id="debugSection">
                     <button class="collapse-toggle" id="toggleDebug">
-                        <i class="fas fa-bug"></i> Debug Log
+                        <i class="fas fa-bug"></i> <span data-i18n="aiTutor.debugLog">Debug Log</span>
                     </button>
                     <div class="debug-content" id="debugContent" hidden>
                         <div class="debug-actions">
-                            <button class="btn-small" id="clearDebug">清空</button>
-                            <button class="btn-small" id="copyDebug">複製</button>
+                            <button class="btn-small" id="clearDebug" data-i18n="aiTutor.clear">Clear</button>
+                            <button class="btn-small" id="copyDebug" data-i18n="aiTutor.copy">Copy</button>
                         </div>
                         <pre id="debugLog"></pre>
                     </div>
@@ -377,7 +384,7 @@
 
                 <!-- Footer -->
                 <footer class="footer">
-                    <p>HKDSE Physics AI Tutor | 僅作學習輔助，不保證滿分</p>
+                    <p>HKDSE Physics AI Tutor | For learning assistance only</p>
                 </footer>
             </div>
         </main>
@@ -412,7 +419,7 @@
             // Initialize i18n first
             await window.i18n.initI18n();
             window.i18n.createLanguageSwitcher('langSwitcherContainer');
-            
+
             initScrollAnimations();
         });
 
