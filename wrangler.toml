@@ -22,6 +22,10 @@ index_name = "hkdse-physics-kb"
 binding = "R2_BUCKET"
 bucket_name = "hkdse-physics-docs"
 
+# Cloudflare Workers AI binding (globally available, no VPN required)
+[ai]
+binding = "AI"
+
 # Note: Queues require paid plan. Using manual /api/kb/process endpoint instead.
 
 # Required environment variables (set in Cloudflare Dashboard):

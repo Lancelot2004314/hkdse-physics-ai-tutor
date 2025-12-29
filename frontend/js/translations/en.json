@@ -286,5 +286,26 @@
     "copied": "Copied to clipboard!",
     "uploading": "Uploading...",
     "processing": "Processing..."
+  },
+  "aiAgent": {
+    "name": "Lancelot",
+    "title": "Physics Learning Assistant",
+    "welcome": "Hello! I'm Lancelot, your physics learning assistant. How can I help you? ⚔️",
+    "placeholder": "Type a message or click the mic to speak...",
+    "quickAction1": "How to use AI Tutor?",
+    "quickAction1Full": "How do I use the AI Tutor feature?",
+    "quickAction2": "Start Practice",
+    "quickAction2Full": "I want to start practice questions, how do I do that?",
+    "quickAction3": "Physics Question",
+    "quickAction3Full": "I have a physics question to ask you",
+    "error": "Sorry, I encountered an issue. Please try again later.",
+    "noSpeech": "No speech detected, please try again.",
+    "micError": "Cannot access microphone. Please check permissions.",
+    "micDenied": "Microphone permission denied. Please allow in browser settings.",
+    "networkError": "Network error, please check connection.",
+    "speechCancelled": "Speech recognition cancelled.",
+    "langNotSupported": "Speech recognition not supported for current language.",
+    "speechFailed": "Speech recognition failed. Please try again or type your message.",
+    "browserNotSupported": "Your browser does not support speech recognition. Please use Chrome or Edge."
   }
 }

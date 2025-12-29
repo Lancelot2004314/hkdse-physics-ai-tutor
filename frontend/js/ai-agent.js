@@ -8,14 +8,6 @@ class AIAgent {
         this.options = {
             containerId: 'ai-agent-root',
             theme: 'knight', // 'default' or 'knight'
-            welcomeMessage: '你好！我是 Lancelot，你的物理學習助手。有什麼可以幫你的嗎？',
-            agentName: 'Lancelot',
-            agentTitle: '物理學習助手',
-            quickActions: [
-                { text: '如何使用 AI Tutor？', action: '如何使用 AI Tutor？' },
-                { text: '開始練習題', action: '我想開始做練習題' },
-                { text: '查看排行榜', action: '怎麼查看排行榜？' }
-            ],
             ...options
         };
 
@@ -55,30 +47,140 @@ class AIAgent {
         this.init();
     }
 
+    /**
+     * Get translation from i18n system
+     */
+    t(key) {
+        // #region agent log
+        const hasT = window.i18n && typeof window.i18n.t === 'function';
+        const result = hasT ? window.i18n.t(key) : null;
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:t',message:'Translation lookup',data:{key,hasT,result,isKeyReturned:result===key},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'F,G,H'})}).catch(()=>{});
+        // #endregion
+
+        if (window.i18n && typeof window.i18n.t === 'function') {
+            const translated = window.i18n.t(key);
+            // If i18n returns the key itself, translations not loaded yet - use fallback
+            if (translated !== key) {
+                return translated;
+            }
+        }
+        // Fallback translations (used when i18n not ready or key not found)
+        const fallbacks = {
+            'aiAgent.name': 'Lancelot',
+            'aiAgent.title': 'Physics Learning Assistant',
+            'aiAgent.welcome': 'Hello! I\'m Lancelot, your physics learning assistant. How can I help you? ⚔️',
+            'aiAgent.placeholder': 'Type a message or click the mic to speak...',
+            'aiAgent.quickAction1': 'How to use AI Tutor?',
+            'aiAgent.quickAction1Full': 'How do I use the AI Tutor feature?',
+            'aiAgent.quickAction2': 'Start Practice',
+            'aiAgent.quickAction2Full': 'I want to start practice questions',
+            'aiAgent.quickAction3': 'Physics Question',
+            'aiAgent.quickAction3Full': 'I have a physics question',
+            'aiAgent.error': 'Sorry, I encountered an issue. Please try again later.',
+            'aiAgent.browserNotSupported': 'Your browser does not support speech recognition.',
+            'aiAgent.noSpeech': 'No speech detected, please try again.',
+            'aiAgent.micError': 'Cannot access microphone. Please check permissions.',
+            'aiAgent.micDenied': 'Microphone permission denied.',
+            'aiAgent.networkError': 'Network error, please check connection.',
+            'aiAgent.speechCancelled': 'Speech recognition cancelled.',
+            'aiAgent.langNotSupported': 'Language not supported.',
+            'aiAgent.speechFailed': 'Speech recognition failed. Please try again or type.'
+        };
+        return fallbacks[key] || key;
+    }
+
     init() {
+        // #region agent log
+        const initLang = this.getCurrentLanguage();
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:init',message:'AIAgent initializing',data:{detectedLang:initLang,translationTest:this.t('aiAgent.welcome')},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D'})}).catch(()=>{});
+        // #endregion
+
         this.createDOM();
         this.bindEvents();
         this.initThreeJS();
         this.initWebSpeechAPI();
+        this.listenForLanguageChange();
 
         // Add welcome message
         setTimeout(() => {
-            this.addMessage(this.options.welcomeMessage, 'assistant');
+            this.addMessage(this.t('aiAgent.welcome'), 'assistant');
         }, 500);
+    }
+
+    /**
+     * Listen for language changes and update UI
+     */
+    listenForLanguageChange() {
+        window.addEventListener('languageChanged', () => {
+            this.updateUILanguage();
+        });
+    }
+
+    /**
+     * Update all UI text when language changes
+     */
+    updateUILanguage() {
+        // Update header
+        const headerName = this.container.querySelector('.ai-agent-header-name');
+        const headerStatus = this.container.querySelector('.ai-agent-header-status');
+        if (headerName) headerName.textContent = this.t('aiAgent.name');
+        if (headerStatus) headerStatus.textContent = this.t('aiAgent.title');
+
+        // Update input placeholder
+        if (this.inputEl) {
+            this.inputEl.placeholder = this.t('aiAgent.placeholder');
+        }
+
+        // Update quick actions
+        const quickBtns = this.container.querySelectorAll('.ai-agent-quick-btn');
+        if (quickBtns.length >= 3) {
+            quickBtns[0].textContent = this.t('aiAgent.quickAction1');
+            quickBtns[0].dataset.action = this.t('aiAgent.quickAction1Full');
+            quickBtns[1].textContent = this.t('aiAgent.quickAction2');
+            quickBtns[1].dataset.action = this.t('aiAgent.quickAction2Full');
+            quickBtns[2].textContent = this.t('aiAgent.quickAction3');
+            quickBtns[2].dataset.action = this.t('aiAgent.quickAction3Full');
+        }
+
+        // Update speech recognition language
+        if (this.recognition) {
+            this.recognition.lang = this.getSpeechRecognitionLang();
+        }
     }
 
     /**
      * Get current language from i18n system or browser
      */
     getCurrentLanguage() {
+        // #region agent log
+        const debugData = {
+            hasI18n: !!window.i18n,
+            i18nType: typeof window.i18n,
+            hasGetLanguage: window.i18n ? typeof window.i18n.getLanguage : 'no i18n',
+            localStorageKeys: Object.keys(localStorage),
+            navigatorLang: navigator.language
+        };
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:getCurrentLanguage:entry',message:'Checking language sources',data:debugData,timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
+        // #endregion
+
         // Try i18n system first
         if (window.i18n && typeof window.i18n.getLanguage === 'function') {
-            return window.i18n.getLanguage();
+            const i18nLang = window.i18n.getLanguage();
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:getCurrentLanguage:i18n',message:'Got language from i18n',data:{i18nLang},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,D'})}).catch(()=>{});
+            // #endregion
+            return i18nLang;
         }
         // Try localStorage
         const stored = localStorage.getItem('language') || localStorage.getItem('lang');
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:getCurrentLanguage:localStorage',message:'Checking localStorage',data:{stored,allKeys:Object.keys(localStorage)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,E'})}).catch(()=>{});
+        // #endregion
         if (stored) return stored;
         // Fall back to browser language
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:getCurrentLanguage:fallback',message:'Using browser language',data:{navigatorLang:navigator.language},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
         return navigator.language || 'zh-HK';
     }
 
@@ -131,17 +233,17 @@ class AIAgent {
                 this.voiceBtnEl.classList.remove('recording');
                 this.voiceBtnEl.textContent = '🎤';
                 
-                // User-friendly error messages
+                // User-friendly error messages using i18n
                 const errorMessages = {
-                    'no-speech': '沒有檢測到語音，請再試一次。',
-                    'audio-capture': '無法存取麥克風，請檢查權限設置。',
-                    'not-allowed': '麥克風權限被拒絕，請在瀏覽器設置中允許。',
-                    'network': '網絡錯誤，請檢查連接。',
-                    'aborted': '語音識別已取消。',
-                    'language-not-supported': '不支持當前語言的語音識別。'
+                    'no-speech': this.t('aiAgent.noSpeech'),
+                    'audio-capture': this.t('aiAgent.micError'),
+                    'not-allowed': this.t('aiAgent.micDenied'),
+                    'network': this.t('aiAgent.networkError'),
+                    'aborted': this.t('aiAgent.speechCancelled'),
+                    'language-not-supported': this.t('aiAgent.langNotSupported')
                 };
                 
-                const msg = errorMessages[event.error] || '語音識別失敗，請再試一次或輸入文字。';
+                const msg = errorMessages[event.error] || this.t('aiAgent.speechFailed');
                 this.addMessage(msg, 'assistant');
             };
 
@@ -249,8 +351,8 @@ class AIAgent {
                 <div class="ai-agent-header">
                     <div class="ai-agent-header-avatar">🛡️</div>
                     <div class="ai-agent-header-info">
-                        <div class="ai-agent-header-name">${this.options.agentName}</div>
-                        <div class="ai-agent-header-status">${this.options.agentTitle}</div>
+                        <div class="ai-agent-header-name">${this.t('aiAgent.name')}</div>
+                        <div class="ai-agent-header-status">${this.t('aiAgent.title')}</div>
                     </div>
                     <button class="ai-agent-close" id="agentClose">&times;</button>
                 </div>
@@ -262,16 +364,16 @@ class AIAgent {
 
                 <!-- Quick Actions -->
                 <div class="ai-agent-quick-actions" id="agentQuickActions">
-                    ${this.options.quickActions.map(action =>
-            `<button class="ai-agent-quick-btn" data-action="${action.action}">${action.text}</button>`
-        ).join('')}
+                    <button class="ai-agent-quick-btn" data-action="${this.t('aiAgent.quickAction1Full')}">${this.t('aiAgent.quickAction1')}</button>
+                    <button class="ai-agent-quick-btn" data-action="${this.t('aiAgent.quickAction2Full')}">${this.t('aiAgent.quickAction2')}</button>
+                    <button class="ai-agent-quick-btn" data-action="${this.t('aiAgent.quickAction3Full')}">${this.t('aiAgent.quickAction3')}</button>
                 </div>
 
                 <!-- Input Area -->
                 <div class="ai-agent-input-area">
                     <div class="ai-agent-input-row">
                         <input type="text" class="ai-agent-input" id="agentInput" 
-                               placeholder="輸入訊息或點擊麥克風說話..." />
+                               placeholder="${this.t('aiAgent.placeholder')}" />
                         <button class="ai-agent-btn ai-agent-btn-voice" id="agentVoiceBtn">
                             🎤
                         </button>
@@ -558,14 +660,16 @@ class AIAgent {
         this.setStatus('thinking');
 
         try {
-            // Call chat API
+            // Call chat API with current language
+            const currentLang = this.getCurrentLanguage();
             const response = await fetch('/api/agent/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({
                     message: text,
-                    history: this.messages.slice(-10)
+                    history: this.messages.slice(-10),
+                    language: currentLang
                 })
             });
 
@@ -589,7 +693,7 @@ class AIAgent {
             console.error('Send message error:', err);
             this.hideTyping();
             this.setStatus('online');
-            this.addMessage('抱歉，我遇到了一些問題。請稍後再試。', 'assistant');
+            this.addMessage(this.t('aiAgent.error'), 'assistant');
         }
     }
 
@@ -657,6 +761,22 @@ class AIAgent {
     }
 
     /**
+     * Remove emojis from text before TTS
+     */
+    stripEmojis(text) {
+        // Remove emojis, symbols, and special characters that TTS might pronounce
+        return text
+            .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Emojis
+            .replace(/[\u{2600}-\u{26FF}]/gu, '')   // Misc symbols
+            .replace(/[\u{2700}-\u{27BF}]/gu, '')   // Dingbats
+            .replace(/[\u{FE00}-\u{FE0F}]/gu, '')   // Variation selectors
+            .replace(/[\u{1F000}-\u{1F02F}]/gu, '') // Mahjong tiles
+            .replace(/[\u{1F0A0}-\u{1F0FF}]/gu, '') // Playing cards
+            .replace(/\s+/g, ' ')                   // Collapse multiple spaces
+            .trim();
+    }
+
+    /**
      * Browser's free Web Speech API with smart voice selection
      */
     speakWithBrowserTTS(text) {
@@ -664,7 +784,15 @@ class AIAgent {
             // Cancel any ongoing speech
             speechSynthesis.cancel();
             
-            const utterance = new SpeechSynthesisUtterance(text);
+            // Remove emojis before speaking
+            const cleanText = this.stripEmojis(text);
+            if (!cleanText) {
+                this.isSpeaking = false;
+                this.avatarEl.classList.remove('speaking');
+                return resolve();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(cleanText);
             
             // Get the best voice for current language
             const bestVoice = this.getBestVoice();
@@ -710,7 +838,7 @@ class AIAgent {
     async startRecording() {
         // Use Web Speech API (FREE!) instead of server-side STT
         if (!this.recognition) {
-            this.addMessage('您的瀏覽器不支持語音識別功能。請使用 Chrome 或 Edge 瀏覽器。', 'assistant');
+            this.addMessage(this.t('aiAgent.browserNotSupported'), 'assistant');
             return;
         }
 
@@ -736,7 +864,7 @@ class AIAgent {
                 this.voiceBtnEl.classList.remove('recording');
                 this.voiceBtnEl.textContent = '🎤';
             } else {
-                this.addMessage('無法啟動語音識別。請確保已授予麥克風權限。', 'assistant');
+                this.addMessage(this.t('aiAgent.micError'), 'assistant');
             }
         }
     }
@@ -769,17 +897,9 @@ class AIAgent {
 
 // Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize AI Agent
+    // Initialize AI Agent (translations loaded from i18n system)
     window.aiAgent = new AIAgent({
-        theme: 'knight',
-        agentName: 'Lancelot',
-        agentTitle: '物理學習助手',
-        welcomeMessage: '你好！我是 Lancelot，你的物理學習助手。有什麼可以幫你的嗎？⚔️',
-        quickActions: [
-            { text: '如何使用 AI Tutor？', action: '請問如何使用 AI Tutor 功能？' },
-            { text: '開始練習題', action: '我想開始做練習題，該怎麼操作？' },
-            { text: '物理問題', action: '我有一個物理問題想問你' }
-        ]
+        theme: 'knight'
     });
 });
 

@@ -286,5 +286,26 @@
     "copied": "已複製到剪貼板！",
     "uploading": "上傳中...",
     "processing": "處理中..."
+  },
+  "aiAgent": {
+    "name": "Lancelot",
+    "title": "物理學習助手",
+    "welcome": "你好！我是 Lancelot，你的物理學習助手。有什麼可以幫你的嗎？⚔️",
+    "placeholder": "輸入訊息或點擊麥克風說話...",
+    "quickAction1": "如何使用 AI Tutor？",
+    "quickAction1Full": "請問如何使用 AI Tutor 功能？",
+    "quickAction2": "開始練習題",
+    "quickAction2Full": "我想開始做練習題，該怎麼操作？",
+    "quickAction3": "物理問題",
+    "quickAction3Full": "我有一個物理問題想問你",
+    "error": "抱歉，我遇到了一些問題。請稍後再試。",
+    "noSpeech": "沒有檢測到語音，請再試一次。",
+    "micError": "無法存取麥克風，請檢查權限設置。",
+    "micDenied": "麥克風權限被拒絕，請在瀏覽器設置中允許。",
+    "networkError": "網絡錯誤，請檢查連接。",
+    "speechCancelled": "語音識別已取消。",
+    "langNotSupported": "不支持當前語言的語音識別。",
+    "speechFailed": "語音識別失敗，請再試一次或輸入文字。",
+    "browserNotSupported": "您的瀏覽器不支持語音識別功能。請使用 Chrome 或 Edge 瀏覽器。"
   }
 }
