@@ -851,33 +851,7 @@ class PhysicsAvatar {
                 alpha = 0.8 * (1 - t);
             }
             this.renderStickFigure(ctx, enemy.position.x, enemy.position.y, enemy.angle, '#FFFFFF', '#CCCCCC', 0.8, alpha);
-
-            // HP label (so you can see if it is actually dying)
-            if (enemy.plugin && !enemy.plugin.dead) {
-                ctx.save();
-                ctx.globalAlpha = 0.9;
-                ctx.font = 'bold 9px Arial';
-                ctx.fillStyle = '#ffffff';
-                ctx.strokeStyle = '#111';
-                ctx.lineWidth = 2;
-                const hp = typeof enemy.plugin.hp === 'number' ? enemy.plugin.hp : '?';
-                ctx.strokeText(String(hp), enemy.position.x - 3, enemy.position.y - 12);
-                ctx.fillText(String(hp), enemy.position.x - 3, enemy.position.y - 12);
-                ctx.restore();
-            }
         });
-
-        // Debug overlay (top-left)
-        const alive = this.enemies.filter(e => !(e.plugin && e.plugin.dead)).length;
-        const dead = this.enemies.filter(e => (e.plugin && e.plugin.dead)).length;
-        this.debug = { alive, dead, total: this.enemies.length };
-        ctx.font = 'bold 9px Arial';
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
-        const sinceSpawn = this.spawnStats.lastSpawnAt ? Math.max(0, (this.nowMs - this.spawnStats.lastSpawnAt)) : 0;
-        const sideChar = this.spawnStats.lastSpawnSide === 1 ? 'R' : 'L';
-        ctx.fillText(`A:${alive} D:${dead} T:${this.enemies.length}`, 6, 10);
-        ctx.fillText(`spawned:${this.spawnStats.totalSpawned} last:${sideChar} ${Math.round(sinceSpawn)}ms`, 6, 22);
-        ctx.fillText(`target:${this.options.enemyCount || 1} combatOnly:${!!this.options.combatOnly}`, 6, 34);
 
         // Render knight
         this.renderKnight(ctx);
