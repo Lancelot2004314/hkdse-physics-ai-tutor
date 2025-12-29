@@ -14,7 +14,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB max for PDF (GCS handles larger files)
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB max for PDF (GCS handles larger files)
 
 /**
  * Auto-detect metadata from filename
