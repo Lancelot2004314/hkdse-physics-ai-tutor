@@ -7,6 +7,7 @@
     <title>AI Tutor - HKDSE Physics</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/thinka.css">
+    <link rel="stylesheet" href="css/ai-agent.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- MathJax Configuration and Loading -->
     <script>
@@ -221,8 +222,10 @@
 
                     <!-- Question Input -->
                     <div class="input-group">
-                        <label for="questionInput" data-i18n="aiTutor.yourQuestion">Your Question (optional but recommended)</label>
-                        <textarea id="questionInput" data-i18n-placeholder="aiTutor.questionPlaceholder" placeholder="e.g. Why use F=ma? I don't understand step 2..."></textarea>
+                        <label for="questionInput" data-i18n="aiTutor.yourQuestion">Your Question (optional but
+                            recommended)</label>
+                        <textarea id="questionInput" data-i18n-placeholder="aiTutor.questionPlaceholder"
+                            placeholder="e.g. Why use F=ma? I don't understand step 2..."></textarea>
                     </div>
 
                     <!-- Options -->
@@ -231,21 +234,24 @@
                             <label for="levelSelect" data-i18n="aiTutor.level">Level</label>
                             <select id="levelSelect">
                                 <option value="basic" data-i18n="aiTutor.levelBasic">Basic</option>
-                                <option value="standard" selected data-i18n="aiTutor.levelStandard">Standard DSE</option>
+                                <option value="standard" selected data-i18n="aiTutor.levelStandard">Standard DSE
+                                </option>
                                 <option value="advanced" data-i18n="aiTutor.levelAdvanced">Advanced</option>
                             </select>
                         </div>
                         <div class="option-group">
                             <label for="modeSelect" data-i18n="aiTutor.mode">Mode</label>
                             <select id="modeSelect">
-                                <option value="direct" selected data-i18n="aiTutor.modeDirect">Direct Explanation</option>
+                                <option value="direct" selected data-i18n="aiTutor.modeDirect">Direct Explanation
+                                </option>
                                 <option value="socratic" data-i18n="aiTutor.modeSocratic">Socratic Guidance</option>
                             </select>
                         </div>
                         <div class="option-group" id="visionModelGroup">
                             <label for="visionModelSelect" data-i18n="aiTutor.aiModel">AI Model</label>
                             <select id="visionModelSelect">
-                                <option value="auto" selected data-i18n="aiTutor.modelAuto">Auto (fallback on failure)</option>
+                                <option value="auto" selected data-i18n="aiTutor.modelAuto">Auto (fallback on failure)
+                                </option>
                                 <option value="gpt4o">GPT-4o</option>
                                 <option value="gpt4o-mini">GPT-4o-mini</option>
                                 <option value="qwen-vl">Qwen VL</option>
@@ -257,14 +263,17 @@
                     <!-- Student Attempt (Optional) -->
                     <div class="input-group collapsible">
                         <button class="collapse-toggle" id="toggleAttempt">
-                            <i class="fas fa-chevron-down"></i> <span data-i18n="aiTutor.yourAttempt">Your attempt/thinking (optional)</span>
+                            <i class="fas fa-chevron-down"></i> <span data-i18n="aiTutor.yourAttempt">Your
+                                attempt/thinking (optional)</span>
                         </button>
-                        <textarea id="studentAttempt" placeholder="Your answer or where you got stuck..." hidden></textarea>
+                        <textarea id="studentAttempt" placeholder="Your answer or where you got stuck..."
+                            hidden></textarea>
                     </div>
 
                     <!-- Submit Button -->
                     <button class="btn-primary btn-glow ripple shine" id="submitBtn" disabled>
-                        <i class="fas fa-paper-plane"></i> <span data-i18n="aiTutor.getExplanation">Get Explanation</span>
+                        <i class="fas fa-paper-plane"></i> <span data-i18n="aiTutor.getExplanation">Get
+                            Explanation</span>
                     </button>
                 </section>
 
@@ -277,17 +286,20 @@
                 <!-- Results Section -->
                 <section class="results-section" id="resultsSection" hidden>
                     <div class="result-card card-lift animate-on-scroll fade-in-up stagger-1">
-                        <h2><i class="fas fa-lightbulb"></i> <span data-i18n="aiTutor.problemSummary">Problem Summary</span></h2>
+                        <h2><i class="fas fa-lightbulb"></i> <span data-i18n="aiTutor.problemSummary">Problem
+                                Summary</span></h2>
                         <div id="problemSummary" class="result-content"></div>
                     </div>
 
                     <div class="result-card card-lift animate-on-scroll fade-in-up stagger-2">
-                        <h2><i class="fas fa-list-ol"></i> <span data-i18n="aiTutor.stepByStep">Step-by-Step Explanation</span></h2>
+                        <h2><i class="fas fa-list-ol"></i> <span data-i18n="aiTutor.stepByStep">Step-by-Step
+                                Explanation</span></h2>
                         <div id="stepsContent" class="result-content steps-list"></div>
                     </div>
 
                     <div class="result-card card-lift animate-on-scroll fade-in-up stagger-3">
-                        <h2><i class="fas fa-exclamation-triangle"></i> <span data-i18n="aiTutor.commonMistakes">Common Mistakes</span></h2>
+                        <h2><i class="fas fa-exclamation-triangle"></i> <span data-i18n="aiTutor.commonMistakes">Common
+                                Mistakes</span></h2>
                         <div id="mistakesContent" class="result-content"></div>
                     </div>
 
@@ -297,7 +309,8 @@
                     </div>
 
                     <div class="result-card card-lift animate-on-scroll fade-in-up stagger-5">
-                        <h2><i class="fas fa-check-circle"></i> <span data-i18n="aiTutor.verification">Verification</span></h2>
+                        <h2><i class="fas fa-check-circle"></i> <span
+                                data-i18n="aiTutor.verification">Verification</span></h2>
                         <div id="verificationContent" class="result-content"></div>
                     </div>
 
@@ -315,11 +328,13 @@
 
                     <!-- Practice Section -->
                     <div class="result-card practice-card" id="practiceSection" hidden>
-                        <h2><i class="fas fa-dumbbell"></i> <span data-i18n="aiTutor.practiceTime">Practice Time!</span></h2>
+                        <h2><i class="fas fa-dumbbell"></i> <span data-i18n="aiTutor.practiceTime">Practice Time!</span>
+                        </h2>
                         <div class="practice-content">
                             <div class="practice-question" id="practiceQuestion">
                                 <p class="practice-loading">
-                                    <i class="fas fa-spinner fa-spin"></i> <span data-i18n="aiTutor.generatingPractice">Generating practice question...</span>
+                                    <i class="fas fa-spinner fa-spin"></i> <span
+                                        data-i18n="aiTutor.generatingPractice">Generating practice question...</span>
                                 </p>
                             </div>
                             <div class="practice-options" id="practiceOptions"></div>
@@ -336,8 +351,10 @@
                             </div>
                             <div class="practice-result" id="practiceResult" hidden></div>
                             <div class="practice-stats" id="practiceStats">
-                                <span class="stat-item">🔥 <span data-i18n="aiTutor.streak">Streak</span>: <span id="currentStreak">0</span></span>
-                                <span class="stat-item">🎯 <span data-i18n="aiTutor.points">Points</span>: <span id="totalPoints">0</span></span>
+                                <span class="stat-item">🔥 <span data-i18n="aiTutor.streak">Streak</span>: <span
+                                        id="currentStreak">0</span></span>
+                                <span class="stat-item">🎯 <span data-i18n="aiTutor.points">Points</span>: <span
+                                        id="totalPoints">0</span></span>
                             </div>
                         </div>
                     </div>
@@ -427,6 +444,8 @@
         window.initScrollAnimations = initScrollAnimations;
     </script>
     <script src="js/app.js"></script>
+    <!-- AI Agent - Lancelot Assistant -->
+    <script src="/js/ai-agent.js"></script>
 </body>
 
 </html>
