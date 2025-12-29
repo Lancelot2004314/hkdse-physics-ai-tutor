@@ -28,6 +28,29 @@ class AIAgent {
         this.currentAudio = null;
         this.threeRenderer = null;
         this.avatar = null;
+        
+        // Web Speech API recognition instance
+        this.recognition = null;
+        this.voicesLoaded = false;
+        this.cachedVoices = [];
+        
+        // Preferred female voices by quality (in priority order)
+        this.preferredVoices = [
+            // Google voices (Chrome) - high quality
+            'Google 粤語（香港）',
+            'Google 普通话（中国大陆）',
+            'Google US English',
+            // Apple voices (macOS/iOS) - high quality
+            'Sinji',              // Cantonese
+            'Ting-Ting',          // Mandarin
+            'Mei-Jia',            // Mandarin Taiwan
+            'Samantha',           // English
+            // Microsoft voices (Windows/Edge)
+            'Microsoft Yaoyao',   // Mandarin
+            'Microsoft Huihui',   // Mandarin
+            'Microsoft Tracy',    // Cantonese
+            'Microsoft Zira',     // English
+        ];
 
         this.init();
     }
@@ -36,11 +59,174 @@ class AIAgent {
         this.createDOM();
         this.bindEvents();
         this.initThreeJS();
+        this.initWebSpeechAPI();
 
         // Add welcome message
         setTimeout(() => {
             this.addMessage(this.options.welcomeMessage, 'assistant');
         }, 500);
+    }
+
+    /**
+     * Get current language from i18n system or browser
+     */
+    getCurrentLanguage() {
+        // Try i18n system first
+        if (window.i18n && typeof window.i18n.getLanguage === 'function') {
+            return window.i18n.getLanguage();
+        }
+        // Try localStorage
+        const stored = localStorage.getItem('language') || localStorage.getItem('lang');
+        if (stored) return stored;
+        // Fall back to browser language
+        return navigator.language || 'zh-HK';
+    }
+
+    /**
+     * Map language code to speech recognition language
+     */
+    getSpeechRecognitionLang() {
+        const lang = this.getCurrentLanguage();
+        const langMap = {
+            'zh-HK': 'zh-HK',    // Cantonese
+            'zh-TW': 'zh-TW',    // Traditional Chinese Taiwan
+            'zh-CN': 'zh-CN',    // Simplified Chinese
+            'zh': 'zh-HK',       // Default Chinese to Cantonese
+            'en': 'en-US',
+            'en-US': 'en-US',
+            'en-GB': 'en-GB'
+        };
+        return langMap[lang] || langMap[lang.split('-')[0]] || 'zh-HK';
+    }
+
+    /**
+     * Initialize Web Speech API for voice recognition (FREE!)
+     */
+    initWebSpeechAPI() {
+        // Check for browser support
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (SpeechRecognition) {
+            this.recognition = new SpeechRecognition();
+            this.recognition.lang = this.getSpeechRecognitionLang();
+            this.recognition.continuous = false;
+            this.recognition.interimResults = false;
+            this.recognition.maxAlternatives = 1;
+
+            // Handle recognition results
+            this.recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                console.log('Speech recognized:', transcript);
+                
+                if (transcript && transcript.trim()) {
+                    this.inputEl.value = transcript;
+                    this.sendMessage();
+                }
+            };
+
+            // Handle errors
+            this.recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                this.isRecording = false;
+                this.voiceBtnEl.classList.remove('recording');
+                this.voiceBtnEl.textContent = '🎤';
+                
+                // User-friendly error messages
+                const errorMessages = {
+                    'no-speech': '沒有檢測到語音，請再試一次。',
+                    'audio-capture': '無法存取麥克風，請檢查權限設置。',
+                    'not-allowed': '麥克風權限被拒絕，請在瀏覽器設置中允許。',
+                    'network': '網絡錯誤，請檢查連接。',
+                    'aborted': '語音識別已取消。',
+                    'language-not-supported': '不支持當前語言的語音識別。'
+                };
+                
+                const msg = errorMessages[event.error] || '語音識別失敗，請再試一次或輸入文字。';
+                this.addMessage(msg, 'assistant');
+            };
+
+            // Handle end of recognition
+            this.recognition.onend = () => {
+                this.isRecording = false;
+                this.voiceBtnEl.classList.remove('recording');
+                this.voiceBtnEl.textContent = '🎤';
+                this.setStatus('online');
+            };
+
+            console.log('Web Speech API initialized with language:', this.recognition.lang);
+        } else {
+            console.warn('Web Speech API not supported in this browser');
+            // Hide voice button if not supported
+            if (this.voiceBtnEl) {
+                this.voiceBtnEl.style.display = 'none';
+            }
+        }
+
+        // Preload voices for TTS
+        this.loadVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => this.loadVoices();
+        }
+    }
+
+    /**
+     * Load and cache available voices
+     */
+    loadVoices() {
+        this.cachedVoices = speechSynthesis.getVoices();
+        this.voicesLoaded = this.cachedVoices.length > 0;
+        console.log('Loaded', this.cachedVoices.length, 'voices');
+    }
+
+    /**
+     * Find the best voice for current language
+     */
+    getBestVoice() {
+        const lang = this.getCurrentLanguage();
+        const voices = this.cachedVoices.length > 0 ? this.cachedVoices : speechSynthesis.getVoices();
+        
+        // First, try to find a preferred voice
+        for (const preferredName of this.preferredVoices) {
+            const voice = voices.find(v => v.name.includes(preferredName));
+            if (voice) {
+                // Check if voice language matches current language
+                const voiceLang = voice.lang.toLowerCase();
+                const currentLang = lang.toLowerCase();
+                
+                // Match logic: zh-HK matches zh, en-US matches en, etc.
+                if (voiceLang.startsWith(currentLang.split('-')[0])) {
+                    console.log('Using preferred voice:', voice.name);
+                    return voice;
+                }
+            }
+        }
+
+        // Second, find any female voice for the language
+        const langPrefix = lang.split('-')[0];
+        const femaleKeywords = ['female', 'woman', '女', 'ting', 'mei', 'hui', 'yao', 'sinji', 'samantha', 'zira', 'tracy'];
+        
+        const femaleVoice = voices.find(v => {
+            const voiceLang = v.lang.toLowerCase();
+            const nameLower = v.name.toLowerCase();
+            return voiceLang.startsWith(langPrefix) && 
+                   femaleKeywords.some(kw => nameLower.includes(kw));
+        });
+        
+        if (femaleVoice) {
+            console.log('Using female voice:', femaleVoice.name);
+            return femaleVoice;
+        }
+
+        // Third, find any voice for the language
+        const langVoice = voices.find(v => v.lang.toLowerCase().startsWith(langPrefix));
+        if (langVoice) {
+            console.log('Using language-matched voice:', langVoice.name);
+            return langVoice;
+        }
+
+        // Last resort: use default
+        console.log('Using default voice');
+        return voices[0] || null;
     }
 
     createDOM() {
@@ -470,22 +656,30 @@ class AIAgent {
         }
     }
 
-    // Browser's free Web Speech API
+    /**
+     * Browser's free Web Speech API with smart voice selection
+     */
     speakWithBrowserTTS(text) {
         return new Promise((resolve) => {
+            // Cancel any ongoing speech
+            speechSynthesis.cancel();
+            
             const utterance = new SpeechSynthesisUtterance(text);
             
-            // Try to find a Chinese voice
-            const voices = speechSynthesis.getVoices();
-            const chineseVoice = voices.find(v => 
-                v.lang.includes('zh') || v.lang.includes('cmn')
-            );
-            if (chineseVoice) {
-                utterance.voice = chineseVoice;
+            // Get the best voice for current language
+            const bestVoice = this.getBestVoice();
+            if (bestVoice) {
+                utterance.voice = bestVoice;
+                utterance.lang = bestVoice.lang;
+            } else {
+                // Fallback to language-based setting
+                utterance.lang = this.getSpeechRecognitionLang();
             }
             
-            utterance.rate = 1.0;
-            utterance.pitch = 1.1;
+            // Optimize speech parameters for natural sound
+            utterance.rate = 0.95;   // Slightly slower for clarity
+            utterance.pitch = 1.05;  // Slightly higher for friendliness
+            utterance.volume = 1.0;
             
             utterance.onend = () => {
                 this.isSpeaking = false;
@@ -493,12 +687,14 @@ class AIAgent {
                 resolve();
             };
             
-            utterance.onerror = () => {
+            utterance.onerror = (event) => {
+                console.error('TTS error:', event.error);
                 this.isSpeaking = false;
                 this.avatarEl.classList.remove('speaking');
                 resolve();
             };
             
+            // Speak!
             speechSynthesis.speak(utterance);
         });
     }
@@ -512,74 +708,46 @@ class AIAgent {
     }
 
     async startRecording() {
+        // Use Web Speech API (FREE!) instead of server-side STT
+        if (!this.recognition) {
+            this.addMessage('您的瀏覽器不支持語音識別功能。請使用 Chrome 或 Edge 瀏覽器。', 'assistant');
+            return;
+        }
+
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-            this.mediaRecorder = new MediaRecorder(stream);
-            this.audioChunks = [];
-
-            this.mediaRecorder.ondataavailable = (e) => {
-                this.audioChunks.push(e.data);
-            };
-
-            this.mediaRecorder.onstop = async () => {
-                // Stop all tracks
-                stream.getTracks().forEach(track => track.stop());
-
-                // Create blob and send to STT
-                const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-                await this.transcribeAudio(audioBlob);
-            };
-
-            this.mediaRecorder.start();
+            // Update language before starting (in case user changed it)
+            this.recognition.lang = this.getSpeechRecognitionLang();
+            
+            this.recognition.start();
             this.isRecording = true;
             this.voiceBtnEl.classList.add('recording');
             this.voiceBtnEl.textContent = '⏹️';
+            this.setStatus('thinking');
+            
+            console.log('Started speech recognition with language:', this.recognition.lang);
 
         } catch (err) {
             console.error('Recording error:', err);
-            alert('無法存取麥克風。請確保已授予錄音權限。');
+            
+            // Handle already started error
+            if (err.name === 'InvalidStateError') {
+                this.recognition.stop();
+                this.isRecording = false;
+                this.voiceBtnEl.classList.remove('recording');
+                this.voiceBtnEl.textContent = '🎤';
+            } else {
+                this.addMessage('無法啟動語音識別。請確保已授予麥克風權限。', 'assistant');
+            }
         }
     }
 
     stopRecording() {
-        if (this.mediaRecorder && this.isRecording) {
-            this.mediaRecorder.stop();
+        if (this.recognition && this.isRecording) {
+            this.recognition.stop();
             this.isRecording = false;
             this.voiceBtnEl.classList.remove('recording');
             this.voiceBtnEl.textContent = '🎤';
-        }
-    }
-
-    async transcribeAudio(audioBlob) {
-        try {
-            this.setStatus('thinking');
-
-            const formData = new FormData();
-            formData.append('audio', audioBlob, 'recording.webm');
-
-            const response = await fetch('/api/agent/stt', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error('STT API error');
-            }
-
-            const data = await response.json();
-
-            if (data.text && data.text.trim()) {
-                this.inputEl.value = data.text;
-                this.sendMessage();
-            } else {
-                this.setStatus('online');
-            }
-
-        } catch (err) {
-            console.error('Transcription error:', err);
             this.setStatus('online');
-            this.addMessage('抱歉，我無法識別你說的話。請再試一次或輸入文字。', 'assistant');
         }
     }
 
