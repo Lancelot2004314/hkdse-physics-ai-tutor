@@ -42,19 +42,29 @@
                 </div>
             </div>
             <ul class="nav-menu">
-                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
-                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a></li>
-                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> <span data-i18n="nav.freePractice">Free Practice</span></a></li>
-                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.statistics">Statistics</span></a></li>
-                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> <span data-i18n="nav.history">History</span></a></li>
-                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span data-i18n="nav.bookmarks">Bookmarks</span></a></li>
-                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span data-i18n="nav.leaderboard">Leaderboard</span></a></li>
-                <li class="nav-item active"><a href="/profile.html"><i class="fas fa-user"></i> <span data-i18n="nav.profile">Profile</span></a></li>
-                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a></li>
+                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> <span
+                            data-i18n="nav.dashboard">Dashboard</span></a></li>
+                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span
+                            data-i18n="nav.aiTutor">AI Tutor</span></a></li>
+                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> <span
+                            data-i18n="nav.freePractice">Free Practice</span></a></li>
+                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span
+                            data-i18n="nav.statistics">Statistics</span></a></li>
+                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> <span
+                            data-i18n="nav.history">History</span></a></li>
+                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span
+                            data-i18n="nav.bookmarks">Bookmarks</span></a></li>
+                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span
+                            data-i18n="nav.leaderboard">Leaderboard</span></a></li>
+                <li class="nav-item active"><a href="/profile.html"><i class="fas fa-user"></i> <span
+                            data-i18n="nav.profile">Profile</span></a></li>
+                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i
+                            class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a></li>
             </ul>
             <div class="sidebar-footer">
                 <div class="language-switcher-container" id="langSwitcherContainer"></div>
-                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.signOut">Sign Out</span></button>
+                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span
+                        data-i18n="nav.signOut">Sign Out</span></button>
             </div>
         </nav>
 
@@ -83,7 +93,8 @@
                     <h2 data-i18n="profile.userProfile">User Profile</h2>
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> <span data-i18n="profile.name">Name</span></label>
-                        <input type="text" id="profileName" data-i18n-placeholder="profile.name" placeholder="Your name" class="input-glow">
+                        <input type="text" id="profileName" data-i18n-placeholder="profile.name" placeholder="Your name"
+                            class="input-glow">
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-envelope"></i> <span data-i18n="profile.email">Email</span></label>
@@ -120,23 +131,33 @@
                         <h3 data-i18n="plans.free.name">Free</h3>
                         <div class="plan-price">$0<span data-i18n="plans.free.perMonth">/month</span></div>
                         <ul class="plan-features">
-                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature1">5 questions per practice</span></li>
-                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature2">3 practices per day</span></li>
-                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature3">Basic statistics</span></li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature1">5 questions per
+                                    practice</span></li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature2">3 practices per
+                                    day</span></li>
+                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature3">Basic
+                                    statistics</span></li>
                         </ul>
                         <button class="btn-secondary" disabled data-i18n="profile.currentPlan">Current Plan</button>
                     </div>
                     <div class="plan-card premium card-lift tilt-card shine">
-                        <div class="plan-badge" data-i18n="plans.premium.discount">Discount limited to first 1,000 users!</div>
+                        <div class="plan-badge" data-i18n="plans.premium.discount">Discount limited to first 1,000
+                            users!</div>
                         <h3 data-i18n="plans.premium.name">Premium</h3>
                         <div class="plan-price">
                             <span class="original">$59</span> $40<span data-i18n="plans.premium.perMonth">/month</span>
                         </div>
                         <ul class="plan-features">
-                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature1"><strong>Unlimited</strong> questions per practice</span></li>
-                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature2"><strong>Unlimited</strong> practices per day</span></li>
-                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature3">Advanced statistics</span></li>
-                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature4">30 days money back guarantee</span></li>
+                            <li><i class="fas fa-star"></i> <span
+                                    data-i18n="plans.premium.feature1"><strong>Unlimited</strong> questions per
+                                    practice</span></li>
+                            <li><i class="fas fa-star"></i> <span
+                                    data-i18n="plans.premium.feature2"><strong>Unlimited</strong> practices per
+                                    day</span></li>
+                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature3">Advanced
+                                    statistics</span></li>
+                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature4">30 days money back
+                                    guarantee</span></li>
                         </ul>
                         <button class="btn-primary btn-glow">Upgrade to Premium</button>
                     </div>

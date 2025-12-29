@@ -82,7 +82,7 @@ export async function onRequestPost(context) {
     } else {
       languageInstruction = 'Respond in the same language as the problem.';
     }
-    
+
     let userPrompt = `Analyze the following HKDSE Physics problem and provide a detailed explanation. ${languageInstruction}\n\nProblem:\n${problemText.trim()}`;
 
     if (question) {

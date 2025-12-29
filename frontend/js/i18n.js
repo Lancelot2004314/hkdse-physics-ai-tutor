@@ -221,7 +221,7 @@ function createLanguageSwitcher(containerId) {
 
   select.addEventListener('change', async (e) => {
     await setLanguage(e.target.value);
-    
+
     // Also save to server if logged in
     try {
       await fetch('/api/user/profile', {
