@@ -59,11 +59,12 @@ const imagePreview = document.getElementById('imagePreview');
 const previewImg = document.getElementById('previewImg');
 const removeImage = document.getElementById('removeImage');
 const questionInput = document.getElementById('questionInput');
-const levelSelect = document.getElementById('levelSelect');
-const modeSelect = document.getElementById('modeSelect');
-const visionModelSelect = document.getElementById('visionModelSelect');
-const toggleAttempt = document.getElementById('toggleAttempt');
-const studentAttempt = document.getElementById('studentAttempt');
+// These options have been removed from UI - use defaults
+const levelSelect = null;
+const modeSelect = null;
+const visionModelSelect = null;
+const toggleAttempt = null;
+const studentAttempt = null;
 const submitBtn = document.getElementById('submitBtn');
 const loading = document.getElementById('loading');
 const resultsSection = document.getElementById('resultsSection');
@@ -190,12 +191,7 @@ function initializeEventListeners() {
     // Text input change - update submit button
     problemTextInput.addEventListener('input', updateSubmitButton);
 
-    // Toggle student attempt
-    toggleAttempt.addEventListener('click', () => {
-        const parent = toggleAttempt.parentElement;
-        parent.classList.toggle('open');
-        studentAttempt.hidden = !studentAttempt.hidden;
-    });
+    // Toggle student attempt (removed from UI)
 
     // Toggle final answer
     toggleAnswer.addEventListener('click', () => {
@@ -364,14 +360,14 @@ async function handleSubmit() {
 
     const requestPayload = {
         question: questionInput.value.trim(),
-        studentLevel: levelSelect.value,
-        mode: modeSelect.value,
-        studentAttempt: studentAttempt.value.trim() || undefined,
+        studentLevel: 'standard', // Default level
+        mode: 'direct', // Default mode
+        studentAttempt: undefined,
     };
 
     if (isImageMode) {
         requestPayload.image = currentImageBase64;
-        requestPayload.visionModel = visionModelSelect.value; // 'auto', 'gpt4o', 'gpt4o-mini', 'qwen-vl', 'gemini'
+        requestPayload.visionModel = 'auto'; // Default: auto fallback
     } else {
         requestPayload.problemText = problemText;
     }
@@ -903,9 +899,7 @@ function resetAll() {
     clearImage();
     problemTextInput.value = '';
     questionInput.value = '';
-    studentAttempt.value = '';
-    levelSelect.value = 'standard';
-    modeSelect.value = 'direct';
+    // studentAttempt, levelSelect, modeSelect removed from UI
     resultsSection.hidden = true;
     chatSection.hidden = true;
     newQuestionBtn.hidden = true;
@@ -1442,17 +1436,7 @@ function restoreFromHistory(historyData) {
     if (requestData.question) {
         questionInput.value = requestData.question;
     }
-    if (requestData.studentLevel) {
-        levelSelect.value = requestData.studentLevel;
-    }
-    if (requestData.mode) {
-        modeSelect.value = requestData.mode;
-    }
-    if (requestData.studentAttempt) {
-        studentAttempt.value = requestData.studentAttempt;
-        studentAttempt.hidden = false;
-        toggleAttempt.parentElement.classList.add('open');
-    }
+    // levelSelect, modeSelect, studentAttempt removed from UI
 
     // Display results
     displayResults(responseData);

@@ -228,48 +228,6 @@
                             placeholder="e.g. Why use F=ma? I don't understand step 2..."></textarea>
                     </div>
 
-                    <!-- Options -->
-                    <div class="options-row">
-                        <div class="option-group">
-                            <label for="levelSelect" data-i18n="aiTutor.level">Level</label>
-                            <select id="levelSelect">
-                                <option value="basic" data-i18n="aiTutor.levelBasic">Basic</option>
-                                <option value="standard" selected data-i18n="aiTutor.levelStandard">Standard DSE
-                                </option>
-                                <option value="advanced" data-i18n="aiTutor.levelAdvanced">Advanced</option>
-                            </select>
-                        </div>
-                        <div class="option-group">
-                            <label for="modeSelect" data-i18n="aiTutor.mode">Mode</label>
-                            <select id="modeSelect">
-                                <option value="direct" selected data-i18n="aiTutor.modeDirect">Direct Explanation
-                                </option>
-                                <option value="socratic" data-i18n="aiTutor.modeSocratic">Socratic Guidance</option>
-                            </select>
-                        </div>
-                        <div class="option-group" id="visionModelGroup">
-                            <label for="visionModelSelect" data-i18n="aiTutor.aiModel">AI Model</label>
-                            <select id="visionModelSelect">
-                                <option value="auto" selected data-i18n="aiTutor.modelAuto">Auto (fallback on failure)
-                                </option>
-                                <option value="gpt4o">GPT-4o</option>
-                                <option value="gpt4o-mini">GPT-4o-mini</option>
-                                <option value="qwen-vl">Qwen VL</option>
-                                <option value="gemini">Gemini 1.5 Flash</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Student Attempt (Optional) -->
-                    <div class="input-group collapsible">
-                        <button class="collapse-toggle" id="toggleAttempt">
-                            <i class="fas fa-chevron-down"></i> <span data-i18n="aiTutor.yourAttempt">Your
-                                attempt/thinking (optional)</span>
-                        </button>
-                        <textarea id="studentAttempt" placeholder="Your answer or where you got stuck..."
-                            hidden></textarea>
-                    </div>
-
                     <!-- Submit Button -->
                     <button class="btn-primary btn-glow ripple shine" id="submitBtn" disabled>
                         <i class="fas fa-paper-plane"></i> <span data-i18n="aiTutor.getExplanation">Get
