@@ -414,41 +414,93 @@ class AIAgent {
             this.isSpeaking = true;
             this.avatarEl.classList.add('speaking');
 
-            // Call TTS API
-            const response = await fetch('/api/agent/tts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, voice: 'nova' })
-            });
+            // Try server TTS first, fallback to browser Web Speech API
+            let usedServerTTS = false;
 
-            if (!response.ok) {
-                throw new Error('TTS API error');
+            try {
+                // Call TTS API
+                const response = await fetch('/api/agent/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, voice: 'nova' })
+                });
+
+                if (response.ok) {
+                    // Play audio from server
+                    const audioBlob = await response.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    this.currentAudio = new Audio(audioUrl);
+                    
+                    this.currentAudio.onended = () => {
+                        this.isSpeaking = false;
+                        this.avatarEl.classList.remove('speaking');
+                        URL.revokeObjectURL(audioUrl);
+                    };
+
+                    this.currentAudio.onerror = () => {
+                        this.isSpeaking = false;
+                        this.avatarEl.classList.remove('speaking');
+                    };
+
+                    await this.currentAudio.play();
+                    usedServerTTS = true;
+                }
+            } catch (serverErr) {
+                console.warn('Server TTS failed, using browser TTS:', serverErr);
             }
 
-            // Play audio
-            const audioBlob = await response.blob();
-            const audioUrl = URL.createObjectURL(audioBlob);
+            // Fallback to browser's Web Speech API (free!)
+            if (!usedServerTTS && 'speechSynthesis' in window) {
+                await this.speakWithBrowserTTS(text);
+            } else if (!usedServerTTS) {
+                // No TTS available, just animate briefly
+                setTimeout(() => {
+                    this.isSpeaking = false;
+                    this.avatarEl.classList.remove('speaking');
+                }, 2000);
+            }
 
-            this.currentAudio = new Audio(audioUrl);
-
-            this.currentAudio.onended = () => {
-                this.isSpeaking = false;
-                this.avatarEl.classList.remove('speaking');
-                URL.revokeObjectURL(audioUrl);
-            };
-
-            this.currentAudio.onerror = () => {
-                this.isSpeaking = false;
-                this.avatarEl.classList.remove('speaking');
-            };
-
-            await this.currentAudio.play();
+            return;
 
         } catch (err) {
             console.error('Speech error:', err);
             this.isSpeaking = false;
             this.avatarEl.classList.remove('speaking');
         }
+    }
+
+    // Browser's free Web Speech API
+    speakWithBrowserTTS(text) {
+        return new Promise((resolve) => {
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Try to find a Chinese voice
+            const voices = speechSynthesis.getVoices();
+            const chineseVoice = voices.find(v => 
+                v.lang.includes('zh') || v.lang.includes('cmn')
+            );
+            if (chineseVoice) {
+                utterance.voice = chineseVoice;
+            }
+            
+            utterance.rate = 1.0;
+            utterance.pitch = 1.1;
+            
+            utterance.onend = () => {
+                this.isSpeaking = false;
+                this.avatarEl.classList.remove('speaking');
+                resolve();
+            };
+            
+            utterance.onerror = () => {
+                this.isSpeaking = false;
+                this.avatarEl.classList.remove('speaking');
+                resolve();
+            };
+            
+            speechSynthesis.speak(utterance);
+        });
     }
 
     async toggleRecording() {
