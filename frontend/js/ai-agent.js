@@ -478,7 +478,7 @@ class AIAgent {
                 return;
             }
             const script = document.createElement('script');
-            script.src = '/js/physics-avatar.js?v=6.0';
+            script.src = '/js/physics-avatar.js?v=6.1';
             script.onload = resolve;
             script.onerror = reject;
             document.head.appendChild(script);
