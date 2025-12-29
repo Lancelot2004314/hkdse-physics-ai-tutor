@@ -92,11 +92,12 @@ class PhysicsAvatar {
 
     createPhysicsWorld() {
         const { Engine, World, Runner } = Matter;
-
+        
         this.engine = Engine.create();
         this.world = this.engine.world;
-        this.world.gravity.y = 0.3; // Light gravity for floating feel
-
+        this.world.gravity.y = 0.15; // Very light gravity for floating feel
+        this.world.gravity.x = 0;
+        
         // Collision events
         Matter.Events.on(this.engine, 'collisionStart', (event) => {
             this.handleCollision(event);
@@ -144,20 +145,21 @@ class PhysicsAvatar {
         const cx = this.options.size / 2;
         const cy = this.options.size / 2 + 5;
 
-        // Knight body (main body)
+        // Knight body (main body) - high air friction to stay stable
         this.knight = Bodies.circle(cx, cy, 8, {
             label: 'knight',
-            density: 0.002,
-            frictionAir: 0.05,
-            restitution: 0.2,
+            density: 0.003,
+            frictionAir: 0.15, // High air friction - won't fly away
+            restitution: 0.1,
             render: { fillStyle: '#FFD700' }
         });
-
-        // Sword (attached to knight)
+        
+        // Sword (attached to knight) - also high air friction
         this.sword = Bodies.rectangle(cx + 12, cy - 5, 14, 2, {
             label: 'sword',
-            density: 0.0005,
-            frictionAir: 0.02,
+            density: 0.001,
+            frictionAir: 0.1,
+            restitution: 0.1,
             render: { fillStyle: '#C0C0C0' }
         });
 
@@ -222,19 +224,19 @@ class PhysicsAvatar {
 
     onSwordHitEnemy(enemy) {
         const { Body } = Matter;
-
-        // Apply knockback
-        const force = { x: 0.008, y: -0.003 };
+        
+        // Apply knockback (reduced to stay in bounds)
+        const force = { x: 0.003, y: -0.001 };
         Body.applyForce(enemy, enemy.position, force);
-
+        
         // Hit effects
-        this.triggerHitStop(3);
-        this.triggerCameraShake(4);
+        this.triggerHitStop(2);
+        this.triggerCameraShake(3);
         this.spawnEffect('impact', enemy.position.x, enemy.position.y);
         this.spawnEffect('shockwave', enemy.position.x, enemy.position.y);
-
+        
         this.comboCount++;
-        if (this.comboCount >= 3) {
+        if (this.comboCount >= 2) {
             this.spawnEffect('comicText', enemy.position.x - 10, enemy.position.y - 10, 'BAM!');
         }
     }
@@ -360,10 +362,13 @@ class PhysicsAvatar {
             this.hitStopFrames--;
             return; // Freeze physics during hit stop
         }
-
+        
         // Step physics
         Matter.Engine.update(this.engine, dt * this.timeScale);
-
+        
+        // IMPORTANT: Keep knight inside bounds
+        this.constrainKnightPosition();
+        
         // Update camera shake
         if (this.cameraShake.intensity > 0) {
             this.cameraShake.x = (Math.random() - 0.5) * this.cameraShake.intensity;
@@ -375,24 +380,67 @@ class PhysicsAvatar {
                 this.cameraShake.y = 0;
             }
         }
-
+        
         // Update effects
         this.effects = this.effects.filter(e => {
             e.frame++;
             e.life = 1 - e.frame / e.maxLife;
             return e.life > 0;
         });
-
+        
         // Track sword tip for trail
         const swordTip = this.getSwordTip();
         this.swordTrail.push({ ...swordTip, alpha: 1 });
         if (this.swordTrail.length > 8) this.swordTrail.shift();
         this.swordTrail.forEach((p, i) => p.alpha = (i + 1) / this.swordTrail.length);
-
+        
         // State-specific updates
         this.updateState(dt);
-
+        
         this.frameCount++;
+    }
+    
+    /**
+     * Keep knight inside the circular boundary
+     */
+    constrainKnightPosition() {
+        const { Body } = Matter;
+        const cx = this.options.size / 2;
+        const cy = this.options.size / 2;
+        const maxRadius = this.options.size / 2 - 12; // Stay 12px from edge
+        
+        // Check knight position
+        const dx = this.knight.position.x - cx;
+        const dy = this.knight.position.y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist > maxRadius) {
+            // Push back to inside bounds
+            const angle = Math.atan2(dy, dx);
+            const newX = cx + Math.cos(angle) * maxRadius;
+            const newY = cy + Math.sin(angle) * maxRadius;
+            Body.setPosition(this.knight, { x: newX, y: newY });
+            
+            // Also reduce velocity to prevent flying out again
+            Body.setVelocity(this.knight, {
+                x: this.knight.velocity.x * 0.5,
+                y: this.knight.velocity.y * 0.5
+            });
+        }
+        
+        // Also constrain sword
+        const sdx = this.sword.position.x - cx;
+        const sdy = this.sword.position.y - cy;
+        const sdist = Math.sqrt(sdx * sdx + sdy * sdy);
+        
+        if (sdist > maxRadius + 5) {
+            const angle = Math.atan2(sdy, sdx);
+            Body.setPosition(this.sword, {
+                x: cx + Math.cos(angle) * maxRadius,
+                y: cy + Math.sin(angle) * maxRadius
+            });
+            Body.setVelocity(this.sword, { x: 0, y: 0 });
+        }
     }
 
     updateState(dt) {
@@ -431,52 +479,70 @@ class PhysicsAvatar {
     updateCombat(dt) {
         const { Body } = Matter;
         const phaseTime = this.frameCount % 160; // 8 second loop at 20fps
-
-        // Combat choreography phases
+        
+        // Combat choreography phases - reduced forces to stay in bounds
         if (phaseTime < 20) {
-            // Phase 0: Ready stance
+            // Phase 0: Ready stance - gentle center pull
             this.combatPhase = 0;
+            this.pullToCenter(0.0001);
         } else if (phaseTime < 40) {
-            // Phase 1: Dash forward
+            // Phase 1: Dash forward (small)
             if (this.combatPhase !== 1) {
                 this.combatPhase = 1;
-                Body.applyForce(this.knight, this.knight.position, { x: 0.004, y: -0.001 });
+                Body.applyForce(this.knight, this.knight.position, { x: 0.0015, y: -0.0005 });
             }
         } else if (phaseTime < 60) {
             // Phase 2: Slash!
             if (this.combatPhase !== 2) {
                 this.combatPhase = 2;
-                Body.applyForce(this.sword, this.sword.position, { x: 0.006, y: -0.002 });
-                Body.setAngularVelocity(this.sword, 0.3);
+                Body.applyForce(this.sword, this.sword.position, { x: 0.002, y: -0.001 });
+                Body.setAngularVelocity(this.sword, 0.2);
             }
         } else if (phaseTime < 80) {
-            // Phase 3: Return
+            // Phase 3: Return to center
             this.combatPhase = 3;
-            Body.applyForce(this.knight, this.knight.position, { x: -0.001, y: 0 });
+            this.pullToCenter(0.0003);
         } else if (phaseTime < 100) {
-            // Phase 4: Jump attack!
+            // Phase 4: Jump attack! (smaller jump)
             if (this.combatPhase !== 4) {
                 this.combatPhase = 4;
-                Body.applyForce(this.knight, this.knight.position, { x: 0.003, y: -0.006 });
-                Body.applyForce(this.sword, this.sword.position, { x: 0.004, y: -0.003 });
+                Body.applyForce(this.knight, this.knight.position, { x: 0.001, y: -0.002 });
+                Body.applyForce(this.sword, this.sword.position, { x: 0.0015, y: -0.001 });
             }
         } else if (phaseTime < 120) {
-            // Phase 5: FINISHER
+            // Phase 5: FINISHER (moderate force)
             if (this.combatPhase !== 5) {
                 this.combatPhase = 5;
-                Body.applyForce(this.knight, this.knight.position, { x: 0.008, y: -0.002 });
-                Body.setAngularVelocity(this.sword, 0.5);
-                this.triggerCameraShake(6);
+                Body.applyForce(this.knight, this.knight.position, { x: 0.002, y: -0.001 });
+                Body.setAngularVelocity(this.sword, 0.3);
+                this.triggerCameraShake(4);
             }
         } else {
-            // Phase 6: Victory
+            // Phase 6: Victory - pull back to center
             this.combatPhase = 6;
-            // Slow down
-            Body.setVelocity(this.knight, {
-                x: this.knight.velocity.x * 0.95,
-                y: this.knight.velocity.y * 0.95
+            this.pullToCenter(0.0005);
+            Body.setVelocity(this.knight, { 
+                x: this.knight.velocity.x * 0.9, 
+                y: this.knight.velocity.y * 0.9 
             });
         }
+    }
+    
+    /**
+     * Gently pull knight toward center
+     */
+    pullToCenter(strength) {
+        const { Body } = Matter;
+        const cx = this.options.size / 2;
+        const cy = this.options.size / 2 + 5;
+        
+        const dx = cx - this.knight.position.x;
+        const dy = cy - this.knight.position.y;
+        
+        Body.applyForce(this.knight, this.knight.position, {
+            x: dx * strength,
+            y: dy * strength
+        });
     }
 
     getSwordTip() {

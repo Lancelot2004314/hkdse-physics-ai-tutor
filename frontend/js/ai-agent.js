@@ -18,18 +18,18 @@ class AIAgent {
         this.mediaRecorder = null;
         this.audioChunks = [];
         this.currentAudio = null;
-        
+
         // Stick Knight Scene System
         this.currentScene = 'idle';
         this.sceneTimer = null;
         this.scenes = ['idle', 'sleep', 'practice', 'combat', 'rest'];
         this.sceneWeights = { idle: 1, sleep: 1, practice: 1.5, combat: 2.5, rest: 1 };
-        
+
         // Web Speech API recognition instance
         this.recognition = null;
         this.voicesLoaded = false;
         this.cachedVoices = [];
-        
+
         // Preferred female voices by quality (in priority order)
         this.preferredVoices = [
             // Google voices (Chrome) - high quality
@@ -58,7 +58,7 @@ class AIAgent {
         // #region agent log
         const hasT = window.i18n && typeof window.i18n.t === 'function';
         const result = hasT ? window.i18n.t(key) : null;
-        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:t',message:'Translation lookup',data:{key,hasT,result,isKeyReturned:result===key},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'F,G,H'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ai-agent.js:t', message: 'Translation lookup', data: { key, hasT, result, isKeyReturned: result === key }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'F,G,H' }) }).catch(() => { });
         // #endregion
 
         if (window.i18n && typeof window.i18n.t === 'function') {
@@ -96,7 +96,7 @@ class AIAgent {
     init() {
         // #region agent log
         const initLang = this.getCurrentLanguage();
-        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:init',message:'AIAgent initializing',data:{detectedLang:initLang,translationTest:this.t('aiAgent.welcome')},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ai-agent.js:init', message: 'AIAgent initializing', data: { detectedLang: initLang, translationTest: this.t('aiAgent.welcome') }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'C,D' }) }).catch(() => { });
         // #endregion
 
         this.createDOM();
@@ -164,26 +164,26 @@ class AIAgent {
             localStorageKeys: Object.keys(localStorage),
             navigatorLang: navigator.language
         };
-        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:getCurrentLanguage:entry',message:'Checking language sources',data:debugData,timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ai-agent.js:getCurrentLanguage:entry', message: 'Checking language sources', data: debugData, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'A,B' }) }).catch(() => { });
         // #endregion
 
         // Try i18n system first
         if (window.i18n && typeof window.i18n.getLanguage === 'function') {
             const i18nLang = window.i18n.getLanguage();
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:getCurrentLanguage:i18n',message:'Got language from i18n',data:{i18nLang},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,D'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ai-agent.js:getCurrentLanguage:i18n', message: 'Got language from i18n', data: { i18nLang }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'A,D' }) }).catch(() => { });
             // #endregion
             return i18nLang;
         }
         // Try localStorage
         const stored = localStorage.getItem('language') || localStorage.getItem('lang');
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:getCurrentLanguage:localStorage',message:'Checking localStorage',data:{stored,allKeys:Object.keys(localStorage)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,E'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ai-agent.js:getCurrentLanguage:localStorage', message: 'Checking localStorage', data: { stored, allKeys: Object.keys(localStorage) }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'B,E' }) }).catch(() => { });
         // #endregion
         if (stored) return stored;
         // Fall back to browser language
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:getCurrentLanguage:fallback',message:'Using browser language',data:{navigatorLang:navigator.language},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ai-agent.js:getCurrentLanguage:fallback', message: 'Using browser language', data: { navigatorLang: navigator.language }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'D' }) }).catch(() => { });
         // #endregion
         return navigator.language || 'zh-HK';
     }
@@ -211,7 +211,7 @@ class AIAgent {
     initWebSpeechAPI() {
         // Check for browser support
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        
+
         if (SpeechRecognition) {
             this.recognition = new SpeechRecognition();
             this.recognition.lang = this.getSpeechRecognitionLang();
@@ -223,7 +223,7 @@ class AIAgent {
             this.recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
                 console.log('Speech recognized:', transcript);
-                
+
                 if (transcript && transcript.trim()) {
                     this.inputEl.value = transcript;
                     this.sendMessage();
@@ -236,7 +236,7 @@ class AIAgent {
                 this.isRecording = false;
                 this.voiceBtnEl.classList.remove('recording');
                 this.voiceBtnEl.textContent = '🎤';
-                
+
                 // User-friendly error messages using i18n
                 const errorMessages = {
                     'no-speech': this.t('aiAgent.noSpeech'),
@@ -246,7 +246,7 @@ class AIAgent {
                     'aborted': this.t('aiAgent.speechCancelled'),
                     'language-not-supported': this.t('aiAgent.langNotSupported')
                 };
-                
+
                 const msg = errorMessages[event.error] || this.t('aiAgent.speechFailed');
                 this.addMessage(msg, 'assistant');
             };
@@ -290,7 +290,7 @@ class AIAgent {
     getBestVoice() {
         const lang = this.getCurrentLanguage();
         const voices = this.cachedVoices.length > 0 ? this.cachedVoices : speechSynthesis.getVoices();
-        
+
         // First, try to find a preferred voice
         for (const preferredName of this.preferredVoices) {
             const voice = voices.find(v => v.name.includes(preferredName));
@@ -298,7 +298,7 @@ class AIAgent {
                 // Check if voice language matches current language
                 const voiceLang = voice.lang.toLowerCase();
                 const currentLang = lang.toLowerCase();
-                
+
                 // Match logic: zh-HK matches zh, en-US matches en, etc.
                 if (voiceLang.startsWith(currentLang.split('-')[0])) {
                     console.log('Using preferred voice:', voice.name);
@@ -310,14 +310,14 @@ class AIAgent {
         // Second, find any female voice for the language
         const langPrefix = lang.split('-')[0];
         const femaleKeywords = ['female', 'woman', '女', 'ting', 'mei', 'hui', 'yao', 'sinji', 'samantha', 'zira', 'tracy'];
-        
+
         const femaleVoice = voices.find(v => {
             const voiceLang = v.lang.toLowerCase();
             const nameLower = v.name.toLowerCase();
-            return voiceLang.startsWith(langPrefix) && 
-                   femaleKeywords.some(kw => nameLower.includes(kw));
+            return voiceLang.startsWith(langPrefix) &&
+                femaleKeywords.some(kw => nameLower.includes(kw));
         });
-        
+
         if (femaleVoice) {
             console.log('Using female voice:', femaleVoice.name);
             return femaleVoice;
@@ -494,7 +494,7 @@ class AIAgent {
         svg.setAttribute('viewBox', '0 0 100 100');
         svg.setAttribute('width', '100%');
         svg.setAttribute('height', '100%');
-        
+
         // Center is at 50,50. Circle radius is ~45, so knight must stay within
         svg.innerHTML = `
             <defs>
@@ -644,7 +644,7 @@ class AIAgent {
                 
             </g>
         `;
-        
+
         this.avatar3DEl.appendChild(svg);
         this.knightSVG = svg;
         this.knightEl = svg.querySelector('.lancelot');
@@ -658,7 +658,7 @@ class AIAgent {
     startSceneCycle() {
         // Start with idle for a few seconds
         this.setScene('idle');
-        
+
         // Then start cycling
         this.scheduleNextScene();
     }
@@ -676,13 +676,13 @@ class AIAgent {
             combat: 10000,   // 10 seconds (full combat animation)
             rest: 4000       // 4 seconds
         };
-        
+
         const duration = durations[this.currentScene] || 3000;
 
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:scheduleNextScene',message:'Scene duration scheduled',data:{scene:this.currentScene,durationMs:duration,runId:'v5'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ai-agent.js:scheduleNextScene', message: 'Scene duration scheduled', data: { scene: this.currentScene, durationMs: duration, runId: 'v5' }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1' }) }).catch(() => { });
         // #endregion
-        
+
         this.sceneTimer = setTimeout(() => {
             // Pick next scene (weighted random)
             const nextScene = this.pickNextScene();
@@ -697,13 +697,13 @@ class AIAgent {
     pickNextScene() {
         // Don't repeat the same scene (except idle can follow anything)
         const availableScenes = this.scenes.filter(s => s !== this.currentScene || s === 'idle');
-        
+
         // Calculate total weight
         let totalWeight = 0;
         for (const scene of availableScenes) {
             totalWeight += this.sceneWeights[scene] || 1;
         }
-        
+
         // Pick random weighted scene
         let random = Math.random() * totalWeight;
         for (const scene of availableScenes) {
@@ -712,7 +712,7 @@ class AIAgent {
                 return scene;
             }
         }
-        
+
         return 'idle';
     }
 
@@ -721,26 +721,26 @@ class AIAgent {
      */
     setScene(sceneName) {
         if (!this.knightSVG) return;
-        
+
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ai-agent.js:setScene',message:'Scene changing',data:{from:this.currentScene,to:sceneName},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'ai-agent.js:setScene', message: 'Scene changing', data: { from: this.currentScene, to: sceneName }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'E' }) }).catch(() => { });
         // #endregion
-        
+
         // Remove all scene classes
         this.knightSVG.classList.remove('scene-idle', 'scene-sleep', 'scene-practice', 'scene-combat', 'scene-rest');
-        
+
         // Add transition class briefly
         this.knightSVG.classList.add('scene-transition');
-        
+
         setTimeout(() => {
             this.knightSVG.classList.remove('scene-transition');
             this.knightSVG.classList.add(`scene-${sceneName}`);
-            
+
             // Handle ZZZ for sleep
             if (this.zzzGroup) {
                 this.zzzGroup.style.display = sceneName === 'sleep' ? 'block' : 'none';
             }
-            
+
             this.currentScene = sceneName;
             console.log('Scene changed to:', sceneName);
         }, 200);
@@ -897,9 +897,9 @@ class AIAgent {
                     // Play audio from server
                     const audioBlob = await response.blob();
                     const audioUrl = URL.createObjectURL(audioBlob);
-                    
+
                     this.currentAudio = new Audio(audioUrl);
-                    
+
                     this.currentAudio.onended = () => {
                         this.isSpeaking = false;
                         this.avatarEl.classList.remove('speaking');
@@ -961,7 +961,7 @@ class AIAgent {
         return new Promise((resolve) => {
             // Cancel any ongoing speech
             speechSynthesis.cancel();
-            
+
             // Remove emojis before speaking
             const cleanText = this.stripEmojis(text);
             if (!cleanText) {
@@ -969,9 +969,9 @@ class AIAgent {
                 this.avatarEl.classList.remove('speaking');
                 return resolve();
             }
-            
+
             const utterance = new SpeechSynthesisUtterance(cleanText);
-            
+
             // Get the best voice for current language
             const bestVoice = this.getBestVoice();
             if (bestVoice) {
@@ -981,25 +981,25 @@ class AIAgent {
                 // Fallback to language-based setting
                 utterance.lang = this.getSpeechRecognitionLang();
             }
-            
+
             // Optimize speech parameters for natural sound
             utterance.rate = 0.95;   // Slightly slower for clarity
             utterance.pitch = 1.05;  // Slightly higher for friendliness
             utterance.volume = 1.0;
-            
+
             utterance.onend = () => {
                 this.isSpeaking = false;
                 this.avatarEl.classList.remove('speaking');
                 resolve();
             };
-            
+
             utterance.onerror = (event) => {
                 console.error('TTS error:', event.error);
                 this.isSpeaking = false;
                 this.avatarEl.classList.remove('speaking');
                 resolve();
             };
-            
+
             // Speak!
             speechSynthesis.speak(utterance);
         });
@@ -1023,18 +1023,18 @@ class AIAgent {
         try {
             // Update language before starting (in case user changed it)
             this.recognition.lang = this.getSpeechRecognitionLang();
-            
+
             this.recognition.start();
             this.isRecording = true;
             this.voiceBtnEl.classList.add('recording');
             this.voiceBtnEl.textContent = '⏹️';
             this.setStatus('thinking');
-            
+
             console.log('Started speech recognition with language:', this.recognition.lang);
 
         } catch (err) {
             console.error('Recording error:', err);
-            
+
             // Handle already started error
             if (err.name === 'InvalidStateError') {
                 this.recognition.stop();
@@ -1076,7 +1076,7 @@ class AIAgent {
 // Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     console.log('AI Agent JS loaded - PHYSICS AVATAR VERSION 6.0');
-    
+
     // Initialize AI Agent (translations loaded from i18n system)
     window.aiAgent = new AIAgent({
         theme: 'knight'
