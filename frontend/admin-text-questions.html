@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Questions Database - Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .text-questions-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .page-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            color: #111827;
+        }
+
+        .page-header h1 i {
+            color: #6366f1;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-box input {
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            width: 280px;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-box button {
+            padding: 10px 16px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .search-box button:hover {
+            background: #4f46e5;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: #374151;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .btn-back:hover {
+            background: #1f2937;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0284c7;
+        }
+
+        .questions-table {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .questions-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .questions-table th {
+            background: #f9fafb;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .questions-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: top;
+        }
+
+        .questions-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .question-text {
+            max-width: 400px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #111827;
+        }
+
+        .question-text.truncated {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .answer-preview {
+            max-width: 300px;
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .answer-preview.truncated {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #9ca3af;
+            white-space: nowrap;
+        }
+
+        .btn-delete {
+            padding: 8px 12px;
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-delete:hover {
+            background: #fecaca;
+        }
+
+        .btn-view {
+            padding: 8px 12px;
+            background: #e0e7ff;
+            color: #4338ca;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 8px;
+        }
+
+        .btn-view:hover {
+            background: #c7d2fe;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 14px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #f3f4f6;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination .page-info {
+            padding: 8px 14px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #d1d5db;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .loading-state .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            max-width: 800px;
+            max-height: 80vh;
+            width: 90%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+        }
+
+        .detail-section h4 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .detail-content {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-box input {
+                width: 200px;
+            }
+
+            .questions-table {
+                overflow-x: auto;
+            }
+
+            .question-text,
+            .answer-preview {
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="text-questions-container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-database"></i> Text Questions Database</h1>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search questions...">
+                    <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+                </div>
+                <a href="/admin.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Admin</a>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Total Questions</span>
+                <span class="stat-value" id="totalCount">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Current Page</span>
+                <span class="stat-value" id="currentPage">-</span>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading-state" id="loadingState">
+            <div class="spinner"></div>
+            <p>Loading questions...</p>
+        </div>
+
+        <!-- Table -->
+        <div class="questions-table" id="tableContainer" hidden>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Question</th>
+                        <th style="width: 30%;">AI Answer Preview</th>
+                        <th style="width: 15%;">Created</th>
+                        <th style="width: 15%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="questionsBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" hidden>
+            <i class="fas fa-inbox"></i>
+            <p>No text questions found</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination" hidden>
+            <button id="prevBtn"><i class="fas fa-chevron-left"></i> Previous</button>
+            <span class="page-info" id="pageInfo">Page 1 of 1</span>
+            <button id="nextBtn">Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Question Details</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-section">
+                    <h4>Question Text</h4>
+                    <div class="detail-content" id="modalQuestion"></div>
+                </div>
+                <div class="detail-section">
+                    <h4>AI Answer</h4>
+                    <div class="detail-content" id="modalAnswer"></div>
+                </div>
+                <div class="detail-section">
+                    <h4>Created At</h4>
+                    <div class="detail-content" id="modalCreated"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/admin/text-questions';
+
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentSearch = '';
+        let questionsData = [];
+
+        // DOM elements
+        const loadingState = document.getElementById('loadingState');
+        const tableContainer = document.getElementById('tableContainer');
+        const emptyState = document.getElementById('emptyState');
+        const questionsBody = document.getElementById('questionsBody');
+        const pagination = document.getElementById('pagination');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageInfo = document.getElementById('pageInfo');
+        const totalCount = document.getElementById('totalCount');
+        const currentPageEl = document.getElementById('currentPage');
+        const detailModal = document.getElementById('detailModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalQuestion = document.getElementById('modalQuestion');
+        const modalAnswer = document.getElementById('modalAnswer');
+        const modalCreated = document.getElementById('modalCreated');
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQuestions();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            searchBtn.addEventListener('click', () => {
+                currentSearch = searchInput.value.trim();
+                currentPage = 1;
+                loadQuestions();
+            });
+
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    currentSearch = searchInput.value.trim();
+                    currentPage = 1;
+                    loadQuestions();
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    loadQuestions();
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    loadQuestions();
+                }
+            });
+
+            modalClose.addEventListener('click', closeModal);
+            detailModal.addEventListener('click', (e) => {
+                if (e.target === detailModal) closeModal();
+            });
+        }
+
+        async function loadQuestions() {
+            showLoading();
+
+            try {
+                let url = `${API_BASE}?page=${currentPage}&limit=20`;
+                if (currentSearch) {
+                    url += `&search=${encodeURIComponent(currentSearch)}`;
+                }
+
+                const response = await fetch(url, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        alert('Admin access required. Please log in as admin.');
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                questionsData = data.questions || [];
+                totalPages = data.pagination?.totalPages || 1;
+                const total = data.pagination?.total || 0;
+
+                // Update stats
+                totalCount.textContent = total;
+                currentPageEl.textContent = currentPage;
+                pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+                // Update pagination buttons
+                prevBtn.disabled = currentPage <= 1;
+                nextBtn.disabled = currentPage >= totalPages;
+
+                if (questionsData.length === 0) {
+                    showEmpty();
+                } else {
+                    renderTable();
+                }
+
+            } catch (err) {
+                console.error('Failed to load questions:', err);
+                alert('Failed to load questions: ' + err.message);
+                showEmpty();
+            }
+        }
+
+        function showLoading() {
+            loadingState.hidden = false;
+            tableContainer.hidden = true;
+            emptyState.hidden = true;
+            pagination.hidden = true;
+        }
+
+        function showEmpty() {
+            loadingState.hidden = true;
+            tableContainer.hidden = true;
+            emptyState.hidden = false;
+            pagination.hidden = true;
+        }
+
+        function renderTable() {
+            loadingState.hidden = true;
+            tableContainer.hidden = false;
+            emptyState.hidden = true;
+            pagination.hidden = false;
+
+            questionsBody.innerHTML = questionsData.map((q, idx) => {
+                const questionPreview = escapeHtml(q.question_text || '');
+                let answerPreview = '';
+
+                if (q.ai_answer) {
+                    if (q.ai_answer.problemSummary) {
+                        answerPreview = q.ai_answer.problemSummary;
+                    } else if (q.ai_answer.answer?.steps?.[0]) {
+                        answerPreview = q.ai_answer.answer.steps[0];
+                    } else if (q.ai_answer.raw) {
+                        answerPreview = q.ai_answer.raw.substring(0, 100);
+                    }
+                }
+                answerPreview = escapeHtml(answerPreview);
+
+                const created = new Date(q.created_at).toLocaleString('zh-HK');
+
+                return `
+                    <tr data-idx="${idx}">
+                        <td>
+                            <div class="question-text truncated">${questionPreview}</div>
+                        </td>
+                        <td>
+                            <div class="answer-preview truncated">${answerPreview}</div>
+                        </td>
+                        <td>
+                            <div class="timestamp">${created}</div>
+                        </td>
+                        <td>
+                            <button class="btn-view" onclick="viewQuestion(${idx})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn-delete" onclick="deleteQuestion('${q.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function viewQuestion(idx) {
+            const q = questionsData[idx];
+            if (!q) return;
+
+            modalQuestion.textContent = q.question_text || '';
+
+            // Format AI answer
+            let answerText = '';
+            if (q.ai_answer) {
+                if (q.ai_answer.problemSummary) {
+                    answerText += `Problem Summary:\n${q.ai_answer.problemSummary}\n\n`;
+                }
+                if (q.ai_answer.answer?.steps) {
+                    answerText += `Steps:\n`;
+                    q.ai_answer.answer.steps.forEach((step, i) => {
+                        answerText += `${i + 1}. ${step}\n`;
+                    });
+                    answerText += '\n';
+                }
+                if (q.ai_answer.answer?.finalAnswer) {
+                    answerText += `Final Answer:\n${q.ai_answer.answer.finalAnswer}\n`;
+                }
+                if (!answerText && q.ai_answer.raw) {
+                    answerText = q.ai_answer.raw;
+                }
+            }
+            modalAnswer.textContent = answerText || 'No answer available';
+            modalCreated.textContent = new Date(q.created_at).toLocaleString('zh-HK');
+
+            detailModal.classList.add('active');
+        }
+
+        function closeModal() {
+            detailModal.classList.remove('active');
+        }
+
+        async function deleteQuestion(id) {
+            if (!confirm('Are you sure you want to delete this question?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}?id=${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+
+                // Reload
+                loadQuestions();
+
+            } catch (err) {
+                console.error('Failed to delete:', err);
+                alert('Failed to delete: ' + err.message);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+
+</html>
+

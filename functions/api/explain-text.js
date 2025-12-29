@@ -1,7 +1,8 @@
 /**
  * HKDSE Physics AI Tutor - Explain Text API
  * Cloudflare Pages Function
- * For text-only physics questions (no image required)
+ * Uses Gemini 3 Flash for text-only physics questions (globally available, no VPN required)
+ * Stores text questions + answers in D1 database for admin review
  */
 
 import { TEACHER_EXPLAINER_PROMPT, SOCRATIC_TUTOR_PROMPT } from '../../shared/prompts.js';
@@ -33,13 +34,6 @@ export async function onRequestPost(context) {
     // Validate problemText
     if (!problemText || problemText.trim().length === 0) {
       return errorResponse(400, 'Please enter the problem content / 請輸入題目內容');
-    }
-
-    // Check DeepSeek API key
-    const deepseekApiKey = env.DEEPSEEK_API_KEY;
-    if (!deepseekApiKey) {
-      console.error('DEEPSEEK_API_KEY not configured');
-      return errorResponse(500, '服務配置錯誤，請聯繫管理員');
     }
 
     // Build prompt based on mode
@@ -95,19 +89,31 @@ export async function onRequestPost(context) {
     // Get user from session (if logged in)
     const user = await getUserFromSession(request, env);
 
-    // Call DeepSeek API
-    const result = await callDeepSeek(deepseekApiKey, systemPrompt, userPrompt);
+    // Try Gemini Flash first (globally available, no VPN needed), fallback to DeepSeek
+    let result;
+    let usedModel = 'gemini-flash';
 
-    if (!result.success) {
-      return errorResponse(500, result.error || 'AI analysis failed / AI 分析失敗');
+    if (env.GEMINI_API_KEY) {
+      result = await callGeminiFlash(env.GEMINI_API_KEY, systemPrompt, userPrompt);
     }
 
-    // Track DeepSeek token usage
+    // Fallback to DeepSeek if Gemini fails or not configured
+    if (!result?.success && env.DEEPSEEK_API_KEY) {
+      console.log('Gemini Flash failed or not configured, falling back to DeepSeek');
+      result = await callDeepSeek(env.DEEPSEEK_API_KEY, systemPrompt, userPrompt);
+      usedModel = 'deepseek';
+    }
+
+    if (!result?.success) {
+      return errorResponse(500, result?.error || 'AI analysis failed / AI 分析失敗');
+    }
+
+    // Track token usage
     if (result.usage && env.DB) {
-      await saveTokenUsage(env.DB, user?.id || null, 'deepseek', result.usage, 'explain-text');
+      await saveTokenUsage(env.DB, user?.id || null, usedModel, result.usage, 'explain-text');
     }
 
-    // Parse DeepSeek response - handle markdown code blocks
+    // Parse response - handle markdown code blocks
     let parsedResponse;
     try {
       let textToParse = result.text;
@@ -126,7 +132,7 @@ export async function onRequestPost(context) {
         throw new Error('No JSON found in response');
       }
     } catch (parseErr) {
-      console.error('Failed to parse DeepSeek response:', parseErr);
+      console.error('Failed to parse response:', parseErr);
       // Fallback: split raw response into readable paragraphs
       const rawText = result.text
         .replace(/```json\s*/g, '')
@@ -178,6 +184,19 @@ export async function onRequestPost(context) {
       }
     }
 
+    // Add model info
+    parsedResponse._model = usedModel;
+
+    // Save text question + answer to D1 database (for admin review)
+    if (env.DB) {
+      try {
+        await saveTextQuestion(env.DB, problemText.trim(), JSON.stringify(parsedResponse));
+      } catch (dbErr) {
+        console.error('Failed to save text question to DB:', dbErr);
+        // Don't fail the request, just log the error
+      }
+    }
+
     return new Response(JSON.stringify(parsedResponse), {
       headers: {
         'Content-Type': 'application/json',
@@ -191,6 +210,92 @@ export async function onRequestPost(context) {
   }
 }
 
+/**
+ * Save text question + AI answer to D1 database
+ */
+async function saveTextQuestion(db, questionText, aiAnswer) {
+  const id = crypto.randomUUID();
+  
+  await db.prepare(`
+    INSERT INTO text_questions (id, question_text, ai_answer, created_at)
+    VALUES (?, ?, ?, datetime('now'))
+  `).bind(id, questionText, aiAnswer).run();
+  
+  console.log(`Saved text question to DB: ${id}`);
+  return id;
+}
+
+/**
+ * Google Gemini 2.0/3 Flash - Primary model (fast, globally available, no VPN needed)
+ */
+async function callGeminiFlash(apiKey, systemPrompt, userPrompt) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+  const requestBody = {
+    contents: [
+      {
+        parts: [
+          {
+            text: systemPrompt + '\n\n' + userPrompt + '\n\nIMPORTANT: You MUST respond with valid JSON only, no markdown code blocks or extra text.'
+          }
+        ]
+      }
+    ],
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: 4096,
+      responseMimeType: 'application/json'
+    }
+  };
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '');
+      console.error('Gemini Flash error:', response.status, errorText);
+      return { success: false, error: `Gemini Flash error (${response.status})` };
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    const usage = {
+      prompt_tokens: data.usageMetadata?.promptTokenCount || 0,
+      completion_tokens: data.usageMetadata?.candidatesTokenCount || 0,
+      total_tokens: data.usageMetadata?.totalTokenCount || 0
+    };
+
+    if (!text) {
+      return { success: false, error: 'Empty response from Gemini Flash' };
+    }
+
+    return { success: true, text, usage };
+
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      return { success: false, error: 'Request timeout' };
+    }
+    console.error('Gemini Flash call failed:', err);
+    return { success: false, error: 'Gemini Flash connection failed' };
+  }
+}
+
+/**
+ * DeepSeek - Fallback model
+ */
 async function callDeepSeek(apiKey, systemPrompt, userPrompt) {
   const url = 'https://api.deepseek.com/chat/completions';
 
@@ -203,7 +308,7 @@ async function callDeepSeek(apiKey, systemPrompt, userPrompt) {
       },
       { role: 'user', content: userPrompt },
     ],
-    temperature: 0.1,  // Low temperature for consistent responses
+    temperature: 0.1,
     max_tokens: 4096,
     response_format: { type: 'json_object' },
   };

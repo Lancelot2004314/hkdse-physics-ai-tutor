@@ -12,8 +12,8 @@ import { searchKnowledgeBase, formatKnowledgeContext } from '../../shared/embedd
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 const REQUEST_TIMEOUT = 90000; // 90 seconds for vision model
 
-// Model priority for auto-fallback
-const MODEL_PRIORITY = ['gpt4o', 'gpt4o-mini', 'qwen-vl', 'gemini'];
+// Model priority for auto-fallback - Gemini 3 Flash is primary (globally available, no VPN needed)
+const MODEL_PRIORITY = ['gemini-flash', 'gpt4o', 'gpt4o-mini', 'qwen-vl', 'gemini'];
 
 // CORS headers
 const corsHeaders = {
@@ -206,6 +206,23 @@ export async function onRequestPost(context) {
       _model: usedModel, // Include which model was used (for debugging)
     };
 
+    // Save to D1 if image is text-only (no figures/graphs)
+    // We do a quick check using Gemini to detect if there are diagrams
+    if (env.DB && env.GEMINI_API_KEY) {
+      try {
+        const textExtraction = await extractTextIfNoFigures(env.GEMINI_API_KEY, base64Data, mimeType);
+        if (textExtraction.isTextOnly && textExtraction.extractedText) {
+          await saveTextQuestion(env.DB, textExtraction.extractedText, JSON.stringify(finalResult));
+          console.log('Saved text-only image question to DB');
+        } else {
+          console.log('Image contains figures/graphs, not saving to text DB');
+        }
+      } catch (dbErr) {
+        console.error('Failed to check/save image question:', dbErr);
+        // Don't fail the request, just log
+      }
+    }
+
     return new Response(JSON.stringify(finalResult), {
       headers: {
         'Content-Type': 'application/json',
@@ -219,6 +236,106 @@ export async function onRequestPost(context) {
   }
 }
 
+/**
+ * Check if image contains figures/graphs/diagrams, and extract text if it's text-only
+ */
+async function extractTextIfNoFigures(apiKey, base64Data, mimeType) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+  const requestBody = {
+    contents: [
+      {
+        parts: [
+          {
+            inline_data: {
+              mime_type: mimeType,
+              data: base64Data
+            }
+          },
+          {
+            text: `Analyze this image and respond with JSON only:
+{
+  "hasFigures": true/false,  // Does this image contain any diagrams, graphs, charts, illustrations, or figures? 
+  "extractedText": "..."     // If hasFigures is false, extract ALL the text from the image. If hasFigures is true, leave empty.
+}
+
+A "figure" includes: graphs, charts, diagrams, circuit diagrams, force diagrams, illustrations, drawings, plots, tables with visual elements.
+Pure text (printed or handwritten) with no visual diagrams should have hasFigures=false.`
+          }
+        ]
+      }
+    ],
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: 2048,
+      responseMimeType: 'application/json'
+    }
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      console.error('Figure detection failed:', response.status);
+      return { isTextOnly: false, extractedText: null };
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      return { isTextOnly: false, extractedText: null };
+    }
+
+    // Parse JSON response
+    let parsed;
+    try {
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+    } catch (e) {
+      console.error('Failed to parse figure detection response:', e);
+      return { isTextOnly: false, extractedText: null };
+    }
+
+    if (!parsed) {
+      return { isTextOnly: false, extractedText: null };
+    }
+
+    return {
+      isTextOnly: parsed.hasFigures === false,
+      extractedText: parsed.hasFigures === false ? (parsed.extractedText || '').trim() : null
+    };
+
+  } catch (err) {
+    console.error('Figure detection error:', err);
+    return { isTextOnly: false, extractedText: null };
+  }
+}
+
+/**
+ * Save text question + AI answer to D1 database
+ */
+async function saveTextQuestion(db, questionText, aiAnswer) {
+  if (!questionText || questionText.length < 10) {
+    console.log('Question text too short, not saving');
+    return null;
+  }
+
+  const id = crypto.randomUUID();
+  
+  await db.prepare(`
+    INSERT INTO text_questions (id, question_text, ai_answer, created_at)
+    VALUES (?, ?, ?, datetime('now'))
+  `).bind(id, questionText, aiAnswer).run();
+  
+  console.log(`Saved text question to DB: ${id}`);
+  return id;
+}
+
 // Check if API key exists for a model
 function hasApiKey(env, modelName) {
   switch (modelName) {
@@ -228,6 +345,7 @@ function hasApiKey(env, modelName) {
     case 'qwen-vl':
       return !!env.QWEN_API_KEY;
     case 'gemini':
+    case 'gemini-flash':
       return !!env.GEMINI_API_KEY;
     default:
       return false;
@@ -237,6 +355,8 @@ function hasApiKey(env, modelName) {
 // Call the appropriate vision model
 async function callVisionModel(env, modelName, base64Data, mimeType, fullImage, systemPrompt, userPrompt) {
   switch (modelName) {
+    case 'gemini-flash':
+      return await callGeminiFlash(env.GEMINI_API_KEY, base64Data, mimeType, systemPrompt, userPrompt);
     case 'gpt4o':
       return await callOpenAI(env.OPENAI_API_KEY, 'gpt-4o', base64Data, mimeType, systemPrompt, userPrompt);
     case 'gpt4o-mini':
@@ -392,9 +512,82 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
   }
 }
 
-// Google Gemini Vision
+// Google Gemini 3 Flash - Primary model (fast, multimodal, globally available)
+async function callGeminiFlash(apiKey, base64Data, mimeType, systemPrompt, userPrompt) {
+  // Use gemini-2.0-flash which is the latest stable flash model
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+  const requestBody = {
+    contents: [
+      {
+        parts: [
+          {
+            inline_data: {
+              mime_type: mimeType,
+              data: base64Data
+            }
+          },
+          {
+            text: systemPrompt + '\n\n' + userPrompt + '\n\nIMPORTANT: You MUST respond with valid JSON only, no markdown code blocks or extra text.'
+          }
+        ]
+      }
+    ],
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: 4096,
+      responseMimeType: 'application/json'
+    }
+  };
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '');
+      console.error('Gemini Flash error:', response.status, errorText);
+      return { success: false, error: `Gemini Flash error (${response.status})` };
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    const usage = {
+      prompt_tokens: data.usageMetadata?.promptTokenCount || 0,
+      completion_tokens: data.usageMetadata?.candidatesTokenCount || 0,
+      total_tokens: data.usageMetadata?.totalTokenCount || 0
+    };
+
+    if (!text) {
+      return { success: false, error: 'Empty response from Gemini Flash' };
+    }
+
+    return { success: true, text, usage };
+
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      return { success: false, error: 'Request timeout' };
+    }
+    console.error('Gemini Flash call failed:', err);
+    return { success: false, error: 'Gemini Flash connection failed' };
+  }
+}
+
+// Google Gemini Vision (legacy/fallback)
 async function callGemini(apiKey, base64Data, mimeType, systemPrompt, userPrompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
   const requestBody = {
     contents: [
