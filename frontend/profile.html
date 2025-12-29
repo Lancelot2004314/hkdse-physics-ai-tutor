@@ -11,6 +11,25 @@
 </head>
 
 <body>
+    <!-- Particles Background -->
+    <div class="particles-container">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
     <div class="app-layout">
         <!-- Sidebar -->
         <nav class="sidebar">
@@ -40,83 +59,93 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <header class="page-header">
-                <h1>Profile</h1>
+            <header class="page-header animate-on-scroll fade-in-up">
+                <h1><i class="fas fa-user-circle"></i> Profile</h1>
             </header>
 
             <!-- User Profile Section -->
-            <div class="profile-section">
+            <div class="profile-section card-lift animate-on-scroll fade-in-up stagger-1">
                 <div class="profile-avatar">
                     <div class="avatar-image" id="avatarImage">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user" id="avatarIcon"></i>
+                        <img id="avatarImg" src="" alt="Avatar" style="display: none;">
                     </div>
-                    <button class="avatar-edit">Edit</button>
+                    <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+                    <button class="avatar-edit btn-glow" id="avatarEditBtn">
+                        <i class="fas fa-camera"></i> Change Photo
+                    </button>
+                    <button class="avatar-remove" id="avatarRemoveBtn" style="display: none;">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
                 </div>
                 <div class="profile-form">
                     <h2>User Profile</h2>
                     <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" id="profileName" placeholder="Your name">
+                        <label><i class="fas fa-user"></i> Name</label>
+                        <input type="text" id="profileName" placeholder="Your name" class="input-glow">
                     </div>
                     <div class="form-group">
-                        <label>Email</label>
+                        <label><i class="fas fa-envelope"></i> Email</label>
                         <input type="email" id="profileEmail" disabled>
                     </div>
                     <div class="form-group">
-                        <label>Language</label>
-                        <select id="profileLanguage">
+                        <label><i class="fas fa-globe"></i> Language</label>
+                        <select id="profileLanguage" class="input-glow">
                             <option value="en">English</option>
                             <option value="zh-HK">繁體中文</option>
                             <option value="zh-CN">简体中文</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>I am a...</label>
-                        <select id="profileRole">
+                        <label><i class="fas fa-id-badge"></i> I am a...</label>
+                        <select id="profileRole" class="input-glow">
                             <option value="student">Student</option>
                             <option value="teacher">Teacher</option>
                             <option value="parent">Parent</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
-                    <button class="btn-primary" id="saveProfileBtn" style="margin-top: 20px;">
-                        Save Changes
+                    <button class="btn-primary btn-glow ripple" id="saveProfileBtn">
+                        <i class="fas fa-save"></i> Save Changes
                     </button>
                 </div>
             </div>
 
             <!-- Payment Section -->
-            <div class="payment-section">
-                <h2>Payment</h2>
+            <div class="payment-section animate-on-scroll fade-in-up stagger-2">
+                <h2><i class="fas fa-credit-card"></i> Payment</h2>
                 <div class="plans-grid">
-                    <div class="plan-card free">
+                    <div class="plan-card free card-lift tilt-card">
                         <h3>Free</h3>
                         <div class="plan-price">$0<span>/month</span></div>
                         <ul class="plan-features">
-                            <li>5 questions per practice</li>
-                            <li>3 practices per day</li>
-                            <li>Basic statistics</li>
+                            <li><i class="fas fa-check"></i> 5 questions per practice</li>
+                            <li><i class="fas fa-check"></i> 3 practices per day</li>
+                            <li><i class="fas fa-check"></i> Basic statistics</li>
                         </ul>
                         <button class="btn-secondary" disabled>Current Plan</button>
                     </div>
-                    <div class="plan-card premium">
+                    <div class="plan-card premium card-lift tilt-card shine">
                         <div class="plan-badge">Discount limited to first 1,000 users!</div>
                         <h3>Premium</h3>
                         <div class="plan-price">
                             <span class="original">$59</span> $40<span>/month</span>
                         </div>
                         <ul class="plan-features">
-                            <li><strong>Unlimited</strong> questions per practice</li>
-                            <li><strong>Unlimited</strong> practices per day</li>
-                            <li>Advanced statistics</li>
-                            <li>30 days money back guarantee</li>
+                            <li><i class="fas fa-star"></i> <strong>Unlimited</strong> questions per practice</li>
+                            <li><i class="fas fa-star"></i> <strong>Unlimited</strong> practices per day</li>
+                            <li><i class="fas fa-star"></i> Advanced statistics</li>
+                            <li><i class="fas fa-star"></i> 30 days money back guarantee</li>
                         </ul>
-                        <button class="btn-primary">Upgrade to Premium</button>
+                        <button class="btn-primary btn-glow">Upgrade to Premium</button>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <style>
         .profile-section {
@@ -126,32 +155,73 @@
             border-radius: 12px;
             padding: 30px;
             margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .profile-avatar {
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
         }
 
         .avatar-image {
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
             background: linear-gradient(135deg, #f59e0b, #d97706);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3em;
+            font-size: 3.5em;
             color: white;
-            margin-bottom: 10px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .avatar-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.4);
+        }
+
+        .avatar-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .avatar-edit {
-            padding: 6px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-secondary);
+            padding: 8px 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border: none;
+            border-radius: 8px;
+            color: white;
             cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.4);
+        }
+
+        .avatar-remove {
+            padding: 6px 16px;
+            background: transparent;
+            border: 1px solid #ef4444;
+            border-radius: 6px;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-remove:hover {
+            background: #ef4444;
+            color: white;
         }
 
         .profile-form {
@@ -160,28 +230,48 @@
 
         .profile-form h2 {
             color: var(--text-primary);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-size: 1.5em;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
             color: var(--text-secondary);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-size: 0.9em;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: var(--accent);
         }
 
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 10px 15px;
+            padding: 12px 15px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 8px;
             color: var(--text-primary);
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
+        }
+
+        .form-group input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .payment-section {
@@ -192,20 +282,27 @@
 
         .payment-section h2 {
             color: var(--text-primary);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+        }
+
+        .payment-section h2 i {
+            margin-right: 10px;
+            color: var(--accent);
         }
 
         .plans-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 25px;
         }
 
         .plan-card {
             background: var(--bg-card);
-            border-radius: 12px;
-            padding: 25px;
+            border-radius: 16px;
+            padding: 30px;
             position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .plan-card.premium {
@@ -215,47 +312,62 @@
 
         .plan-badge {
             position: absolute;
-            top: -10px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            background: #ef4444;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
+            padding: 6px 16px;
+            border-radius: 20px;
             font-size: 0.75em;
             white-space: nowrap;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
         }
 
         .plan-card h3 {
-            font-size: 1.3em;
-            margin-bottom: 10px;
+            font-size: 1.4em;
+            margin-bottom: 15px;
         }
 
         .plan-price {
-            font-size: 2em;
+            font-size: 2.5em;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .plan-price span {
-            font-size: 0.5em;
+            font-size: 0.4em;
             font-weight: 400;
+            opacity: 0.8;
         }
 
         .plan-price .original {
             text-decoration: line-through;
-            opacity: 0.6;
-            font-size: 0.6em;
+            opacity: 0.5;
+            font-size: 0.5em;
+            margin-right: 5px;
         }
 
         .plan-features {
             list-style: none;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .plan-features li {
-            padding: 8px 0;
+            padding: 10px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .plan-features li i {
+            color: #22c55e;
+        }
+
+        .plan-card.premium .plan-features li i {
+            color: #fbbf24;
         }
 
         .plan-card.free .plan-features li {
@@ -264,6 +376,75 @@
 
         .plan-card button {
             width: 100%;
+            padding: 14px;
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        /* Toast styles */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .profile-form {
+                width: 100%;
+            }
         }
     </style>
 
@@ -274,26 +455,76 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await loadProfile();
             initEventListeners();
+            initScrollAnimations();
         });
+
+        // Initialize scroll animations
+        function initScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+                animatedElements.forEach(el => observer.observe(el));
+            } else {
+                animatedElements.forEach(el => el.classList.add('visible'));
+            }
+        }
 
         async function loadProfile() {
             try {
                 const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
                 if (response.ok) {
-                    currentUser = await response.json();
+                    const data = await response.json();
+                    currentUser = data.user;
 
-                    document.getElementById('sideUserName').textContent = currentUser.name || currentUser.email?.split('@')[0];
+                    if (!currentUser) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+
+                    // Update sidebar
+                    document.getElementById('sideUserName').textContent = currentUser.name || currentUser.email?.split('@')[0] || 'User';
                     document.getElementById('sideUserEmail').textContent = currentUser.email || '';
+
+                    // Update form
                     document.getElementById('profileName').value = currentUser.name || '';
                     document.getElementById('profileEmail').value = currentUser.email || '';
                     document.getElementById('profileLanguage').value = currentUser.language || 'en';
                     document.getElementById('profileRole').value = currentUser.role || 'student';
+
+                    // Update avatar
+                    updateAvatarDisplay(currentUser.avatar_url);
+
                     checkAdminAccess();
                 } else {
-                    window.location.href = '/?login=true';
+                    window.location.href = '/login.html';
                 }
             } catch (err) {
                 console.error('Failed to load profile:', err);
+                showToast('Failed to load profile', 'error');
+            }
+        }
+
+        function updateAvatarDisplay(avatarUrl) {
+            const avatarIcon = document.getElementById('avatarIcon');
+            const avatarImg = document.getElementById('avatarImg');
+            const removeBtn = document.getElementById('avatarRemoveBtn');
+
+            if (avatarUrl) {
+                avatarIcon.style.display = 'none';
+                avatarImg.src = avatarUrl;
+                avatarImg.style.display = 'block';
+                removeBtn.style.display = 'block';
+            } else {
+                avatarIcon.style.display = 'block';
+                avatarImg.style.display = 'none';
+                removeBtn.style.display = 'none';
             }
         }
 
@@ -308,7 +539,20 @@
         }
 
         function initEventListeners() {
+            // Save profile
             document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+
+            // Avatar upload
+            document.getElementById('avatarEditBtn').addEventListener('click', () => {
+                document.getElementById('avatarInput').click();
+            });
+
+            document.getElementById('avatarInput').addEventListener('change', uploadAvatar);
+
+            // Avatar remove
+            document.getElementById('avatarRemoveBtn').addEventListener('click', removeAvatar);
+
+            // Logout
             document.getElementById('logoutBtn').addEventListener('click', async () => {
                 await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
                 window.location.href = '/';
@@ -316,20 +560,135 @@
         }
 
         async function saveProfile() {
-            const name = document.getElementById('profileName').value;
+            const btn = document.getElementById('saveProfileBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            const name = document.getElementById('profileName').value.trim();
             const language = document.getElementById('profileLanguage').value;
             const role = document.getElementById('profileRole').value;
 
             try {
-                // Note: Profile update API would need to be implemented
-                alert('Profile saved! (API not yet implemented)');
+                const response = await fetch(`${API_BASE}/user/profile`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, language, role })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Profile saved successfully!', 'success');
+                    // Update sidebar name
+                    document.getElementById('sideUserName').textContent = name || currentUser.email?.split('@')[0] || 'User';
+                } else {
+                    showToast(data.error || 'Failed to save profile', 'error');
+                }
             } catch (err) {
                 console.error('Failed to save profile:', err);
+                showToast('Failed to save profile', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
+        }
+
+        async function uploadAvatar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file size (2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('File too large. Maximum size is 2MB.', 'error');
+                return;
+            }
+
+            // Preview immediately
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('avatarIcon').style.display = 'none';
+                document.getElementById('avatarImg').src = e.target.result;
+                document.getElementById('avatarImg').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // Upload
+            showToast('Uploading avatar...', 'info');
+
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            try {
+                const response = await fetch(`${API_BASE}/user/avatar`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Avatar uploaded successfully!', 'success');
+                    updateAvatarDisplay(data.avatar_url);
+                } else {
+                    showToast(data.error || 'Failed to upload avatar', 'error');
+                    // Revert preview
+                    updateAvatarDisplay(currentUser.avatar_url);
+                }
+            } catch (err) {
+                console.error('Failed to upload avatar:', err);
+                showToast('Failed to upload avatar', 'error');
+                updateAvatarDisplay(currentUser.avatar_url);
+            }
+
+            // Clear input
+            event.target.value = '';
+        }
+
+        async function removeAvatar() {
+            if (!confirm('Are you sure you want to remove your avatar?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/user/avatar`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    showToast('Avatar removed', 'success');
+                    updateAvatarDisplay(null);
+                    currentUser.avatar_url = null;
+                } else {
+                    const data = await response.json();
+                    showToast(data.error || 'Failed to remove avatar', 'error');
+                }
+            } catch (err) {
+                console.error('Failed to remove avatar:', err);
+                showToast('Failed to remove avatar', 'error');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle'
+            };
+
+            toast.innerHTML = `<i class="fas ${icons[type]}"></i> ${message}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         }
     </script>
 </body>
 
 </html>
-
-

@@ -101,9 +101,10 @@ export async function getUserFromSession(request, env) {
   try {
     const tokenHash = await hashToken(sessionToken);
 
-    // Find session and user
+    // Find session and user (include profile fields)
     const result = await env.DB.prepare(`
-      SELECT s.id as session_id, s.expires_at, u.id as user_id, u.email
+      SELECT s.id as session_id, s.expires_at, 
+             u.id as user_id, u.email, u.name, u.language, u.role, u.avatar_url
       FROM sessions s
       JOIN users u ON s.user_id = u.id
       WHERE s.token_hash = ?
@@ -123,6 +124,10 @@ export async function getUserFromSession(request, env) {
     return {
       id: result.user_id,
       email: result.email,
+      name: result.name,
+      language: result.language || 'en',
+      role: result.role || 'student',
+      avatar_url: result.avatar_url,
       sessionId: result.session_id,
     };
   } catch (err) {

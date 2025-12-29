@@ -29,3 +29,4 @@ CREATE INDEX IF NOT EXISTS idx_question_bank_reserved ON question_bank(status, r
 
 -- Index for stats: count by status
 CREATE INDEX IF NOT EXISTS idx_question_bank_status ON question_bank(status);
+

@@ -24,3 +24,4 @@ CREATE INDEX IF NOT EXISTS idx_pregen_jobs_status ON pregen_jobs(status);
 
 -- Index for recent jobs
 CREATE INDEX IF NOT EXISTS idx_pregen_jobs_created ON pregen_jobs(created_at DESC);
+

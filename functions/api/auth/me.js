@@ -28,6 +28,10 @@ export async function onRequestGet(context) {
       user: {
         id: user.id,
         email: user.email,
+        name: user.name,
+        language: user.language,
+        role: user.role,
+        avatar_url: user.avatar_url,
       },
     });
 
