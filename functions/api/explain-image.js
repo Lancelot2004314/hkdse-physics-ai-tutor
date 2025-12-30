@@ -116,6 +116,10 @@ export async function onRequestPost(context) {
       modelsToTry = [visionModel, ...MODEL_PRIORITY.filter(m => m !== visionModel && hasApiKey(env, m))];
     }
 
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'explain-image.js:113',message:'Models to try',data:{modelsToTry,hasQwenKey:!!env.QWEN_API_KEY,hasGeminiKey:!!env.GEMINI_API_KEY,hasOpenAIKey:!!env.OPENAI_API_KEY,visionModel,MODEL_PRIORITY},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
+
     if (modelsToTry.length === 0) {
       return errorResponse(500, 'No vision API configured / 未配置視覺 API');
     }
@@ -128,6 +132,10 @@ export async function onRequestPost(context) {
     for (const modelName of modelsToTry) {
       console.log(`Trying vision model: ${modelName}`);
 
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'explain-image.js:128',message:'Trying model',data:{modelName,imageSize:base64Data?.length,mimeType},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
+      // #endregion
+
       const result = await callVisionModel(
         env,
         modelName,
@@ -137,6 +145,10 @@ export async function onRequestPost(context) {
         systemPrompt,
         userPrompt
       );
+
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'explain-image.js:140',message:'Model result',data:{modelName,success:result.success,error:result.error,hasText:!!result.text,textPreview:result.text?.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,C,D'})}).catch(()=>{});
+      // #endregion
 
       if (result.success) {
         visionResult = result;
@@ -150,6 +162,9 @@ export async function onRequestPost(context) {
     }
 
     if (!visionResult) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'explain-image.js:152',message:'All models failed',data:{lastError,triedModels:modelsToTry},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
+      // #endregion
       return errorResponse(500, lastError || 'All vision models failed / 所有視覺模型都失敗');
     }
 
@@ -490,8 +505,15 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
 
     clearTimeout(timeoutId);
 
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'explain-image.js:506',message:'Qwen API response status',data:{status:response.status,ok:response.ok},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'explain-image.js:511',message:'Qwen API error',data:{status:response.status,errorText:errorText?.substring(0,500)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
       console.error('Qwen-VL error:', response.status, errorText);
       return { success: false, error: `Qwen-VL error (${response.status})` };
     }
@@ -499,6 +521,10 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
     const data = await response.json();
     const text = data.output?.choices?.[0]?.message?.content?.[0]?.text;
     const usage = data.usage || null;
+
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'explain-image.js:520',message:'Qwen parsed response',data:{hasText:!!text,textPreview:text?.substring(0,100),dataKeys:Object.keys(data||{})},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
 
     if (!text) {
       return { success: false, error: 'Empty response from Qwen-VL' };
