@@ -10,10 +10,10 @@ import { saveTokenUsage } from '../../shared/tokenUsage.js';
 import { searchKnowledgeBase, formatKnowledgeContext } from '../../shared/embedding.js';
 
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
-const REQUEST_TIMEOUT = 60000; // 60 seconds for vision model
+const REQUEST_TIMEOUT = 120000; // 120 seconds for vision model (qwen-vl-max needs more time)
 const OCR_TIMEOUT = 15000; // 15 seconds for OCR pre-processing (quick extraction)
 
-// Use Qwen-VL-Plus (faster than Max, still good quality)
+// Use Qwen-VL-Max (strongest vision model for accurate reasoning)
 const MODEL_PRIORITY = ['qwen-vl'];
 
 // CORS headers
@@ -276,7 +276,7 @@ hasFigures should be false if image only contains pure text (printed or handwrit
 If hasFigures is false, extract ALL the text from the image into extractedText. If hasFigures is true, leave extractedText empty.`;
 
   const requestBody = {
-    model: 'qwen-vl-plus',  // Faster than qwen-vl-max
+    model: 'qwen-vl-max',  // Strongest vision model
     input: {
       messages: [
         {
@@ -361,7 +361,7 @@ async function extractTextWithOCR(apiKey, base64Data, mimeType) {
 直接输出识别到的文字内容：`;
 
   const requestBody = {
-    model: 'qwen-vl-plus',  // Faster than qwen-vl-max
+    model: 'qwen-vl-max',  // Strongest vision model
     input: {
       messages: [
         {
@@ -553,7 +553,7 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
   const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
 
   const requestBody = {
-    model: 'qwen-vl-plus',  // Faster than qwen-vl-max
+    model: 'qwen-vl-max',  // Strongest vision model
     input: {
       messages: [
         {
