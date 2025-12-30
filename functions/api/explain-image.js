@@ -10,8 +10,8 @@ import { saveTokenUsage } from '../../shared/tokenUsage.js';
 import { searchKnowledgeBase, formatKnowledgeContext } from '../../shared/embedding.js';
 
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
-const REQUEST_TIMEOUT = 90000; // 90 seconds for vision model
-const OCR_TIMEOUT = 30000; // 30 seconds for OCR pre-processing
+const REQUEST_TIMEOUT = 60000; // 60 seconds for vision model
+const OCR_TIMEOUT = 15000; // 15 seconds for OCR pre-processing (quick extraction)
 
 // Only use Qwen-VL-Max (globally available, no VPN needed, best for China)
 const MODEL_PRIORITY = ['qwen-vl'];
