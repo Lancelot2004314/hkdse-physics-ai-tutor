@@ -184,22 +184,28 @@ export async function onRequestPost(context) {
     let parsedResponse;
     try {
       let textToParse = visionResult.text;
+      console.log('Raw text to parse (first 500 chars):', textToParse.substring(0, 500));
 
       // Strip markdown code blocks if present
       const codeBlockMatch = textToParse.match(/```(?:json)?\s*([\s\S]*?)```/);
       if (codeBlockMatch) {
         textToParse = codeBlockMatch[1];
+        console.log('Extracted from code block');
       }
 
-      // Extract JSON object
+      // Extract JSON object - find the outermost { }
       const jsonMatch = textToParse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
+        console.log('Found JSON object, length:', jsonMatch[0].length);
         parsedResponse = JSON.parse(jsonMatch[0]);
+        console.log('JSON parsed successfully, keys:', Object.keys(parsedResponse));
       } else {
         throw new Error('No JSON found in response');
       }
     } catch (parseErr) {
-      console.error('Failed to parse vision response:', parseErr);
+      console.error('Failed to parse vision response:', parseErr.message);
+      console.error('Text that failed to parse:', visionResult.text.substring(0, 1000));
+      
       // Fallback: split raw response into readable paragraphs
       const rawText = visionResult.text
         .replace(/```json\s*/g, '')
@@ -606,13 +612,32 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
     }
 
     const data = await response.json();
-    // OpenAI-compatible format
-    const text = data.choices?.[0]?.message?.content;
+    console.log('Qwen3-VL raw response structure:', JSON.stringify(data).substring(0, 500));
+    
+    // OpenAI-compatible format - handle thinking mode
+    const message = data.choices?.[0]?.message;
+    let text = message?.content;
+    
+    // If thinking mode is enabled, the reasoning might be in reasoning_content
+    // We only need the final content, not the reasoning
+    if (!text && message?.reasoning_content) {
+      console.log('Found reasoning_content, but no content');
+    }
+    
+    // Sometimes the content might be an array (multimodal response)
+    if (Array.isArray(text)) {
+      text = text.map(item => item.text || item.content || '').join('');
+    }
+    
     const usage = data.usage || null;
 
     if (!text) {
-      return { success: false, error: 'Empty response from Qwen-VL' };
+      console.error('Empty response from Qwen3-VL:', JSON.stringify(message));
+      return { success: false, error: 'Empty response from Qwen3-VL' };
     }
+    
+    console.log('Qwen3-VL extracted text length:', text.length);
+    console.log('Qwen3-VL text preview:', text.substring(0, 300));
 
     return { success: true, text, usage };
 
