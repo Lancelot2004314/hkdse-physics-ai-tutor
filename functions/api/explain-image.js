@@ -13,8 +13,8 @@ const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 const REQUEST_TIMEOUT = 90000; // 90 seconds for vision model
 const OCR_TIMEOUT = 30000; // 30 seconds for OCR pre-processing
 
-// Model priority for auto-fallback - Qwen-VL-Max is primary (globally available, no VPN needed, best for China)
-const MODEL_PRIORITY = ['qwen-vl', 'gemini-flash', 'gpt4o', 'gpt4o-mini', 'gemini'];
+// Only use Qwen-VL-Max (globally available, no VPN needed, best for China)
+const MODEL_PRIORITY = ['qwen-vl'];
 
 // CORS headers
 const corsHeaders = {
@@ -134,14 +134,8 @@ export async function onRequestPost(context) {
       modelsToTry = [visionModel, ...MODEL_PRIORITY.filter(m => m !== visionModel && hasApiKey(env, m))];
     }
 
-    // Debug: Log available API keys
-    console.log('Available API keys:', {
-      qwen: !!env.QWEN_API_KEY,
-      openai: !!env.OPENAI_API_KEY,
-      gemini: !!env.GEMINI_API_KEY,
-      deepseek: !!env.DEEPSEEK_API_KEY
-    });
-    console.log('Models to try:', modelsToTry);
+    // Debug: Log Qwen API key status
+    console.log('QWEN_API_KEY configured:', !!env.QWEN_API_KEY);
 
     if (modelsToTry.length === 0) {
       return errorResponse(500, 'No vision API configured / 未配置視覺 API');
