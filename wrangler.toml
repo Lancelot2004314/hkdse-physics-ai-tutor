@@ -29,8 +29,13 @@ binding = "AI"
 # Note: Queues require paid plan. Using manual /api/kb/process endpoint instead.
 
 # Required environment variables (set in Cloudflare Dashboard):
-# - QWEN_API_KEY: 通义千问 API key
+# - QWEN_API_KEY: 通义千问 API key (also used for OCR pre-processing)
 # - DEEPSEEK_API_KEY: DeepSeek API key
 # - OPENAI_API_KEY: OpenAI API key (for embeddings)
 # - AUTH_SECRET: Secret for signing session cookies (generate with: openssl rand -hex 32)
 # - RESEND_API_KEY: Resend.com API key for magic link emails
+
+# OCR Enhancement Feature:
+# The system now uses Qwen-VL for OCR pre-processing to improve blurry image recognition.
+# This uses the same QWEN_API_KEY - no additional configuration needed.
+# OCR text is extracted first and provided as reference to the Vision model.

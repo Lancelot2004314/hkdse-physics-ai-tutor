@@ -57,6 +57,8 @@ export async function onRequestPost(context) {
     let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
 
     // Grade each answer
+    console.log(`[Quiz] Starting grading for ${questions.length} questions, session max_score: ${session.max_score}`);
+    
     for (let i = 0; i < questions.length; i++) {
       const question = questions[i];
       const userAnswer = answers[i] || '';
@@ -64,47 +66,73 @@ export async function onRequestPost(context) {
       let feedback = '';
       let isCorrect = false;
 
+      console.log(`[Quiz] Q${i+1}: type=${question.type}, score=${question.score}, userAnswer=${userAnswer?.substring(0, 50)}`);
+
       if (question.type === 'mc') {
         // Auto-grade MC
-        isCorrect = userAnswer.toUpperCase() === question.correctAnswer?.toUpperCase();
+        const userAns = (userAnswer || '').trim().toUpperCase();
+        const correctAns = (question.correctAnswer || '').trim().toUpperCase();
+        isCorrect = userAns === correctAns;
         score = isCorrect ? (question.score || 1) : 0;
         feedback = isCorrect ? 'Correct!' : `Incorrect. The correct answer is ${question.correctAnswer}.`;
+        console.log(`[Quiz] MC Q${i+1}: user="${userAns}" vs correct="${correctAns}" => ${isCorrect ? 'CORRECT' : 'WRONG'}, score=${score}`);
       } else if (question.type === 'short' || question.type === 'long') {
         // AI-grade short/long answers
+        const maxQuestionScore = question.score || question.parts?.reduce((s, p) => s + p.marks, 0) || 5;
+        
         if (userAnswer.trim()) {
           const gradeResult = await gradeShortAnswer(
             env.DEEPSEEK_API_KEY,
             userAnswer,
             question.modelAnswer || question.parts?.map(p => p.modelAnswer).join('\n'),
-            question.markingScheme || question.parts?.map(p => `${p.marks} marks: ${p.question}`),
-            question.score || question.parts?.reduce((s, p) => s + p.marks, 0) || 5
+            question.markingScheme || question.parts?.map(p => `${p.marks} marks: ${p.question}`).join('\n'),
+            maxQuestionScore
           );
 
           if (gradeResult.success) {
-            score = gradeResult.score;
-            feedback = gradeResult.feedback;
+            // Validate score is reasonable (0 to maxScore)
+            score = Math.min(Math.max(gradeResult.score || 0, 0), maxQuestionScore);
+            feedback = gradeResult.feedback || 'Graded by AI';
+            console.log(`[Quiz] Q${i+1} graded: ${score}/${maxQuestionScore}`);
             if (gradeResult.usage) {
               totalUsage.prompt_tokens += gradeResult.usage.prompt_tokens || 0;
               totalUsage.completion_tokens += gradeResult.usage.completion_tokens || 0;
               totalUsage.total_tokens += gradeResult.usage.total_tokens || 0;
             }
+          } else {
+            // Grading failed - give 0 marks, not full marks!
+            score = 0;
+            feedback = gradeResult.feedback || 'Grading failed - 0 marks awarded';
+            console.error(`[Quiz] Q${i+1} grading failed: ${gradeResult.feedback}`);
           }
+        } else {
+          // Empty answer = 0 marks
+          score = 0;
+          feedback = 'No answer provided - 0 marks';
         }
-        isCorrect = score >= (question.score || 5) * 0.5; // 50% threshold
+        isCorrect = score >= maxQuestionScore * 0.5; // 50% threshold
       }
 
       totalScore += score;
+      const qMaxScore = question.score || 1;
+      console.log(`[Quiz] Q${i+1} result: score=${score}/${qMaxScore}, isCorrect=${isCorrect}`);
+      
       results.push({
         questionIndex: i,
         userAnswer,
         correctAnswer: question.correctAnswer || question.modelAnswer,
         score,
-        maxScore: question.score || 1,
+        maxScore: qMaxScore,
         isCorrect,
         feedback,
         explanation: question.explanation,
       });
     }
+
+    // Log final summary
+    const correctCount = results.filter(r => r.isCorrect).length;
+    console.log(`[Quiz] FINAL: totalScore=${totalScore}/${session.max_score}, correct=${correctCount}/${questions.length}`);
+    console.log(`[Quiz] Score breakdown:`, results.map(r => `Q${r.questionIndex+1}: ${r.score}/${r.maxScore}`).join(', '));
 
     // Calculate grade
     const percentage = session.max_score > 0 ? (totalScore / session.max_score) * 100 : 0;
@@ -200,10 +228,10 @@ async function gradeShortAnswer(apiKey, studentAnswer, modelAnswer, markingSchem
     if (jsonMatch) {
       const result = JSON.parse(jsonMatch[0]);
       const finalScore = Math.min(Math.max(result.score || 0, 0), maxScore); // Ensure score is between 0 and maxScore
-      
+
       console.log('[Grading] Parsed score:', result.score, '-> Final score:', finalScore, '/', maxScore);
       console.log('[Grading] Breakdown:', JSON.stringify(result.breakdown || []));
-      
+
       return {
         success: true,
         score: finalScore,

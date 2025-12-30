@@ -11,6 +11,7 @@ import { searchKnowledgeBase, formatKnowledgeContext } from '../../shared/embedd
 
 const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 const REQUEST_TIMEOUT = 90000; // 90 seconds for vision model
+const OCR_TIMEOUT = 30000; // 30 seconds for OCR pre-processing
 
 // Model priority for auto-fallback - Qwen-VL-Max is primary (globally available, no VPN needed, best for China)
 const MODEL_PRIORITY = ['qwen-vl', 'gemini-flash', 'gpt4o', 'gpt4o-mini', 'gemini'];
@@ -105,6 +106,23 @@ export async function onRequestPost(context) {
 
     // Get user from session (if logged in)
     const user = await getUserFromSession(request, env);
+
+    // OCR Pre-processing: Extract text from image to help with blurry images
+    let ocrText = null;
+    if (env.QWEN_API_KEY) {
+      try {
+        console.log('Running OCR pre-processing...');
+        ocrText = await extractTextWithOCR(env.QWEN_API_KEY, base64Data, mimeType);
+        if (ocrText && ocrText.length > 10) {
+          console.log(`OCR extracted ${ocrText.length} characters`);
+          // Add OCR text as reference to help Vision model with blurry text
+          userPrompt += `\n\n[OCR 参考文字 / OCR Reference Text]:\n${ocrText}\n\n注意：以上是 OCR 提取的文字参考，如果图片文字模糊，请参考此内容。如果图片包含图形/图表，请直接分析图像。`;
+        }
+      } catch (ocrErr) {
+        console.warn('OCR pre-processing failed, continuing without:', ocrErr.message);
+        // Continue without OCR - Vision model will still analyze the image
+      }
+    }
 
     // Determine which models to try
     let modelsToTry;
@@ -316,6 +334,85 @@ If hasFigures is false, extract ALL the text from the image into extractedText. 
   } catch (err) {
     console.error('Figure detection error:', err);
     return { isTextOnly: false, extractedText: null };
+  }
+}
+
+/**
+ * Extract text from image using OCR (optimized for blurry images)
+ * Uses Qwen-VL with a specialized OCR prompt
+ */
+async function extractTextWithOCR(apiKey, base64Data, mimeType) {
+  const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
+
+  // Specialized OCR prompt - focuses on text extraction only
+  const ocrPrompt = `你是一个专业的 OCR 文字识别系统。请仔细识别这张图片中的所有文字内容。
+
+要求：
+1. 提取图片中的所有可见文字（包括模糊的文字）
+2. 保持原有的格式和换行
+3. 如果是数学公式，用 LaTeX 格式表示
+4. 如果某些文字模糊难以辨认，请尽力推测最可能的内容
+5. 只输出识别到的文字，不要添加任何解释或分析
+
+直接输出识别到的文字内容：`;
+
+  const requestBody = {
+    model: 'qwen-vl-max',
+    input: {
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { image: `data:${mimeType};base64,${base64Data}` },
+            { text: ocrPrompt }
+          ]
+        }
+      ]
+    },
+    parameters: {
+      temperature: 0.1,  // Very low temperature for accurate recognition
+      max_tokens: 2048
+    }
+  };
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), OCR_TIMEOUT);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(requestBody),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      console.error('OCR API error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const text = data.output?.choices?.[0]?.message?.content?.[0]?.text;
+
+    if (!text || text.length < 5) {
+      return null;
+    }
+
+    // Clean up the extracted text
+    return text.trim();
+
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      console.warn('OCR request timeout');
+    } else {
+      console.error('OCR extraction error:', err);
+    }
+    return null;
   }
 }
 
