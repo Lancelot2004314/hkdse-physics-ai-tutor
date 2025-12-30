@@ -13,7 +13,7 @@ const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 const REQUEST_TIMEOUT = 120000; // 120 seconds for vision model (qwen-vl-max needs more time)
 const OCR_TIMEOUT = 15000; // 15 seconds for OCR pre-processing (quick extraction)
 
-// Use Qwen-VL-Max (strongest vision model for accurate reasoning)
+// Use Qwen3-VL-Flash (with thinking mode for accurate reasoning)
 const MODEL_PRIORITY = ['qwen-vl'];
 
 // CORS headers
@@ -548,31 +548,39 @@ async function callOpenAI(apiKey, model, base64Data, mimeType, systemPrompt, use
   }
 }
 
-// Qwen Vision (通义千问)
+// Qwen3-VL-Flash with thinking mode (通义千问3视觉模型)
 async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPrompt) {
-  const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
+  // Use OpenAI-compatible API endpoint for Qwen3-VL
+  const url = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
 
   const requestBody = {
-    model: 'qwen-vl-max',  // Strongest vision model
-    input: {
-      messages: [
-        {
-          role: 'system',
-          content: [{ text: systemPrompt + '\n\nIMPORTANT: You MUST respond with valid JSON only, no markdown or extra text.' }]
-        },
-        {
-          role: 'user',
-          content: [
-            { image: `data:${mimeType};base64,${base64Data}` },
-            { text: userPrompt }
-          ]
-        }
-      ]
-    },
-    parameters: {
-      temperature: 0.1,  // Low temperature for consistent responses
-      max_tokens: 4096
-    }
+    model: 'qwen3-vl-flash',  // Qwen3 VL with thinking mode support
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompt + '\n\nIMPORTANT: You MUST respond with valid JSON only, no markdown or extra text. Think step by step before giving the final answer.'
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:${mimeType};base64,${base64Data}`
+            }
+          },
+          {
+            type: 'text',
+            text: userPrompt
+          }
+        ]
+      }
+    ],
+    temperature: 0.1,  // Low temperature for consistent responses
+    max_tokens: 8192,
+    // Enable thinking mode for better reasoning on complex problems
+    enable_thinking: true,
+    thinking_budget: 4096  // Allow up to 4096 tokens for reasoning
   };
 
   try {
@@ -593,12 +601,13 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
-      console.error('Qwen-VL error:', response.status, errorText);
-      return { success: false, error: `Qwen-VL error (${response.status}): ${errorText?.substring(0, 200)}` };
+      console.error('Qwen3-VL error:', response.status, errorText);
+      return { success: false, error: `Qwen3-VL error (${response.status}): ${errorText?.substring(0, 200)}` };
     }
 
     const data = await response.json();
-    const text = data.output?.choices?.[0]?.message?.content?.[0]?.text;
+    // OpenAI-compatible format
+    const text = data.choices?.[0]?.message?.content;
     const usage = data.usage || null;
 
     if (!text) {
