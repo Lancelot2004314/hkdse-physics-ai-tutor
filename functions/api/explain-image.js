@@ -150,21 +150,7 @@ export async function onRequestPost(context) {
     }
 
     if (!visionResult) {
-      // DEBUG: Return detailed error info
-      return new Response(JSON.stringify({
-        error: lastError || 'All vision models failed',
-        debug: {
-          modelsToTry,
-          hasQwenKey: !!env.QWEN_API_KEY,
-          hasGeminiKey: !!env.GEMINI_API_KEY,
-          hasOpenAIKey: !!env.OPENAI_API_KEY,
-          MODEL_PRIORITY,
-          lastError
-        }
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders }
-      });
+      return errorResponse(500, lastError || 'All vision models failed / 所有視覺模型都失敗');
     }
 
     // Track token usage
