@@ -134,6 +134,15 @@ export async function onRequestPost(context) {
       modelsToTry = [visionModel, ...MODEL_PRIORITY.filter(m => m !== visionModel && hasApiKey(env, m))];
     }
 
+    // Debug: Log available API keys
+    console.log('Available API keys:', {
+      qwen: !!env.QWEN_API_KEY,
+      openai: !!env.OPENAI_API_KEY,
+      gemini: !!env.GEMINI_API_KEY,
+      deepseek: !!env.DEEPSEEK_API_KEY
+    });
+    console.log('Models to try:', modelsToTry);
+
     if (modelsToTry.length === 0) {
       return errorResponse(500, 'No vision API configured / 未配置視覺 API');
     }
@@ -142,6 +151,7 @@ export async function onRequestPost(context) {
     let visionResult = null;
     let usedModel = null;
     let lastError = null;
+    const modelErrors = []; // Track all errors for debugging
 
     for (const modelName of modelsToTry) {
       console.log(`Trying vision model: ${modelName}`);
@@ -159,15 +169,18 @@ export async function onRequestPost(context) {
       if (result.success) {
         visionResult = result;
         usedModel = modelName;
+        console.log(`Model ${modelName} succeeded!`);
         break;
       } else {
         lastError = result.error;
-        console.log(`Model ${modelName} failed: ${result.error}`);
+        modelErrors.push({ model: modelName, error: result.error });
+        console.error(`Model ${modelName} failed: ${result.error}`);
         // Continue to next model
       }
     }
 
     if (!visionResult) {
+      console.error('All models failed:', modelErrors);
       return errorResponse(500, lastError || 'All vision models failed / 所有視覺模型都失敗');
     }
 
@@ -613,9 +626,9 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
 }
 
 // Google Gemini 3 Flash - Primary model (fast, multimodal, globally available)
-// Released December 2025 - faster than 2.5 Flash with PhD-level reasoning
+// Gemini 2.0 Flash - fast multimodal model
 async function callGeminiFlash(apiKey, base64Data, mimeType, systemPrompt, userPrompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
   const requestBody = {
     contents: [

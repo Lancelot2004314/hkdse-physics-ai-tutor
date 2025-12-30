@@ -98,16 +98,16 @@ export async function onRequestPost(context) {
           // Step 1: Quick pre-validation with Qwen-turbo (fast & cheap)
           const modelAnswer = question.modelAnswer || question.parts?.map(p => p.modelAnswer).join('\n');
           const questionText = question.question || question.parts?.map(p => p.question).join('\n');
-          
+
           const preValidation = await quickValidateAnswer(
             env.QWEN_API_KEY,
             trimmedAnswer,
             modelAnswer,
             questionText
           );
-          
+
           console.log(`[Quiz] Q${i + 1} pre-validation: ${preValidation.isRelevant ? 'RELEVANT' : 'IRRELEVANT'} (${preValidation.reason})`);
-          
+
           if (!preValidation.isRelevant) {
             // Answer is completely irrelevant - give 0 marks
             score = 0;
@@ -281,7 +281,7 @@ Is this student answer RELEVANT to the physics question? Respond with JSON only.
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content || '';
-    
+
     // Parse JSON response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -294,7 +294,7 @@ Is this student answer RELEVANT to the physics question? Respond with JSON only.
 
     // Fallback: if can't parse, assume relevant
     return { isRelevant: true, reason: 'Could not parse validation result' };
-    
+
   } catch (err) {
     console.error('[QuickValidate] Error:', err);
     return { isRelevant: true, reason: 'Validation error' };
