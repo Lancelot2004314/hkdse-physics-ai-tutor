@@ -154,7 +154,13 @@ export async function onRequestPost(context) {
 }
 
 async function gradeShortAnswer(apiKey, studentAnswer, modelAnswer, markingScheme, maxScore) {
-  if (!apiKey) return { success: false, score: 0, feedback: 'Grading unavailable' };
+  if (!apiKey) {
+    console.log('[Grading] No API key available');
+    return { success: false, score: 0, feedback: 'Grading unavailable' };
+  }
+
+  console.log('[Grading] Starting grading for answer:', studentAnswer.substring(0, 100) + '...');
+  console.log('[Grading] Max score:', maxScore);
 
   const prompt = GRADE_SHORT_ANSWER_PROMPT
     .replace('{studentAnswer}', studentAnswer)
@@ -172,36 +178,45 @@ async function gradeShortAnswer(apiKey, studentAnswer, modelAnswer, markingSchem
       body: JSON.stringify({
         model: 'deepseek-chat',
         messages: [
-          { role: 'system', content: 'You are an HKDSE Physics examiner. Grade fairly and provide constructive feedback.' },
+          { role: 'system', content: 'You are a STRICT HKDSE Physics examiner. Grade accurately - do NOT give marks for wrong answers or effort alone. Only award marks for correct physics content.' },
           { role: 'user', content: prompt },
         ],
-        temperature: 0.3,
+        temperature: 0.1, // Lower temperature for more consistent strict grading
         max_tokens: 1024,
       }),
     });
 
     if (!response.ok) {
+      console.error('[Grading] API error:', response.status);
       return { success: false, score: 0, feedback: 'Grading failed' };
     }
 
     const data = await response.json();
     const text = data.choices[0]?.message?.content || '';
+    console.log('[Grading] AI response:', text.substring(0, 200) + '...');
 
     // Parse grading result
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const result = JSON.parse(jsonMatch[0]);
+      const finalScore = Math.min(Math.max(result.score || 0, 0), maxScore); // Ensure score is between 0 and maxScore
+      
+      console.log('[Grading] Parsed score:', result.score, '-> Final score:', finalScore, '/', maxScore);
+      console.log('[Grading] Breakdown:', JSON.stringify(result.breakdown || []));
+      
       return {
         success: true,
-        score: Math.min(result.score || 0, maxScore),
+        score: finalScore,
         feedback: result.feedback || '',
+        breakdown: result.breakdown || [],
         usage: data.usage,
       };
     }
 
+    console.error('[Grading] Failed to parse JSON from:', text);
     return { success: false, score: 0, feedback: 'Failed to parse grade' };
   } catch (err) {
-    console.error('Grading error:', err);
+    console.error('[Grading] Error:', err);
     return { success: false, score: 0, feedback: 'Grading error' };
   }
 }
@@ -292,6 +307,7 @@ function errorResponse(status, message) {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 }
+
 
 
 

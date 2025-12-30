@@ -1045,11 +1045,11 @@
         // Switch data source between D1 and Vertex AI RAG
         async function switchDataSource(source) {
             currentDataSource = source;
-            
+
             // Update button styles
             document.getElementById('srcD1').className = source === 'd1' ? 'btn btn-primary' : 'btn btn-secondary';
             document.getElementById('srcRAG').className = source === 'rag' ? 'btn btn-primary' : 'btn btn-secondary';
-            
+
             if (source === 'd1') {
                 await loadDocuments();
             } else {
@@ -1061,10 +1061,10 @@
         async function loadRagFiles() {
             const docList = document.getElementById('documentList');
             docList.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading RAG files from Vertex AI...</div>';
-            
+
             try {
                 const response = await fetch(`${API_BASE}/kb/rag-files`, { credentials: 'include' });
-                
+
                 if (!response.ok) {
                     if (response.status === 401 || response.status === 403) {
                         window.location.href = '/admin.html';
@@ -1073,13 +1073,13 @@
                     const data = await response.json();
                     throw new Error(data.error || 'Failed to load RAG files');
                 }
-                
+
                 const data = await response.json();
                 ragFiles = data.files || [];
-                
+
                 renderRagFiles();
                 updateRagStats(data.stats, data.corpus);
-                
+
             } catch (err) {
                 console.error('Load RAG files error:', err);
                 docList.innerHTML = `
@@ -1093,7 +1093,7 @@
         // Render RAG files list
         function renderRagFiles() {
             const docList = document.getElementById('documentList');
-            
+
             if (ragFiles.length === 0) {
                 docList.innerHTML = `
                     <div class="empty-state">
@@ -1103,7 +1103,7 @@
                 `;
                 return;
             }
-            
+
             docList.innerHTML = ragFiles.map(file => `
                 <div class="document-row">
                     <div class="document-info">
@@ -1133,13 +1133,13 @@
         function updateRagStats(stats, corpus) {
             document.getElementById('statDocuments').textContent = stats?.totalFiles || 0;
             document.getElementById('statDocumentsLabel').textContent = 'RAG Files';
-            
+
             document.getElementById('statChunks').textContent = stats?.totalSizeMB || '0';
             document.getElementById('statChunksLabel').textContent = 'Total Size (MB)';
-            
+
             document.getElementById('statYears').textContent = corpus?.corpusId ? '1' : '0';
             document.getElementById('statYearsLabel').textContent = 'Corpus';
-            
+
             // Hide D1-specific buttons in RAG view
             document.getElementById('refreshStatusBtn').style.display = 'none';
             document.getElementById('retryFailedBtn').style.display = 'none';
@@ -1867,4 +1867,3 @@
 </body>
 
 </html>
-

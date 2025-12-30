@@ -71,20 +71,20 @@ async function callPregenAPI(subtopic, language, qtype, count) {
 
 async function waitForJobCompletion(jobId, maxWaitSeconds = 180) {
   const startTime = Date.now();
-  
+
   while (Date.now() - startTime < maxWaitSeconds * 1000) {
     await sleep(5000); // Check every 5 seconds
-    
+
     try {
       const response = await fetch(`${BASE_URL}/api/admin/pregen-status?jobId=${jobId}`, {
         headers: { Cookie: SESSION_COOKIE },
       });
-      
+
       if (!response.ok) continue;
-      
+
       const data = await response.json();
       const job = data.job;
-      
+
       if (job.status === 'completed' || job.status === 'failed') {
         return job;
       }
@@ -92,13 +92,13 @@ async function waitForJobCompletion(jobId, maxWaitSeconds = 180) {
       // Continue waiting
     }
   }
-  
+
   return { status: 'timeout' };
 }
 
 async function main() {
   console.log('\n🔍 Fetching current pool stats...\n');
-  
+
   const stats = await getPoolStats();
   if (!stats) {
     console.error('❌ Failed to get pool stats');
@@ -109,7 +109,7 @@ async function main() {
   // stats.inventory is an ARRAY: [{ topicKey: 'heat_1', en: { mc: { ready: 5 }, ... }, zh: {...} }, ...]
   const countMap = {};
   const inventoryArray = stats.inventory || [];
-  
+
   for (const item of inventoryArray) {
     const subtopic = item.topicKey;
     for (const language of ['en', 'zh']) {
@@ -143,16 +143,16 @@ async function main() {
   }
 
   console.log(`📋 Found ${toFill.length} combinations needing more questions:\n`);
-  
+
   let totalNeeded = 0;
   for (const item of toFill) {
     console.log(`   ${item.subtopic} | ${item.language.toUpperCase()} | ${item.qtype.toUpperCase()} - has ${item.current}, need ${item.needed} more`);
     totalNeeded += item.needed;
   }
-  
+
   console.log(`\n📊 Total questions to generate: ${totalNeeded}`);
   console.log(`⏱️  Estimated time: ${Math.ceil(totalNeeded * 25 / 60)} minutes\n`);
-  console.log('=' .repeat(60));
+  console.log('='.repeat(60));
   console.log('Starting generation...\n');
 
   let successCount = 0;
@@ -167,9 +167,9 @@ async function main() {
     try {
       const startResult = await callPregenAPI(item.subtopic, item.language, item.qtype, item.needed);
       const jobId = startResult.jobId;
-      
+
       const jobResult = await waitForJobCompletion(jobId);
-      
+
       if (jobResult.status === 'completed') {
         const stored = jobResult.completed_count || 0;
         console.log(`✅ ${stored}/${item.needed} stored`);

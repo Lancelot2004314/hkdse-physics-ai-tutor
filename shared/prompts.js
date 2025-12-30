@@ -473,7 +473,7 @@ export const QUIZ_LONG_REWRITE_PROMPT = `Generate HKDSE Physics long structured 
   ]
 }`;
 
-export const GRADE_SHORT_ANSWER_PROMPT = `Grade a student's short answer for HKDSE Physics.
+export const GRADE_SHORT_ANSWER_PROMPT = `Grade a student's short answer for HKDSE Physics. Be STRICT like a real DSE examiner.
 
 ## Student Answer
 {studentAnswer}
@@ -487,21 +487,32 @@ export const GRADE_SHORT_ANSWER_PROMPT = `Grade a student's short answer for HKD
 ## Maximum Score
 {maxScore}
 
-## Rules
-1. Be fair but strict - follow HKDSE marking standards
-2. Award partial marks for partially correct answers
-3. Ignore minor language errors if physics content is correct
-4. Penalize conceptual errors more than calculation errors
+## STRICT Grading Rules (MUST FOLLOW)
+1. **Do NOT give marks for effort alone** - only award marks for CORRECT physics content
+2. **Wrong physics = 0 marks** - if the concept/formula/calculation is wrong, award 0 for that criterion
+3. **Empty or irrelevant answers = 0 marks** - do not give partial credit for unrelated content
+4. **Conceptual errors are serious** - wrong concepts should result in 0 marks for related parts
+5. **Calculation errors** - may receive method marks if approach is correct, but answer mark = 0
+6. **Compare carefully with model answer** - student must demonstrate understanding, not just guess
+7. **Follow HKDSE marking standards exactly** - 1M = method mark, 1A = answer mark
+8. **Be skeptical** - assume nothing is correct unless explicitly demonstrated
 
-## Output JSON
+## Scoring Guidelines
+- If answer shows NO understanding of the physics concept: score = 0
+- If answer has correct concept but wrong calculation: partial marks for method only
+- If answer is partially correct: award proportional marks based on marking scheme
+- If answer is completely correct: full marks
+
+## Output JSON (score MUST be justified)
 {
-  "score": 3,
+  "score": 2,
   "maxScore": 4,
-  "feedback": "Correct identification of... Missing mention of...",
+  "feedback": "Identified correct formula (+1M). Substitution error led to wrong final answer (0A). Missing explanation of why the formula applies.",
   "breakdown": [
-    {"criterion": "Concept X", "awarded": 1, "max": 1},
-    {"criterion": "Formula", "awarded": 1, "max": 1},
-    {"criterion": "Calculation", "awarded": 1, "max": 2}
+    {"criterion": "Concept/Formula", "awarded": 1, "max": 1, "reason": "Correct formula stated"},
+    {"criterion": "Substitution", "awarded": 1, "max": 1, "reason": "Values correctly identified"},
+    {"criterion": "Calculation", "awarded": 0, "max": 1, "reason": "Arithmetic error"},
+    {"criterion": "Final Answer", "awarded": 0, "max": 1, "reason": "Incorrect due to calculation error"}
   ]
 }`;
 

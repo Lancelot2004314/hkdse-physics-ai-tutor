@@ -132,6 +132,35 @@
         </div>
     </div>
 
+    <!-- Grading Overlay -->
+    <div class="modal grading-overlay" id="gradingOverlay" hidden>
+        <div class="modal-content grading-content" style="text-align: center; padding: 40px;">
+            <div class="grading-spinner" style="margin-bottom: 20px;">
+                <i class="fas fa-robot fa-spin" style="font-size: 48px; color: var(--primary);"></i>
+            </div>
+            <h2 style="margin-bottom: 10px;">AI 正在批改試卷...</h2>
+            <p style="color: var(--text-secondary);">請稍候，系統正在分析您的答案</p>
+            <div class="grading-progress" style="margin-top: 20px;">
+                <div class="progress-bar" style="height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
+                    <div class="progress-fill" style="height: 100%; width: 0%; background: var(--primary); animation: progress 3s ease-out forwards;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 95%; }
+        }
+        .grading-overlay .modal-content {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+    </style>
+
     <!-- Results Modal -->
     <div class="modal" id="resultsModal" hidden>
         <div class="modal-content results-content">
@@ -452,6 +481,9 @@
             document.getElementById('submitModal').hidden = true;
             clearInterval(timerInterval);
 
+            // Show grading overlay
+            document.getElementById('gradingOverlay').hidden = false;
+
             const totalTime = (quizData.timeLimit || 60) * 60;
             const timeSpent = totalTime - timeRemaining;
 
@@ -467,6 +499,9 @@
                     }),
                 });
 
+                // Hide grading overlay
+                document.getElementById('gradingOverlay').hidden = true;
+
                 if (response.ok) {
                     const results = await response.json();
                     showResults(results);
@@ -474,6 +509,8 @@
                     throw new Error('Submit failed');
                 }
             } catch (err) {
+                // Hide grading overlay on error
+                document.getElementById('gradingOverlay').hidden = true;
                 console.error('Submit error:', err);
                 alert('Failed to submit quiz. Please try again.');
             }
