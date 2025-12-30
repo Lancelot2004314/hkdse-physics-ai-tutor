@@ -614,19 +614,30 @@
             <i class="fas fa-cloud"></i> <span id="backendText">Loading...</span>
         </div>
 
+        <!-- Data Source Toggle -->
+        <div class="data-source-toggle" style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+            <span style="font-weight: 500; color: var(--text-secondary);">Data Source:</span>
+            <button class="btn btn-primary" id="srcD1" onclick="switchDataSource('d1')">
+                <i class="fas fa-database"></i> D1 Database
+            </button>
+            <button class="btn btn-secondary" id="srcRAG" onclick="switchDataSource('rag')">
+                <i class="fas fa-brain"></i> Vertex AI RAG
+            </button>
+        </div>
+
         <!-- Stats -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
                 <div class="stat-value" id="statDocuments">-</div>
-                <div class="stat-label">Documents</div>
+                <div class="stat-label" id="statDocumentsLabel">Documents</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="statChunks">-</div>
-                <div class="stat-label">Chunks</div>
+                <div class="stat-label" id="statChunksLabel">Chunks</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="statYears">-</div>
-                <div class="stat-label">Years Covered</div>
+                <div class="stat-label" id="statYearsLabel">Years Covered</div>
             </div>
         </div>
 
@@ -1015,6 +1026,8 @@
     <script>
         const API_BASE = '/api';
         let documents = [];
+        let ragFiles = [];
+        let currentDataSource = 'd1'; // 'd1' or 'rag'
 
         // Backend configuration
         let backendType = 'unknown';
@@ -1028,6 +1041,147 @@
             initSearch();
             initConnectionTests();
         });
+
+        // Switch data source between D1 and Vertex AI RAG
+        async function switchDataSource(source) {
+            currentDataSource = source;
+            
+            // Update button styles
+            document.getElementById('srcD1').className = source === 'd1' ? 'btn btn-primary' : 'btn btn-secondary';
+            document.getElementById('srcRAG').className = source === 'rag' ? 'btn btn-primary' : 'btn btn-secondary';
+            
+            if (source === 'd1') {
+                await loadDocuments();
+            } else {
+                await loadRagFiles();
+            }
+        }
+
+        // Load RAG files from Vertex AI
+        async function loadRagFiles() {
+            const docList = document.getElementById('documentList');
+            docList.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading RAG files from Vertex AI...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/kb/rag-files`, { credentials: 'include' });
+                
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        window.location.href = '/admin.html';
+                        return;
+                    }
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to load RAG files');
+                }
+                
+                const data = await response.json();
+                ragFiles = data.files || [];
+                
+                renderRagFiles();
+                updateRagStats(data.stats, data.corpus);
+                
+            } catch (err) {
+                console.error('Load RAG files error:', err);
+                docList.innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i> Failed to load RAG files: ${err.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Render RAG files list
+        function renderRagFiles() {
+            const docList = document.getElementById('documentList');
+            
+            if (ragFiles.length === 0) {
+                docList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No files in Vertex AI RAG corpus</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            docList.innerHTML = ragFiles.map(file => `
+                <div class="document-row">
+                    <div class="document-info">
+                        <div class="document-title">
+                            <i class="fas fa-file-alt" style="color: var(--primary);"></i>
+                            ${escapeHtml(file.displayName || file.name.split('/').pop())}
+                        </div>
+                        <div class="document-meta">
+                            <span><i class="fas fa-hdd"></i> ${formatFileSize(file.sizeBytes)}</span>
+                            <span><i class="fas fa-calendar"></i> ${formatDate(file.createTime)}</span>
+                            <span><i class="fas fa-tag"></i> ${file.ragFileType || 'Unknown'}</span>
+                        </div>
+                        <div class="document-meta" style="margin-top: 4px; font-size: 11px; color: var(--text-secondary);">
+                            <span title="${escapeHtml(file.gcsUri || '')}"><i class="fas fa-cloud"></i> ${file.gcsUri ? truncateUri(file.gcsUri) : 'N/A'}</span>
+                        </div>
+                    </div>
+                    <div class="document-actions">
+                        <span class="status-badge status-ready">
+                            <i class="fas fa-check-circle"></i> In RAG
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update stats for RAG view
+        function updateRagStats(stats, corpus) {
+            document.getElementById('statDocuments').textContent = stats?.totalFiles || 0;
+            document.getElementById('statDocumentsLabel').textContent = 'RAG Files';
+            
+            document.getElementById('statChunks').textContent = stats?.totalSizeMB || '0';
+            document.getElementById('statChunksLabel').textContent = 'Total Size (MB)';
+            
+            document.getElementById('statYears').textContent = corpus?.corpusId ? '1' : '0';
+            document.getElementById('statYearsLabel').textContent = 'Corpus';
+            
+            // Hide D1-specific buttons in RAG view
+            document.getElementById('refreshStatusBtn').style.display = 'none';
+            document.getElementById('retryFailedBtn').style.display = 'none';
+        }
+
+        // Helper functions
+        function formatFileSize(bytes) {
+            if (!bytes) return 'N/A';
+            const b = parseInt(bytes);
+            if (b < 1024) return b + ' B';
+            if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+            return (b / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function truncateUri(uri) {
+            if (!uri) return '';
+            if (uri.length <= 50) return uri;
+            return uri.substring(0, 25) + '...' + uri.substring(uri.length - 22);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(isoString) {
+            if (!isoString) return 'N/A';
+            try {
+                const date = new Date(isoString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return isoString;
+            }
+        }
 
         // Check which backend is configured
         async function checkBackend() {
@@ -1180,12 +1334,15 @@
         // Update stats
         function updateStats() {
             document.getElementById('statDocuments').textContent = documents.length;
+            document.getElementById('statDocumentsLabel').textContent = 'Documents';
 
             const totalChunks = documents.reduce((sum, d) => sum + (d.chunk_count || 0), 0);
             document.getElementById('statChunks').textContent = totalChunks;
+            document.getElementById('statChunksLabel').textContent = 'Chunks';
 
             const years = new Set(documents.filter(d => d.year).map(d => d.year));
             document.getElementById('statYears').textContent = years.size;
+            document.getElementById('statYearsLabel').textContent = 'Years Covered';
 
             // Show/hide Refresh Status button (for processing documents)
             const processingCount = documents.filter(d => d.status === 'processing').length;
@@ -1710,3 +1867,4 @@
 </body>
 
 </html>
+
