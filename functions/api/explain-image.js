@@ -13,7 +13,7 @@ const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 const REQUEST_TIMEOUT = 60000; // 60 seconds for vision model
 const OCR_TIMEOUT = 15000; // 15 seconds for OCR pre-processing (quick extraction)
 
-// Only use Qwen-VL-Max (globally available, no VPN needed, best for China)
+// Use Qwen-VL-Plus (faster than Max, still good quality)
 const MODEL_PRIORITY = ['qwen-vl'];
 
 // CORS headers
@@ -107,22 +107,19 @@ export async function onRequestPost(context) {
     // Get user from session (if logged in)
     const user = await getUserFromSession(request, env);
 
-    // OCR Pre-processing: Extract text from image to help with blurry images
-    let ocrText = null;
-    if (env.QWEN_API_KEY) {
-      try {
-        console.log('Running OCR pre-processing...');
-        ocrText = await extractTextWithOCR(env.QWEN_API_KEY, base64Data, mimeType);
-        if (ocrText && ocrText.length > 10) {
-          console.log(`OCR extracted ${ocrText.length} characters`);
-          // Add OCR text as reference to help Vision model with blurry text
-          userPrompt += `\n\n[OCR 参考文字 / OCR Reference Text]:\n${ocrText}\n\n注意：以上是 OCR 提取的文字参考，如果图片文字模糊，请参考此内容。如果图片包含图形/图表，请直接分析图像。`;
-        }
-      } catch (ocrErr) {
-        console.warn('OCR pre-processing failed, continuing without:', ocrErr.message);
-        // Continue without OCR - Vision model will still analyze the image
-      }
-    }
+    // OCR Pre-processing: Disabled for faster response
+    // TODO: Re-enable when needed for blurry images
+    // let ocrText = null;
+    // if (env.QWEN_API_KEY) {
+    //   try {
+    //     ocrText = await extractTextWithOCR(env.QWEN_API_KEY, base64Data, mimeType);
+    //     if (ocrText && ocrText.length > 10) {
+    //       userPrompt += `\n\n[OCR 参考文字]:\n${ocrText}`;
+    //     }
+    //   } catch (ocrErr) {
+    //     console.warn('OCR failed:', ocrErr.message);
+    //   }
+    // }
 
     // Determine which models to try
     let modelsToTry;
@@ -279,7 +276,7 @@ hasFigures should be false if image only contains pure text (printed or handwrit
 If hasFigures is false, extract ALL the text from the image into extractedText. If hasFigures is true, leave extractedText empty.`;
 
   const requestBody = {
-    model: 'qwen-vl-max',
+    model: 'qwen-vl-plus',  // Faster than qwen-vl-max
     input: {
       messages: [
         {
@@ -364,7 +361,7 @@ async function extractTextWithOCR(apiKey, base64Data, mimeType) {
 直接输出识别到的文字内容：`;
 
   const requestBody = {
-    model: 'qwen-vl-max',
+    model: 'qwen-vl-plus',  // Faster than qwen-vl-max
     input: {
       messages: [
         {
@@ -556,7 +553,7 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
   const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation';
 
   const requestBody = {
-    model: 'qwen-vl-max',  // Best Qwen-VL model - superior visual reasoning
+    model: 'qwen-vl-plus',  // Faster than qwen-vl-max
     input: {
       messages: [
         {
