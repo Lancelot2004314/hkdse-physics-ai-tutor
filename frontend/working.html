@@ -553,11 +553,15 @@
                 mcOptions.hidden = false;
                 answerSection.hidden = true;
                 renderMCOptions(question.options, answers[index]);
+                // Disable input tool buttons for MC questions
+                disableInputTools();
             } else {
                 mcOptions.hidden = true;
                 mcOptions.innerHTML = ''; // Clear old MC options to prevent residual display
                 answerSection.hidden = false;
                 document.getElementById('answerTextarea').value = answers[index] || '';
+                // Enable input tool buttons for short/long questions
+                enableInputTools();
             }
 
             // Update navigation
@@ -867,10 +871,38 @@
             }
         }
 
+        // ==================== Input Tools Control ====================
+        function disableInputTools() {
+            const tools = ['insertMathBtn', 'uploadImageBtn', 'drawBtn'];
+            tools.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                }
+            });
+        }
+
+        function enableInputTools() {
+            const tools = ['insertMathBtn', 'uploadImageBtn', 'drawBtn'];
+            tools.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                }
+            });
+        }
+
         // ==================== Math Editor Functions ====================
         let mathFieldElement = null;
 
         function openMathEditor() {
+            // Check if disabled
+            if (document.getElementById('insertMathBtn')?.disabled) return;
+            
             document.getElementById('mathEditorModal').hidden = false;
             mathFieldElement = document.getElementById('mathField');
             
@@ -913,6 +945,12 @@
 
         // ==================== Image Upload OCR Functions ====================
         async function handleImageUpload(event) {
+            // Check if disabled
+            if (document.getElementById('uploadImageBtn')?.disabled) {
+                event.target.value = '';
+                return;
+            }
+            
             const file = event.target.files[0];
             if (!file) return;
 
@@ -1005,6 +1043,9 @@
         let lastY = 0;
 
         function openDrawCanvas() {
+            // Check if disabled
+            if (document.getElementById('drawBtn')?.disabled) return;
+            
             document.getElementById('drawModal').hidden = false;
             initCanvas();
         }
@@ -1015,20 +1056,34 @@
 
         function initCanvas() {
             drawCanvas = document.getElementById('drawCanvas');
+            if (!drawCanvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            
             drawCtx = drawCanvas.getContext('2d');
             
             // Set white background
             drawCtx.fillStyle = '#ffffff';
             drawCtx.fillRect(0, 0, drawCanvas.width, drawCanvas.height);
             
-            // Remove old listeners to avoid duplicates
-            drawCanvas.onpointerdown = startDrawing;
-            drawCanvas.onpointermove = draw;
-            drawCanvas.onpointerup = stopDrawing;
-            drawCanvas.onpointerout = stopDrawing;
+            // Remove old event listeners
+            drawCanvas.onpointerdown = null;
+            drawCanvas.onpointermove = null;
+            drawCanvas.onpointerup = null;
+            drawCanvas.onpointerout = null;
+            drawCanvas.onpointercancel = null;
+            
+            // Add new event listeners
+            drawCanvas.addEventListener('pointerdown', startDrawing);
+            drawCanvas.addEventListener('pointermove', draw);
+            drawCanvas.addEventListener('pointerup', stopDrawing);
+            drawCanvas.addEventListener('pointerout', stopDrawing);
+            drawCanvas.addEventListener('pointercancel', stopDrawing);
         }
 
         function startDrawing(e) {
+            e.preventDefault();
             isDrawing = true;
             const rect = drawCanvas.getBoundingClientRect();
             const scaleX = drawCanvas.width / rect.width;
@@ -1039,6 +1094,7 @@
 
         function draw(e) {
             if (!isDrawing) return;
+            e.preventDefault();
             
             const rect = drawCanvas.getBoundingClientRect();
             const scaleX = drawCanvas.width / rect.width;
@@ -1066,7 +1122,10 @@
             lastY = y;
         }
 
-        function stopDrawing() {
+        function stopDrawing(e) {
+            if (isDrawing) {
+                e.preventDefault();
+            }
             isDrawing = false;
         }
 
