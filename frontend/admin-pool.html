@@ -817,7 +817,7 @@
                 const response = await fetch(`/api/admin/pool-stats?subject=${subject}`, { credentials: 'include' });
                 if (!response.ok) throw new Error('Failed');
                 const data = await response.json();
-                
+
                 const select = document.getElementById('subtopicSelect');
                 select.innerHTML = '<option value="">-- Select Subtopic --</option>';
                 for (const st of data.allSubtopics || []) {
@@ -1032,16 +1032,16 @@
         // Subject Selection
         function selectSubject(subject) {
             currentSubject = subject;
-            
+
             // Update tab UI
             document.querySelectorAll('.subject-tab').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.subject === subject);
             });
-            
+
             // Reload subtopics and stats for this subject
             loadSubtopicsForSubject(subject);
             loadPoolStats();
-            
+
             // Reload questions
             loadQuestionBank();
         }
@@ -1076,10 +1076,16 @@
                 if (qtype) params.set('qtype', qtype);
                 params.set('limit', '20');
 
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'admin-pool.html:1073', message: 'loadQuestionBank request', data: { subject: currentSubject, subtopic, language, qtype }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'math-check', hypothesisId: 'H4' }) }).catch(() => { });
+                // #endregion
                 const response = await fetch(`/api/admin/questions?${params}`, { credentials: 'include' });
                 if (!response.ok) throw new Error('Failed to load questions');
 
                 const data = await response.json();
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'admin-pool.html:1083', message: 'loadQuestionBank response', data: { subject: currentSubject, total: data.total || 0, count: data.questions?.length || 0 }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'math-check', hypothesisId: 'H1,H5' }) }).catch(() => { });
+                // #endregion
                 displayQuestions(data.questions, data.total);
             } catch (err) {
                 container.innerHTML = `<div style="text-align:center;padding:30px;color:#e74c3c;">Error: ${err.message}</div>`;
@@ -1092,6 +1098,9 @@
 
             if (questions.length === 0) {
                 const subjectLabel = currentSubject === 'Mathematics' ? '數學' : '物理';
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'admin-pool.html:1094', message: 'No questions to display', data: { subject: currentSubject }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'math-check', hypothesisId: 'H1' }) }).catch(() => { });
+                // #endregion
                 container.innerHTML = `<div style="text-align:center;padding:30px;color:#666;">
                     <i class="fas fa-database" style="font-size:2rem;margin-bottom:10px;display:block;"></i>
                     No ${subjectLabel} questions found
