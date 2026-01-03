@@ -778,12 +778,13 @@
                 // #endregion
                 const statsResponse = await fetch(statsUrl, { credentials: 'include' });
                 // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:781',message:'pool-stats response',data:{status:statsResponse.status,ok:statsResponse.ok},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                const errorText = !statsResponse.ok ? await statsResponse.clone().text() : '';
+                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:781',message:'pool-stats response',data:{status:statsResponse.status,ok:statsResponse.ok,errorBody:errorText.substring(0,500)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'F,G,H,I'})}).catch(()=>{});
                 // #endregion
                 if (!statsResponse.ok) {
                     if (statsResponse.status === 403) {
                         // #region agent log
-                        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:787',message:'403 Forbidden received',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:787',message:'403 Forbidden received',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
                         // #endregion
                         showError('無權限訪問 - 需要管理員權限');
                         return;
