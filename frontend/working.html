@@ -46,24 +46,27 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
         }
+
         .math-editor-content {
             background: white;
             border-radius: 16px;
             padding: 24px;
             width: 90%;
             max-width: 600px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
+
         .math-editor-content h3 {
             margin: 0 0 16px 0;
             color: var(--text-primary);
         }
+
         .math-editor-content math-field {
             width: 100%;
             font-size: 24px;
@@ -72,6 +75,7 @@
             border-radius: 8px;
             min-height: 60px;
         }
+
         .math-editor-preview {
             margin: 16px 0;
             padding: 12px;
@@ -79,12 +83,13 @@
             border-radius: 8px;
             min-height: 40px;
         }
+
         .math-editor-actions {
             display: flex;
             gap: 12px;
             justify-content: flex-end;
         }
-        
+
         /* Drawing Canvas Modal */
         .draw-modal {
             position: fixed;
@@ -92,29 +97,33 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
         }
+
         .draw-modal-content {
             background: white;
             border-radius: 16px;
             padding: 24px;
             width: 95%;
             max-width: 800px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
+
         .draw-modal-content h3 {
             margin: 0 0 16px 0;
         }
+
         .draw-toolbar {
             display: flex;
             gap: 8px;
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
+
         .draw-toolbar button {
             padding: 8px 16px;
             border: 1px solid var(--border);
@@ -122,32 +131,37 @@
             background: white;
             cursor: pointer;
         }
+
         .draw-toolbar button:hover {
             background: var(--bg-secondary);
         }
+
         .draw-toolbar button.active {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
         }
+
         .draw-canvas-container {
             border: 2px solid var(--border);
             border-radius: 8px;
             overflow: hidden;
             background: white;
         }
+
         #drawCanvas {
             display: block;
             cursor: crosshair;
             touch-action: none;
         }
+
         .draw-actions {
             display: flex;
             gap: 12px;
             justify-content: flex-end;
             margin-top: 16px;
         }
-        
+
         /* OCR Loading */
         .ocr-loading {
             display: flex;
@@ -158,14 +172,21 @@
             border-radius: 8px;
             margin-top: 12px;
         }
+
         .ocr-loading i {
             animation: spin 1s linear infinite;
         }
+
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
-        
+
         /* Input tool button improvements */
         .input-tools {
             display: flex;
@@ -173,6 +194,7 @@
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
+
         .input-tool {
             padding: 10px 16px;
             border: 1px solid var(--border);
@@ -185,14 +207,16 @@
             font-size: 14px;
             transition: all 0.2s;
         }
+
         .input-tool:hover {
             background: var(--bg-secondary);
             border-color: var(--primary);
         }
+
         .input-tool i {
             color: var(--primary);
         }
-        
+
         /* Hidden file input */
         #imageUploadInput {
             display: none;
@@ -268,14 +292,14 @@
             <!-- Short/Long Answer -->
             <div class="answer-input-section" id="answerSection" hidden>
                 <h3>Write your answer here</h3>
-                <div class="input-tools">
-                    <button class="input-tool" id="insertMathBtn" onclick="openMathEditor()">
+                <div class="input-tools" id="inputToolsContainer">
+                    <button class="input-tool" id="insertMathBtn">
                         <i class="fas fa-square-root-alt"></i> Insert Math
                     </button>
-                    <button class="input-tool" id="uploadImageBtn" onclick="document.getElementById('imageUploadInput').click()">
+                    <button class="input-tool" id="uploadImageBtn">
                         <i class="fas fa-camera"></i> Upload Image
                     </button>
-                    <button class="input-tool" id="drawBtn" onclick="openDrawCanvas()">
+                    <button class="input-tool" id="drawBtn">
                         <i class="fas fa-pencil-alt"></i> Draw
                     </button>
                 </div>
@@ -484,6 +508,7 @@
             displayQuestion(0);
             startTimer();
             initEventListeners();
+            initInputTools();
         }
 
         function startTimer() {
@@ -659,33 +684,33 @@
         function formatMath(text) {
             if (!text) return '';
             text = String(text);
-            
+
             // Protect LaTeX blocks from <br> insertion
             const latexBlocks = [];
             let processed = text;
-            
+
             // Extract display math ($$...$$) first
             processed = processed.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
                 const idx = latexBlocks.length;
                 latexBlocks.push(`$$${latex}$$`);
                 return `%%LATEX_BLOCK_${idx}%%`;
             });
-            
+
             // Extract inline math ($...$)
             processed = processed.replace(/\$([^$]+)\$/g, (match, latex) => {
                 const idx = latexBlocks.length;
                 latexBlocks.push(`$${latex}$`);
                 return `%%LATEX_BLOCK_${idx}%%`;
             });
-            
+
             // Convert newlines to <br> only in non-math parts
             processed = processed.replace(/\n/g, '<br>');
-            
+
             // Restore LaTeX blocks
             latexBlocks.forEach((latex, idx) => {
                 processed = processed.replace(`%%LATEX_BLOCK_${idx}%%`, latex);
             });
-            
+
             return processed;
         }
 
@@ -872,6 +897,31 @@
         }
 
         // ==================== Input Tools Control ====================
+        function initInputTools() {
+            // Setup event listeners for input tools
+            const insertMathBtn = document.getElementById('insertMathBtn');
+            const uploadImageBtn = document.getElementById('uploadImageBtn');
+            const drawBtn = document.getElementById('drawBtn');
+
+            if (insertMathBtn) {
+                insertMathBtn.addEventListener('click', function(e) {
+                    if (!this.disabled) openMathEditor();
+                });
+            }
+
+            if (uploadImageBtn) {
+                uploadImageBtn.addEventListener('click', function(e) {
+                    if (!this.disabled) document.getElementById('imageUploadInput').click();
+                });
+            }
+
+            if (drawBtn) {
+                drawBtn.addEventListener('click', function(e) {
+                    if (!this.disabled) openDrawCanvas();
+                });
+            }
+        }
+
         function disableInputTools() {
             const tools = ['insertMathBtn', 'uploadImageBtn', 'drawBtn'];
             tools.forEach(id => {
@@ -880,6 +930,7 @@
                     btn.disabled = true;
                     btn.style.opacity = '0.5';
                     btn.style.cursor = 'not-allowed';
+                    btn.style.pointerEvents = 'none'; // Prevent all clicks
                 }
             });
         }
@@ -892,6 +943,7 @@
                     btn.disabled = false;
                     btn.style.opacity = '1';
                     btn.style.cursor = 'pointer';
+                    btn.style.pointerEvents = 'auto'; // Allow clicks
                 }
             });
         }
@@ -902,10 +954,10 @@
         function openMathEditor() {
             // Check if disabled
             if (document.getElementById('insertMathBtn')?.disabled) return;
-            
+
             document.getElementById('mathEditorModal').hidden = false;
             mathFieldElement = document.getElementById('mathField');
-            
+
             // Setup MathLive field
             if (mathFieldElement) {
                 mathFieldElement.value = '';
@@ -935,7 +987,7 @@
                 const end = textarea.selectionEnd;
                 const text = textarea.value;
                 const mathText = `$${latex}$`;
-                
+
                 textarea.value = text.substring(0, start) + mathText + text.substring(end);
                 textarea.selectionStart = textarea.selectionEnd = start + mathText.length;
                 textarea.focus();
@@ -950,7 +1002,7 @@
                 event.target.value = '';
                 return;
             }
-            
+
             const file = event.target.files[0];
             if (!file) return;
 
@@ -972,7 +1024,7 @@
             try {
                 // Convert to base64
                 const base64 = await fileToBase64(file);
-                
+
                 // Call OCR API
                 const response = await fetch(`${API_BASE}/ocr`, {
                     method: 'POST',
@@ -986,13 +1038,13 @@
                 }
 
                 const result = await response.json();
-                
+
                 if (result.text) {
                     // Insert recognized text into textarea
                     const textarea = document.getElementById('answerTextarea');
                     const currentText = textarea.value;
                     textarea.value = currentText + (currentText ? '\n' : '') + result.text;
-                    
+
                     statusDiv.innerHTML = `
                         <div style="color: var(--success); padding: 8px;">
                             <i class="fas fa-check-circle"></i> 文字識別成功！
@@ -1045,7 +1097,7 @@
         function openDrawCanvas() {
             // Check if disabled
             if (document.getElementById('drawBtn')?.disabled) return;
-            
+
             document.getElementById('drawModal').hidden = false;
             initCanvas();
         }
@@ -1062,39 +1114,80 @@
             }
             
             drawCtx = drawCanvas.getContext('2d');
+            if (!drawCtx) {
+                console.error('Cannot get canvas context');
+                return;
+            }
             
             // Set white background
             drawCtx.fillStyle = '#ffffff';
             drawCtx.fillRect(0, 0, drawCanvas.width, drawCanvas.height);
             
-            // Remove old event listeners
-            drawCanvas.onpointerdown = null;
-            drawCanvas.onpointermove = null;
-            drawCanvas.onpointerup = null;
-            drawCanvas.onpointerout = null;
-            drawCanvas.onpointercancel = null;
+            console.log('Canvas initialized:', drawCanvas.width, 'x', drawCanvas.height);
             
-            // Add new event listeners
-            drawCanvas.addEventListener('pointerdown', startDrawing);
-            drawCanvas.addEventListener('pointermove', draw);
-            drawCanvas.addEventListener('pointerup', stopDrawing);
-            drawCanvas.addEventListener('pointerout', stopDrawing);
-            drawCanvas.addEventListener('pointercancel', stopDrawing);
+            // Clear any existing listeners by cloning and replacing
+            const newCanvas = drawCanvas.cloneNode(true);
+            drawCanvas.parentNode.replaceChild(newCanvas, drawCanvas);
+            drawCanvas = newCanvas;
+            drawCtx = drawCanvas.getContext('2d');
+            
+            // Redraw white background
+            drawCtx.fillStyle = '#ffffff';
+            drawCtx.fillRect(0, 0, drawCanvas.width, drawCanvas.height);
+            
+            // Add event listeners for both mouse and touch
+            drawCanvas.addEventListener('pointerdown', startDrawing, { passive: false });
+            drawCanvas.addEventListener('pointermove', draw, { passive: false });
+            drawCanvas.addEventListener('pointerup', stopDrawing, { passive: false });
+            drawCanvas.addEventListener('pointerleave', stopDrawing, { passive: false });
+            drawCanvas.addEventListener('pointercancel', stopDrawing, { passive: false });
+            
+            // Also support touch events for better mobile support
+            drawCanvas.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('pointerdown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                drawCanvas.dispatchEvent(mouseEvent);
+            }, { passive: false });
+            
+            drawCanvas.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('pointermove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                drawCanvas.dispatchEvent(mouseEvent);
+            }, { passive: false });
+            
+            drawCanvas.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                const mouseEvent = new MouseEvent('pointerup', {});
+                drawCanvas.dispatchEvent(mouseEvent);
+            }, { passive: false });
         }
 
         function startDrawing(e) {
             e.preventDefault();
+            e.stopPropagation();
             isDrawing = true;
+            
             const rect = drawCanvas.getBoundingClientRect();
             const scaleX = drawCanvas.width / rect.width;
             const scaleY = drawCanvas.height / rect.height;
             lastX = (e.clientX - rect.left) * scaleX;
             lastY = (e.clientY - rect.top) * scaleY;
+            
+            console.log('Start drawing at:', lastX, lastY);
         }
 
         function draw(e) {
             if (!isDrawing) return;
             e.preventDefault();
+            e.stopPropagation();
             
             const rect = drawCanvas.getBoundingClientRect();
             const scaleX = drawCanvas.width / rect.width;
@@ -1125,6 +1218,8 @@
         function stopDrawing(e) {
             if (isDrawing) {
                 e.preventDefault();
+                e.stopPropagation();
+                console.log('Stop drawing');
             }
             isDrawing = false;
         }
@@ -1164,7 +1259,7 @@
             try {
                 // Convert canvas to base64
                 const base64 = drawCanvas.toDataURL('image/png');
-                
+
                 // Call OCR API
                 const response = await fetch(`${API_BASE}/ocr`, {
                     method: 'POST',
@@ -1178,19 +1273,19 @@
                 }
 
                 const result = await response.json();
-                
+
                 if (result.text) {
                     // Insert recognized text into textarea
                     const textarea = document.getElementById('answerTextarea');
                     const currentText = textarea.value;
                     textarea.value = currentText + (currentText ? '\n' : '') + result.text;
-                    
+
                     statusDiv.innerHTML = `
                         <div style="color: var(--success); padding: 8px;">
                             <i class="fas fa-check-circle"></i> 識別成功！已插入答案框
                         </div>
                     `;
-                    
+
                     // Close modal after success
                     setTimeout(() => {
                         closeDrawCanvas();
