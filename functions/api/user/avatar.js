@@ -137,3 +137,4 @@ export async function onRequestDelete(context) {
     return errorResponse(500, 'Failed to remove avatar');
   }
 }
+

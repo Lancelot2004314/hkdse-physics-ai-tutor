@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="css/thinka.css">
     <link rel="stylesheet" href="css/ai-agent.css?v=6.3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- JSXGraph for Math visualizations -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <script src="/js/math-graph.js"></script>
     <style>
         .review-header {
             display: flex;
@@ -381,11 +385,19 @@
                     ? `<span class="badge ${isCorrect ? 'badge-correct' : 'badge-wrong'}">${isCorrect ? 'Correct' : 'Incorrect'}</span>`
                     : `<span class="badge">In progress</span>`;
 
+                // Generate graph HTML if graphData exists
+                const graphHtml = (q.graphData && window.MathGraph && window.MathGraph.hasValidData(q.graphData)) ? `
+                    <div class="q-block">
+                        <div id="mathGraph-${idx}" class="math-graph-review" style="width: 100%; max-width: 400px; height: 280px; margin: 12px auto; border: 1px solid var(--border); border-radius: 12px; background: #fafafa;"></div>
+                    </div>
+                ` : '';
+
                 const questionHtml = `
                     <div class="q-block">
                         <h3>Question</h3>
                         <div class="q-content">${formatMath(q.question || '')}</div>
                     </div>
+                    ${graphHtml}
                 `;
 
                 const mcHtml = isMC ? renderMCReview(q, userAnswer, correctAnswer, data.status) : '';
@@ -452,6 +464,17 @@
             }).join('');
 
             container.insertAdjacentHTML('beforeend', html);
+            
+            // Render math graphs after HTML is inserted
+            questions.forEach((q, idx) => {
+                if (q.graphData && window.MathGraph && window.MathGraph.hasValidData(q.graphData)) {
+                    const containerId = `mathGraph-${idx}`;
+                    // Small delay to ensure DOM is ready
+                    setTimeout(() => {
+                        window.MathGraph.render(containerId, q.graphData);
+                    }, 100 + idx * 50); // Stagger rendering for smoother loading
+                }
+            });
         }
 
         function renderMCReview(q, userAnswer, correctAnswer, status) {

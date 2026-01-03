@@ -256,3 +256,4 @@ window.i18n = {
   getLanguageHeader,
   languageNames
 };
+

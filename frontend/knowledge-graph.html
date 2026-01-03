@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Knowledge Graph | HKDSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/thinka.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/knowledge-graph.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="/js/i18n.js"></script>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-atom"></i>
+                </div>
+                <div class="user-info" id="userInfo">
+                    <div class="user-name" id="userName">Guest</div>
+                    <div class="user-email" id="userEmail"></div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/free-practice.html"><i class="fas fa-pen"></i> <span data-i18n="nav.freePractice">Free Practice</span></a>
+                </li>
+                <li class="nav-item active">
+                    <a href="/knowledge-graph.html"><i class="fas fa-project-diagram"></i> <span data-i18n="nav.knowledgeGraph">Knowledge Graph</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.statistics">Statistics</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/practice-history.html"><i class="fas fa-history"></i> <span data-i18n="nav.history">History</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span data-i18n="nav.bookmarks">Bookmarks</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span data-i18n="nav.leaderboard">Leaderboard</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/profile.html"><i class="fas fa-user"></i> <span data-i18n="nav.profile">Profile</span></a>
+                </li>
+                <li class="nav-item admin-only" id="adminNavItem" hidden>
+                    <a href="/admin.html"><i class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="language-switcher-container" id="langSwitcherContainer"></div>
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.signOut">Sign Out</span>
+                </button>
+                <div class="version">v2.0.0</div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" style="padding: 0; overflow: hidden;">
+            <div class="kg-container">
+                <!-- Controls Bar -->
+                <div class="kg-controls">
+                    <div class="kg-view-toggle">
+                        <button class="kg-view-btn active" data-view="graph">
+                            <i class="fas fa-project-diagram"></i> Graph
+                        </button>
+                        <button class="kg-view-btn" data-view="timeline">
+                            <i class="fas fa-stream"></i> Timeline
+                        </button>
+                    </div>
+
+                    <div class="kg-filters">
+                        <select class="kg-filter-select" id="typeFilter">
+                            <option value="">All Types</option>
+                            <option value="scientist">Scientists</option>
+                            <option value="equation">Equations</option>
+                            <option value="concept">Concepts</option>
+                            <option value="discovery">Discoveries</option>
+                        </select>
+
+                        <select class="kg-filter-select" id="categoryFilter">
+                            <option value="">All Categories</option>
+                            <option value="mechanics">Mechanics</option>
+                            <option value="electromagnetism">Electromagnetism</option>
+                            <option value="relativity">Relativity</option>
+                            <option value="quantum">Quantum</option>
+                            <option value="thermodynamics">Thermodynamics</option>
+                            <option value="optics">Optics</option>
+                            <option value="nuclear">Nuclear</option>
+                        </select>
+
+                        <input type="text" class="kg-search-input" id="searchInput" placeholder="Search physics knowledge...">
+                    </div>
+                </div>
+
+                <!-- Main Graph/Timeline Area -->
+                <div class="kg-main">
+                    <!-- Graph View -->
+                    <div class="kg-graph-container" id="graphContainer">
+                        <div id="kg-graph">
+                            <div class="kg-loading" id="graphLoading">
+                                <div class="kg-loading-spinner"></div>
+                                <span>Loading Knowledge Graph...</span>
+                            </div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="kg-legend">
+                            <div class="kg-legend-item">
+                                <div class="kg-legend-dot scientist"></div>
+                                <span>Scientist</span>
+                            </div>
+                            <div class="kg-legend-item">
+                                <div class="kg-legend-dot equation"></div>
+                                <span>Equation</span>
+                            </div>
+                            <div class="kg-legend-item">
+                                <div class="kg-legend-dot concept"></div>
+                                <span>Concept</span>
+                            </div>
+                            <div class="kg-legend-item">
+                                <div class="kg-legend-dot discovery"></div>
+                                <span>Discovery</span>
+                            </div>
+                        </div>
+
+                        <!-- Zoom Controls -->
+                        <div class="kg-zoom-controls">
+                            <button class="kg-zoom-btn" id="zoomIn" title="Zoom In">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="kg-zoom-btn" id="zoomOut" title="Zoom Out">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button class="kg-zoom-btn" id="zoomReset" title="Reset Zoom">
+                                <i class="fas fa-compress-arrows-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Timeline View -->
+                    <div class="kg-timeline-container" id="timelineContainer">
+                        <div class="kg-timeline" id="timeline">
+                            <!-- Timeline items will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Detail Panel -->
+                    <div class="kg-detail-panel" id="detailPanel">
+                        <button class="kg-detail-close" id="closeDetail">&times;</button>
+                        <div id="detailContent">
+                            <!-- Detail content will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="kg-stats">
+                    <div class="kg-stat-item">
+                        <span class="kg-stat-dot scientist"></span>
+                        <span class="kg-stat-value" id="statScientists">0</span>
+                        <span>Scientists</span>
+                    </div>
+                    <div class="kg-stat-item">
+                        <span class="kg-stat-dot equation"></span>
+                        <span class="kg-stat-value" id="statEquations">0</span>
+                        <span>Equations</span>
+                    </div>
+                    <div class="kg-stat-item">
+                        <span class="kg-stat-dot concept"></span>
+                        <span class="kg-stat-value" id="statConcepts">0</span>
+                        <span>Concepts</span>
+                    </div>
+                    <div class="kg-stat-item">
+                        <span class="kg-stat-dot discovery"></span>
+                        <span class="kg-stat-value" id="statDiscoveries">0</span>
+                        <span>Discoveries</span>
+                    </div>
+                    <div class="kg-stat-item">
+                        <i class="fas fa-link" style="color: var(--text-muted);"></i>
+                        <span class="kg-stat-value" id="statEdges">0</span>
+                        <span>Connections</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="kg-tooltip" id="tooltip"></div>
+
+    <script src="/js/knowledge-graph.js"></script>
+    <script>
+        // Auth and basic UI
+        const API_BASE = '/api';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await window.i18n?.initI18n?.();
+            window.i18n?.createLanguageSwitcher?.('langSwitcherContainer');
+            await checkAuth();
+            initEventListeners();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                const data = await response.json();
+                if (response.ok && data.user) {
+                    currentUser = data.user;
+                    updateUIForLoggedInUser();
+                } else {
+                    updateUIForGuest();
+                }
+            } catch (err) {
+                console.error('Auth check failed:', err);
+                updateUIForGuest();
+            }
+        }
+
+        function updateUIForLoggedInUser() {
+            const name = currentUser.name || currentUser.email?.split('@')[0] || 'Student';
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userEmail').textContent = currentUser.email || '';
+            document.getElementById('logoutBtn').hidden = false;
+        }
+
+        function updateUIForGuest() {
+            document.getElementById('userName').textContent = 'Guest';
+            document.getElementById('userEmail').textContent = '';
+            document.getElementById('logoutBtn').hidden = true;
+        }
+
+        function initEventListeners() {
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+                window.location.reload();
+            });
+        }
+    </script>
+</body>
+
+</html>
+

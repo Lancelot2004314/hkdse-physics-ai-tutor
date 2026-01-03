@@ -90,8 +90,9 @@
                     </div>
                     <div class="config-item">
                         <label>Subject</label>
-                        <select id="subjectSelect" disabled>
-                            <option>Physics</option>
+                        <select id="subjectSelect">
+                            <option value="Physics">Physics 物理</option>
+                            <option value="Mathematics">Mathematics 數學</option>
                         </select>
                     </div>
                     <div class="config-item">
@@ -178,7 +179,7 @@
         // Handle bfcache (back/forward navigation) - ensure overlay is hidden
         window.addEventListener('pageshow', hideLoadingOverlay);
 
-        // Topics data
+        // Topics data - Physics
         const PHYSICS_TOPICS = {
             heat_gas: {
                 id: 'heat_gas',
@@ -246,6 +247,112 @@
                 ]
             }
         };
+
+        // Topics data - Mathematics (based on official HKDSE curriculum)
+        const MATH_TOPICS = {
+            // Compulsory Part
+            number_algebra: {
+                id: 'number_algebra',
+                name: '數與代數',
+                color: '#3b82f6',
+                subtopics: [
+                    { id: 'math_na_1', name: '指數定律' },
+                    { id: 'math_na_2', name: '多項式' },
+                    { id: 'math_na_3', name: '因式分解' },
+                    { id: 'math_na_4', name: '二次方程' },
+                    { id: 'math_na_5', name: '函數及其圖像' },
+                    { id: 'math_na_6', name: '指數函數與對數函數' },
+                    { id: 'math_na_7', name: '等差數列與等比數列' },
+                    { id: 'math_na_8', name: '不等式' },
+                    { id: 'math_na_9', name: '線性規劃' },
+                    { id: 'math_na_10', name: '變分' }
+                ]
+            },
+            geometry: {
+                id: 'geometry',
+                name: '度量、圖形與空間',
+                color: '#8b5cf6',
+                subtopics: [
+                    { id: 'math_geo_1', name: '直線方程' },
+                    { id: 'math_geo_2', name: '圓的方程' },
+                    { id: 'math_geo_3', name: '軌跡' },
+                    { id: 'math_geo_4', name: '演繹幾何' },
+                    { id: 'math_geo_5', name: '平面圖形的面積與周界' },
+                    { id: 'math_geo_6', name: '立體圖形' },
+                    { id: 'math_geo_7', name: '三維圖形的體積與表面積' },
+                    { id: 'math_geo_8', name: '相似與全等' }
+                ]
+            },
+            trigonometry: {
+                id: 'trigonometry',
+                name: '三角學',
+                color: '#ef4444',
+                subtopics: [
+                    { id: 'math_trig_1', name: '三角比' },
+                    { id: 'math_trig_2', name: '三角函數的圖像' },
+                    { id: 'math_trig_3', name: '三角恆等式' },
+                    { id: 'math_trig_4', name: '解三角形' },
+                    { id: 'math_trig_5', name: '弧度制與扇形' },
+                    { id: 'math_trig_6', name: '二維與三維問題' }
+                ]
+            },
+            statistics: {
+                id: 'statistics',
+                name: '數據處理',
+                color: '#22c55e',
+                subtopics: [
+                    { id: 'math_stat_1', name: '統計的表達方式' },
+                    { id: 'math_stat_2', name: '集中趨勢的量度' },
+                    { id: 'math_stat_3', name: '離差的量度' },
+                    { id: 'math_stat_4', name: '概率' },
+                    { id: 'math_stat_5', name: '排列與組合' }
+                ]
+            },
+            // Extended Part M1
+            calculus_m1: {
+                id: 'calculus_m1',
+                name: 'M1 微積分與統計',
+                color: '#f59e0b',
+                subtopics: [
+                    { id: 'math_m1_1', name: '二項式展開' },
+                    { id: 'math_m1_2', name: '極限與微分' },
+                    { id: 'math_m1_3', name: '微分的應用' },
+                    { id: 'math_m1_4', name: '積分' },
+                    { id: 'math_m1_5', name: '定積分的應用' },
+                    { id: 'math_m1_6', name: '離散隨機變量' },
+                    { id: 'math_m1_7', name: '二項分佈' },
+                    { id: 'math_m1_8', name: '正態分佈' },
+                    { id: 'math_m1_9', name: '抽樣分佈與估計' }
+                ]
+            },
+            // Extended Part M2
+            algebra_m2: {
+                id: 'algebra_m2',
+                name: 'M2 代數與微積分',
+                color: '#06b6d4',
+                subtopics: [
+                    { id: 'math_m2_1', name: '數學歸納法' },
+                    { id: 'math_m2_2', name: '二項式定理' },
+                    { id: 'math_m2_3', name: '三角學進階' },
+                    { id: 'math_m2_4', name: 'e 和自然對數' },
+                    { id: 'math_m2_5', name: '極限' },
+                    { id: 'math_m2_6', name: '微分法' },
+                    { id: 'math_m2_7', name: '微分的應用' },
+                    { id: 'math_m2_8', name: '不定積分' },
+                    { id: 'math_m2_9', name: '定積分' },
+                    { id: 'math_m2_10', name: '定積分的應用' },
+                    { id: 'math_m2_11', name: '矩陣' },
+                    { id: 'math_m2_12', name: '線性方程組' },
+                    { id: 'math_m2_13', name: '向量' }
+                ]
+            }
+        };
+
+        // Get current topics based on selected subject
+        function getCurrentTopics() {
+            const subject = document.getElementById('subjectSelect').value;
+            return subject === 'Mathematics' ? MATH_TOPICS : PHYSICS_TOPICS;
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             // Force hide loading overlay immediately on page load
@@ -376,8 +483,9 @@
         function renderTopics() {
             const container = document.getElementById('topicsSection');
             const t = window.i18n ? window.i18n.t : (key) => key;
+            const topics = getCurrentTopics();
 
-            container.innerHTML = Object.values(PHYSICS_TOPICS).map((topic, index) => {
+            container.innerHTML = Object.values(topics).map((topic, index) => {
                 // Get translated topic name, fallback to original
                 const topicName = t(`topics.${topic.id}`) !== `topics.${topic.id}` ? t(`topics.${topic.id}`) : topic.name;
 
@@ -424,6 +532,12 @@
             // Language change - update limits
             document.getElementById('languageSelect').addEventListener('change', updateLimitsUI);
 
+            // Subject change - re-render topics and clear selection
+            document.getElementById('subjectSelect').addEventListener('change', () => {
+                selectedTopics.clear();
+                renderTopics();
+            });
+
             // Start button
             document.getElementById('startBtn').addEventListener('click', startQuiz);
 
@@ -450,6 +564,7 @@
             const longCount = parseInt(document.getElementById('longCount').value) || 0;
             const timeLimit = parseInt(document.getElementById('timeLimit').value) || 30;
             const language = document.getElementById('languageSelect').value;
+            const subject = document.getElementById('subjectSelect').value;
 
             if (selectedTopics.size === 0) {
                 alert('請選擇至少一個章節 / Please select at least one topic');
@@ -472,6 +587,7 @@
                     credentials: 'include',
                     body: JSON.stringify({
                         topics: Array.from(selectedTopics),
+                        subject, // Physics or Mathematics
                         mcCount,
                         shortCount,
                         longCount,

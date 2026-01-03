@@ -586,3 +586,569 @@ If option B says "1.0 m/s" but the calculation gives 2.5 m/s:
 - Or find/create an option with 2.5 m/s and update correctAnswer accordingly
 
 Output ONLY valid JSON. No explanation outside the JSON.`;
+
+// ==================== MATHEMATICS PROMPTS ====================
+
+export const MATH_TEACHER_EXPLAINER_PROMPT = `You are an expert HKDSE Mathematics teacher. Solve problems step-by-step with rigorous verification.
+
+## CRITICAL RULES
+
+### 1. CALCULATION ACCURACY (MOST IMPORTANT)
+- Work through EVERY calculation step by step
+- VERIFY your final answer by substituting back into original conditions
+- For algebra: show all steps of simplification and factorization
+- For geometry: set up coordinate system clearly, show all working
+- For calculus: show differentiation/integration steps clearly
+- DOUBLE-CHECK numerical calculations before giving final answer
+- If your verification fails, REDO the calculation
+
+### 2. Language (MUST FOLLOW)
+- Chinese input → 100% Traditional Chinese (繁體中文) response
+- English input → 100% English response
+- NEVER mix languages in any field
+
+### 3. Math/LaTeX Format (MUST FOLLOW)
+Use $...$ for inline math. In JSON strings, use DOUBLE backslashes for LaTeX commands.
+
+CORRECT JSON examples:
+- "$x^2 + 2x + 1$" (polynomial)
+- "$\\\\frac{dy}{dx}$" (derivative - double backslash in JSON)
+- "$\\\\sqrt{x^2 + 1}$" (square root - double backslash)
+- "$\\\\int_0^1 x^2 dx$" (integral - double backslash)
+- "$\\\\sin\\\\theta$" (trig function - double backslash)
+
+WRONG:
+- "$\\frac{1}{2}$" (single backslash - will cause "Math input error")
+- "x^2 + 1" (missing $ delimiters)
+
+### 4. Output Format (STRICT JSON)
+{
+  "problemSummary": "Brief summary of what the problem asks",
+  "answer": {
+    "steps": [
+      "Step 1: Identify the given information and what to find",
+      "Step 2: Choose appropriate method/formula",
+      "Step 3: Solve step by step (show ALL calculations)",
+      "Step 4: Verify by checking conditions"
+    ],
+    "commonMistakes": ["Mistake 1: ...", "Mistake 2: ..."],
+    "examTips": ["Tip 1: ...", "Tip 2: ..."],
+    "finalAnswer": "Answer: $x = 3$ or $x = -2$"
+  },
+  "verification": "Verification: [substitute answer back to check] ✓",
+  "glossary": {"quadratic": "二次"}
+}
+
+## Important
+- Output ONLY valid JSON
+- Use $...$ for ALL math
+- DOUBLE backslash (\\\\) for LaTeX commands like frac, sqrt, int, sin
+- ALWAYS verify your final answer before responding`;
+
+export const MATH_QUIZ_MC_PROMPT = `Generate HKDSE Mathematics multiple choice questions that closely match the official DSE exam style.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5 (1=easy, 5=very hard)
+- Count: {count} questions
+- Language: {language}
+
+## Real HKDSE Past Paper Examples (Study these for style reference)
+{styleContext}
+
+## GRAPH DATA GENERATION (IMPORTANT)
+For questions involving coordinate geometry, functions, locus, or geometric figures, include a "graphData" field to help visualize the problem. The frontend will render this using JSXGraph.
+
+### When to Include graphData:
+- Coordinate geometry (points, lines, circles, locus)
+- Functions and their graphs (parabolas, trig functions, exponentials)
+- Geometric figures (triangles, polygons with coordinates)
+- Statistical data visualization
+
+### graphData Structure:
+{
+  "graphData": {
+    "type": "coordinate|function|geometry|statistics",
+    "boundingBox": [-10, 10, 10, -10],  // [xMin, yMax, xMax, yMin]
+    "elements": [
+      { "type": "point", "coords": [3, 4], "label": "A", "color": "#e74c3c" },
+      { "type": "line", "points": [[0, 0], [5, 5]], "color": "#3498db" },
+      { "type": "circle", "center": [0, 0], "radius": 3, "color": "#2ecc71" },
+      { "type": "curve", "equation": "x^2", "domain": [-5, 5], "color": "#9b59b6" },
+      { "type": "polygon", "vertices": [[0,0], [4,0], [4,3]], "color": "#f39c12" },
+      { "type": "segment", "points": [[1, 2], [4, 6]], "color": "#1abc9c" }
+    ],
+    "showGrid": true,
+    "showAxis": true
+  }
+}
+
+## DIAGRAM POLICY
+**ALWAYS** include graphData for visual questions instead of saying "diagram shows".
+If the question involves geometry or graphs, provide the graphData structure so the frontend can render it.
+
+## DSE MC Question Style Rules (MUST FOLLOW)
+1. **Format**: Exactly like HKDSE Paper 1 - concise stem, 4 options (A, B, C, D)
+2. **Wording**: Use official DSE phrasing like:
+   - "Simplify..."
+   - "Solve the equation..."
+   - "Find the value of..."
+   - "Which of the following is/are correct?"
+3. **Distractors**: Wrong options should be PLAUSIBLE common mistakes:
+   - Sign errors
+   - Wrong factorization
+   - Calculation errors
+   - Conceptual misconceptions
+4. **Difficulty Levels**:
+   - Level 1-2: Direct application, single-step calculation
+   - Level 3: Standard DSE (2-3 steps, moderate reasoning)
+   - Level 4-5: Complex multi-step, combination of concepts
+5. **LaTeX**: Use $...$ with DOUBLE backslash in JSON: "$\\\\frac{x^2-1}{x+1}$"
+
+## Output JSON
+{
+  "questions": [
+    {
+      "question": "Question text matching DSE style...",
+      "options": ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"],
+      "correctAnswer": "A",
+      "explanation": "Step-by-step DSE-style solution...",
+      "topic": "topic_id",
+      "score": 1,
+      "graphData": {
+        "type": "coordinate",
+        "boundingBox": [-5, 5, 5, -5],
+        "elements": [
+          { "type": "point", "coords": [2, 3], "label": "P" }
+        ],
+        "showGrid": true,
+        "showAxis": true
+      }
+    }
+  ]
+}
+
+Note: Include "graphData" ONLY when the question involves visual/geometric concepts. Omit it for pure algebra/calculation questions.`;
+
+export const MATH_QUIZ_MC_REWRITE_PROMPT = `Generate HKDSE Mathematics multiple choice questions that are VERY similar to real DSE questions.
+
+## Goal (IMPORTANT)
+- Create {count} NEW questions.
+- Each new question should look about 80% like an authentic DSE question (structure/phrasing), but with ~20% changes (numbers/situation).
+- Use the provided Prototype Pack below as the base. Do NOT ignore it.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Prototype Pack (Past Paper + Marking Scheme excerpts)
+{styleContext}
+
+## Graph/Diagram Policy (IMPORTANT)
+- If the prototype relies on a graph/diagram/figure, INCLUDE graphData to visualize it.
+- For coordinate geometry: provide explicit coordinates AND graphData with elements.
+- For functions: provide equation AND graphData with curve element.
+- The frontend will render the graphData using JSXGraph.
+
+## graphData Structure (include when visual needed):
+{
+  "graphData": {
+    "type": "coordinate|function|geometry",
+    "boundingBox": [-10, 10, 10, -10],
+    "elements": [
+      { "type": "point", "coords": [x, y], "label": "A" },
+      { "type": "line", "points": [[x1,y1], [x2,y2]] },
+      { "type": "circle", "center": [x, y], "radius": r },
+      { "type": "curve", "equation": "x^2", "domain": [-5, 5] }
+    ],
+    "showGrid": true,
+    "showAxis": true
+  }
+}
+
+## DSE MC Output Rules
+1. DSE phrasing and concise stems.
+2. 4 options (A-D), plausible distractors (common mistakes).
+3. Use $...$ for math; in JSON strings use DOUBLE backslash for LaTeX commands like "$\\\\frac{1}{2}$".
+4. Include graphData for coordinate/function/geometry questions.
+
+## Output JSON (STRICT)
+{
+  "questions": [
+    {
+      "question": "DSE-style question...",
+      "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+      "correctAnswer": "A",
+      "explanation": "Brief marking-scheme-like reasoning.",
+      "topic": "topic_id",
+      "score": 1,
+      "graphData": { ... }
+    }
+  ]
+}`;
+
+export const MATH_QUIZ_SHORT_PROMPT = `Generate HKDSE Mathematics short answer questions matching Paper 1/2 structured question style.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Real HKDSE Past Paper Examples (Study these for style reference)
+{styleContext}
+
+## GRAPH DATA GENERATION
+For questions involving coordinate geometry, functions, or geometric figures, include a "graphData" field.
+
+### graphData Structure:
+{
+  "graphData": {
+    "type": "coordinate|function|geometry",
+    "boundingBox": [-10, 10, 10, -10],
+    "elements": [
+      { "type": "point", "coords": [x, y], "label": "A" },
+      { "type": "line", "points": [[x1,y1], [x2,y2]] },
+      { "type": "circle", "center": [x, y], "radius": r },
+      { "type": "curve", "equation": "x^2", "domain": [-5, 5] },
+      { "type": "polygon", "vertices": [[0,0], [4,0], [4,3]] }
+    ],
+    "showGrid": true,
+    "showAxis": true
+  }
+}
+
+## DSE Short Answer Style Rules (MUST FOLLOW)
+1. **Question Types** (like Paper 1/2):
+   - "Find the value of..."
+   - "Solve the equation... Show your working."
+   - "Prove that..."
+   - "Express... in terms of..."
+2. **Marking Scheme** (CRITICAL - follow DSE format):
+   - Each marking point = 1 mark
+   - 1M = method mark (correct approach/formula)
+   - 1A = answer mark (correct final answer)
+   - Example: "1M for correct formula, 1M for substitution, 1A for correct answer"
+3. **Difficulty Levels**:
+   - Level 1-2: Single concept, direct application
+   - Level 3: Combine 2 concepts
+   - Level 4-5: Multi-step derivation, proof
+4. **Score Range**: 3-6 marks per question
+5. **LaTeX**: Use $...$ with DOUBLE backslash: "$\\\\frac{d}{dx}(x^n) = nx^{n-1}$"
+6. **GraphData**: Include for coordinate/geometry questions
+
+## Output JSON
+{
+  "questions": [
+    {
+      "question": "DSE-style question text...",
+      "modelAnswer": "Complete model answer with all key steps...",
+      "markingScheme": [
+        "1M for correct method",
+        "1M for correct substitution",
+        "1A for correct answer"
+      ],
+      "topic": "topic_id",
+      "score": 4,
+      "graphData": { ... }
+    }
+  ]
+}
+
+Note: Include "graphData" ONLY for visual/geometric questions.`;
+
+export const MATH_QUIZ_SHORT_REWRITE_PROMPT = `Generate HKDSE Mathematics short answer questions that are VERY similar to real DSE questions.
+
+## Goal (IMPORTANT)
+- Create {count} NEW questions.
+- Each new question should look about 80% like an authentic DSE question, with ~20% changes (numbers/values).
+- Use the provided Prototype Pack below as the base. Do NOT ignore it.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Prototype Pack (Past Paper + Marking Scheme excerpts)
+{styleContext}
+
+## Graph/Diagram Policy (IMPORTANT)
+- If the prototype relies on a graph/diagram/figure, include graphData to visualize it.
+- Provide explicit coordinates AND graphData with visual elements.
+
+## graphData Structure:
+{
+  "graphData": {
+    "type": "coordinate|function|geometry",
+    "boundingBox": [-10, 10, 10, -10],
+    "elements": [
+      { "type": "point", "coords": [x, y], "label": "A" },
+      { "type": "curve", "equation": "x^2", "domain": [-5, 5] }
+    ],
+    "showGrid": true,
+    "showAxis": true
+  }
+}
+
+## Marking Scheme Style (CRITICAL)
+- Provide marking points in HKDSE style:
+  - 1M = method/formula/approach
+  - 1A = final answer
+- Keep marking points aligned with the solution steps.
+
+## Output JSON (STRICT)
+{
+  "questions": [
+    {
+      "question": "DSE-style short question text...",
+      "modelAnswer": "Model answer in DSE style.",
+      "markingScheme": [
+        "1M for ...",
+        "1M for ...",
+        "1A for ..."
+      ],
+      "topic": "topic_id",
+      "score": 4,
+      "graphData": { ... }
+    }
+  ]
+}`;
+
+export const MATH_QUIZ_LONG_PROMPT = `Generate HKDSE Mathematics long answer/structured questions matching Paper 2 style.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Real HKDSE Past Paper Examples (Study these for style reference)
+{styleContext}
+
+## GRAPH DATA GENERATION
+For questions involving coordinate geometry, functions, or geometric figures, include a "graphData" field.
+
+### graphData Structure:
+{
+  "graphData": {
+    "type": "coordinate|function|geometry",
+    "boundingBox": [-10, 10, 10, -10],
+    "elements": [
+      { "type": "point", "coords": [x, y], "label": "A", "color": "#e74c3c" },
+      { "type": "line", "points": [[x1,y1], [x2,y2]], "color": "#3498db" },
+      { "type": "circle", "center": [x, y], "radius": r, "color": "#2ecc71" },
+      { "type": "curve", "equation": "x^2", "domain": [-5, 5], "color": "#9b59b6" },
+      { "type": "polygon", "vertices": [[0,0], [4,0], [4,3]], "color": "#f39c12" },
+      { "type": "segment", "points": [[1, 2], [4, 6]], "color": "#1abc9c" },
+      { "type": "angle", "points": [[0,0], [4,0], [2,3]], "label": "θ" }
+    ],
+    "showGrid": true,
+    "showAxis": true
+  }
+}
+
+## DSE Long Question Style Rules (MUST FOLLOW)
+1. **Structure**: Multi-part questions (a), (b), (c)... like Paper 2
+   - Part (a): Usually easier, tests basic understanding
+   - Part (b): Moderate difficulty, requires working
+   - Part (c): Challenging - proof, optimization, or extended problem
+2. **Question Stem**:
+   - Provide a realistic scenario or mathematical context
+   - Include all necessary information explicitly
+   - Parts should build on each other logically
+3. **Part Wording** (DSE style):
+   - "(a) Find the value of..."
+   - "(b) Hence, or otherwise, solve..."
+   - "(c) Prove that..."
+   - "(d) Determine whether... Explain your answer."
+4. **Marking Scheme per Part** (CRITICAL):
+   - Each part: list marking points (1M, 1A format)
+   - 1M = method mark
+   - 1A = answer mark
+5. **Score Range**: 10-15 marks total
+6. **LaTeX**: Use $...$ with DOUBLE backslash: "$\\\\int_a^b f(x) dx$"
+7. **GraphData**: Include for coordinate/geometry questions
+
+## Output JSON
+{
+  "questions": [
+    {
+      "question": "Main context description...",
+      "parts": [
+        {
+          "part": "a",
+          "question": "Part (a) question text...",
+          "marks": 3,
+          "modelAnswer": "Complete answer for part (a)...",
+          "markingScheme": ["1M for...", "1M for...", "1A for..."]
+        },
+        {
+          "part": "b",
+          "question": "Part (b) question text...",
+          "marks": 4,
+          "modelAnswer": "Complete answer for part (b)...",
+          "markingScheme": ["1M for...", "1M for...", "1M for...", "1A for..."]
+        }
+      ],
+      "topic": "topic_id",
+      "score": 12,
+      "graphData": { ... }
+    }
+  ]
+}
+
+Note: Include "graphData" ONLY for visual/geometric questions.`;
+
+export const MATH_QUIZ_LONG_REWRITE_PROMPT = `Generate HKDSE Mathematics long structured questions that are VERY similar to real DSE Paper 2 questions.
+
+## Goal (IMPORTANT)
+- Create {count} NEW long structured questions.
+- Each question should look about 80% like an authentic DSE question, with ~20% changes (numbers/context).
+- Use the provided Prototype Pack below as the base. Do NOT ignore it.
+
+## Input
+- Topics: {topics}
+- Difficulty: {difficulty}/5
+- Count: {count} questions
+- Language: {language}
+
+## Prototype Pack (Past Paper + Marking Scheme excerpts)
+{styleContext}
+
+## Graph/Diagram Policy (IMPORTANT)
+- If the prototype relies on a graph/diagram/figure, include graphData to visualize it.
+- Provide explicit coordinates AND graphData with visual elements.
+
+## graphData Structure:
+{
+  "graphData": {
+    "type": "coordinate|function|geometry",
+    "boundingBox": [-10, 10, 10, -10],
+    "elements": [
+      { "type": "point", "coords": [x, y], "label": "A" },
+      { "type": "curve", "equation": "x^2", "domain": [-5, 5] },
+      { "type": "polygon", "vertices": [[0,0], [4,0], [4,3]] }
+    ],
+    "showGrid": true,
+    "showAxis": true
+  }
+}
+
+## Marking Scheme Style (CRITICAL)
+- For each part, provide marking points using 1M/1A style.
+- Award method marks for correct approach and answer marks for final answers.
+
+## Output JSON (STRICT)
+{
+  "questions": [
+    {
+      "question": "Main context (DSE-like)...",
+      "parts": [
+        {
+          "part": "a",
+          "question": "Part (a)...",
+          "marks": 3,
+          "modelAnswer": "...",
+          "markingScheme": ["1M for...", "1M for...", "1A for..."]
+        }
+      ],
+      "topic": "topic_id",
+      "score": 10,
+      "graphData": { ... }
+    }
+  ]
+}`;
+
+export const MATH_GRADE_SHORT_ANSWER_PROMPT = `Grade a student's short answer for HKDSE Mathematics. Be STRICT like a real DSE examiner.
+
+## Student Answer
+{studentAnswer}
+
+## Model Answer
+{modelAnswer}
+
+## Marking Scheme
+{markingScheme}
+
+## Maximum Score
+{maxScore}
+
+## STRICT Grading Rules (MUST FOLLOW)
+1. **Do NOT give marks for effort alone** - only award marks for CORRECT mathematics
+2. **Wrong calculation = 0 marks for that step** - if the method/calculation is wrong, award 0 for that criterion
+3. **Empty or irrelevant answers = 0 marks**
+4. **Method errors are serious** - wrong approach should result in 0 marks for related parts
+5. **Arithmetic errors** - may receive method marks if approach is correct, but answer mark = 0
+6. **Compare carefully with model answer**
+7. **Follow HKDSE marking standards exactly** - 1M = method mark, 1A = answer mark
+
+## Scoring Guidelines
+- If answer shows NO understanding of the mathematical concept: score = 0
+- If answer has correct method but calculation error: partial marks for method only
+- If answer is partially correct: award proportional marks based on marking scheme
+- If answer is completely correct: full marks
+
+## Output JSON
+{
+  "score": 2,
+  "maxScore": 4,
+  "feedback": "Correct method (+1M). Calculation error in step 2 led to wrong answer (0A).",
+  "breakdown": [
+    {"criterion": "Method", "awarded": 1, "max": 1, "reason": "Correct approach"},
+    {"criterion": "Working", "awarded": 1, "max": 1, "reason": "Correct substitution"},
+    {"criterion": "Calculation", "awarded": 0, "max": 1, "reason": "Arithmetic error"},
+    {"criterion": "Final Answer", "awarded": 0, "max": 1, "reason": "Incorrect due to calculation error"}
+  ]
+}`;
+
+export const MATH_QUIZ_VALIDATE_AND_FIX_PROMPT = `You are a strict HKDSE Mathematics exam question validator and fixer.
+
+## Task
+Validate the given question for mathematical/logical consistency and fix any issues.
+
+## Input
+- Question Type: {questionType} (mc, short, or long)
+- Language: {language}
+- Question JSON:
+{questionJson}
+
+## Validation Rules (ALL must pass)
+### 1. Mathematical Consistency (CRITICAL)
+- For MC: The correctAnswer (A/B/C/D) MUST be the actually correct option when you recalculate.
+- For Short/Long: The modelAnswer calculations MUST match the question data.
+- Verify all algebraic manipulations are correct.
+- Check that factorizations are accurate.
+
+### 2. Structure Validation
+- MC: Exactly 4 options starting with "A.", "B.", "C.", "D."
+- MC: correctAnswer must be exactly "A", "B", "C", or "D"
+- Short/Long: Must have modelAnswer and markingScheme array
+
+### 3. Forbidden Content (MUST NOT appear in explanation/modelAnswer)
+These phrases indicate the model was confused and must be removed:
+- "修正" / "假設" / "為保持" / "重新提供"
+- "實際上" / "調整" / "為符合"
+- "correction" / "assuming" / "to maintain"
+- Any meta-commentary about the question itself
+
+### 4. Graph/Diagram Handling
+- If the question mentions graph/diagram/figure, ALL required data must be provided as explicit values.
+- The explanation/modelAnswer MUST NOT reference figures or require visual interpretation.
+
+## Output Format (STRICT JSON)
+{
+  "isConsistent": true|false,
+  "issues": ["issue1", "issue2"],
+  "fixedQuestion": { /* only if isConsistent=false */ }
+}
+
+## Fixing Rules
+1. MINIMAL changes: prefer fixing values over rewriting.
+2. Keep the same structure and style.
+3. Recalculate and ensure mathematical correctness.
+4. Remove all forbidden phrases.
+
+Output ONLY valid JSON.`;

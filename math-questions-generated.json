@@ -1,0 +1,2084 @@
+{
+  "success": [
+    "math_na_1",
+    "math_na_2",
+    "math_na_4",
+    "math_na_5",
+    "math_na_6",
+    "math_na_8",
+    "math_na_9",
+    "math_na_10",
+    "math_geo_1",
+    "math_geo_2",
+    "math_geo_3",
+    "math_geo_4",
+    "math_geo_5",
+    "math_geo_6",
+    "math_geo_8",
+    "math_trig_1",
+    "math_trig_2",
+    "math_trig_3",
+    "math_trig_5",
+    "math_trig_6",
+    "math_stat_1",
+    "math_stat_2",
+    "math_stat_3",
+    "math_stat_4",
+    "math_stat_5",
+    "math_m1_1",
+    "math_m1_2",
+    "math_m1_4",
+    "math_m1_5",
+    "math_m1_7",
+    "math_m1_8",
+    "math_m1_9",
+    "math_m2_2",
+    "math_m2_3",
+    "math_m2_4",
+    "math_m2_5",
+    "math_m2_6",
+    "math_m2_7",
+    "math_m2_8",
+    "math_m2_9",
+    "math_m2_10",
+    "math_m2_11",
+    "math_m2_12",
+    "math_m2_13"
+  ],
+  "failed": [
+    {
+      "id": "math_na_3",
+      "error": "Bad escaped character in JSON at position 533 (line 10 column 275)"
+    },
+    {
+      "id": "math_na_7",
+      "error": "fetch failed"
+    },
+    {
+      "id": "math_geo_7",
+      "error": "fetch failed"
+    },
+    {
+      "id": "math_trig_4",
+      "error": "Bad escaped character in JSON at position 46 (line 2 column 45)"
+    },
+    {
+      "id": "math_m1_3",
+      "error": "fetch failed"
+    },
+    {
+      "id": "math_m1_6",
+      "error": "Bad escaped character in JSON at position 61 (line 2 column 60)"
+    },
+    {
+      "id": "math_m2_1",
+      "error": "Bad escaped character in JSON at position 44 (line 2 column 43)"
+    }
+  ],
+  "questions": [
+    {
+      "subtopicId": "math_na_1",
+      "subtopicName": "指數定律",
+      "categoryName": "數與代數",
+      "question": {
+        "question": "將以下代數式用指數定律化簡，並寫成 $2^{m}3^{n}$ 的形式，求 $m+n$。 $$\\dfrac{\\left(2^{3}\\cdot3^{-2}\\right)^{2}\\cdot6^{-3}}{2^{-1}\\cdot3^{4}}$$",
+        "options": [
+          "A. $-7$",
+          "B. $-5$",
+          "C. $7$",
+          "D. $-11$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "先逐步化簡原式。 首先，$\\left(2^{3}\\cdot3^{-2}\\right)^{2}=2^{3\\times2}\\cdot3^{-2\\times2}=2^{6}\\cdot3^{-4}$。 接着，$6^{-3}=(2\\cdot3)^{-3}=2^{-3}\\cdot3^{-3}$，所以乘起來得到 $2^{6}\\cdot3^{-4}\\cdot2^{-3}\\cdot3^{-3}=2^{6-3}\\cdot3^{-4-3}=2^{3}\\cdot3^{-7}$。 最後除以 $2^{-1}\\cdot3^{4}$，指數相減：$2^{3-(-1)}\\cdot3^{-7-4}=2^{4}\\cdot3^{-11}$。 因此 $m=4,n=-11$，所以 $m+n=4+(-11)=-7$。",
+        "topic": "math_na_1",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 394,
+          "completion_tokens": 1410,
+          "total_tokens": 1804,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1024,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_na_2",
+      "subtopicName": "多項式",
+      "categoryName": "數與代數",
+      "question": {
+        "question": "已知多項式 $p(x)=x^{3}-3x^{2}+ax+b$，且 $(x-1)^{2}$ 是 $p(x)$ 的因式。求 $p(-1)$ 的值為何？",
+        "options": [
+          "A. $-8$",
+          "B. $0$",
+          "C. $8$",
+          "D. $16$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "因為 $(x-1)^{2}$ 是 $p(x)$ 的因式，故 $x=1$ 為重根，表示\n1) $p(1)=0$；\n2) $p'(1)=0$。\n首先計算 $p(1)$：\n$$p(1)=1-3+a+b=a+b-2=0\\Rightarrow a+b=2.$$ \n再計算導數 $p'(x)=3x^{2}-6x+a$，代入 $x=1$：\n$$p'(1)=3-6+a=a-3=0\\Rightarrow a=3.$$ \n由 $a+b=2$ 得 $b=2-a=2-3=-1$。 \n因此 $p(x)=x^{3}-3x^{2}+3x-1$。計算 $p(-1)$：\n$$p(-1)=-1-3-3-1=-8.$$ \n故答案為 $-8$。",
+        "topic": "math_na_2",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 393,
+          "completion_tokens": 1064,
+          "total_tokens": 1457,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 704,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_na_4",
+      "subtopicName": "二次方程",
+      "categoryName": "數與代數",
+      "question": {
+        "question": "考慮二次方程 $(k-3)x^2+2kx-1=0$。求參數 $k$ 的範圍，使該方程恰有一正一負的兩個實根。",
+        "options": [
+          "A. $k>1$",
+          "B. $k>3$",
+          "C. $-1<k<3$",
+          "D. $k<-3$"
+        ],
+        "correctAnswer": "B",
+        "explanation": "設二次方程為 $ax^2+bx+c=0$，兩根符號相反當且僅當根的乘積 $\\dfrac{c}{a}<0$（且方程為二次，即 $a\\neq0$），同時須有兩個實根，故判別式 $\\Delta>0$。\n\n於本題，$a=k-3,\\; b=2k,\\; c=-1$。\n\n首先要求乘積為負：\n$$\\frac{c}{a}=\\frac{-1}{k-3}<0\\Rightarrow k-3>0\\Rightarrow k>3.$$\n（若 $k=3$ 則變為一次方程，故不可取。）\n\n再檢查判別式確保兩實根：\n$$\\Delta=b^2-4ac=(2k)^2-4(k-3)(-1)=4k^2+4(k-3)=4(k^2+k-3).$$\n要求 $\\Delta>0$ 等價於 $k^2+k-3>0$，其根為 $\\dfrac{-1\\pm\\sqrt{13}}{2}\\approx-2.303,\\;1.303$，故 $\\Delta>0$ 當且僅當 $k>\\dfrac{-1+\\sqrt{13}}{2}\\approx1.303$ 或 $k<\\dfrac{-1-\\sqrt{13}}{2}\\approx-2.303$。\n\n將此與 $k>3$ 的條件合併，得到唯一符合的範圍為 $k>3$。因此答案為 B。",
+        "topic": "math_na_4",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 394,
+          "completion_tokens": 2331,
+          "total_tokens": 2725,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1792,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_na_5",
+      "subtopicName": "函數及其圖像",
+      "categoryName": "數與代數",
+      "question": {
+        "question": "已知二次函數 $$y=x^{2}-2x+2$$ 與一次函數 $$y=kx+1$$ 在平面上恰有一個公共點，則下列哪一項為可能的 $k$ 值？",
+        "options": [
+          "A. $k=0$",
+          "B. $k=0\\text{ 或 }k=-4$",
+          "C. $k=-4$",
+          "D. $k=2$"
+        ],
+        "correctAnswer": "B",
+        "explanation": "兩函數有公共點即同時滿足 $$x^{2}-2x+2=kx+1\\,. $$\n移項得二次方程 $$x^{2}-(2+k)x+1=0\\,. $$\n若恰有一個公共點，則該二次方程有重根，判別式為零：\n$$\\Delta=(2+k)^{2}-4\\cdot1\\cdot1=0\\,. $$\n所以 $$(k+2)^{2}=4\\Rightarrow k+2=\\pm2\\Rightarrow k=0\\text{ 或 }k=-4\\,. $$\n因此正確答案為 B。",
+        "topic": "math_na_5",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            -6,
+            6,
+            6,
+            -6
+          ],
+          "elements": [
+            {
+              "type": "curve",
+              "equation": "x^2-2*x+2",
+              "domain": [
+                -6,
+                6
+              ]
+            },
+            {
+              "type": "line",
+              "points": [
+                [
+                  -6,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ]
+              ]
+            },
+            {
+              "type": "line",
+              "points": [
+                [
+                  -6,
+                  25
+                ],
+                [
+                  6,
+                  -23
+                ]
+              ],
+              "equation": "-4*x+1"
+            },
+            {
+              "type": "point",
+              "coords": [
+                1,
+                1
+              ],
+              "label": "A"
+            },
+            {
+              "type": "point",
+              "coords": [
+                -1,
+                5
+              ],
+              "label": "B"
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 396,
+          "completion_tokens": 1678,
+          "total_tokens": 2074,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1152,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_na_6",
+      "subtopicName": "指數函數與對數函數",
+      "categoryName": "數與代數",
+      "question": {
+        "question": "考慮指數函數與多項式函數的交點：方程 $2^x=x^2$ 有多少個實數解？",
+        "options": [
+          "A. 1 個實根",
+          "B. 2 個實根",
+          "C. 3 個實根",
+          "D. 4 個實根"
+        ],
+        "correctAnswer": "C",
+        "explanation": "設函數 $$f(x)=2^x-x^2.$$\n\n(1) 先在負數區間找根：\n計算 $f(-1)=2^{-1}-(-1)^2=\\tfrac12-1=-\\tfrac12<0$，$f(0)=2^0-0^2=1>0$，由連續性可知在 $(-1,0)$ 有至少一個根。可用數值法可得該根約 $x\\approx-0.766$。\n\n(2) 在正數區間分析正根個數：令 $x>0$，考慮\n$$g(x)=\\ln\\bigl(\\tfrac{x^2}{2^x}\\bigr)=2\\ln x-x\\ln2.$$\n則\n$$g'(x)=\\frac{2}{x}-\\ln2.$$\n解 $g'(x)=0$ 得臨界點 $x_0=\\dfrac{2}{\\ln2}\\approx2.885$。因此 $g(x)$ 在 $(0,x_0)$ 上單調遞增，於 $(x_0,\\infty)$ 上單調遞減，故 $\\dfrac{x^2}{2^x}$ 在 $x>0$ 上只有一個極大值，因此方程 $x^2=2^x$ 在 $x>0$ 最多有兩個解。\n\n檢驗顯然 $x=2$ 與 $x=4$ 是方程的解，因為 $2^2=4=2^2$（即 $2^2=2^2$）與 $2^4=16=4^2$。由前面的單峰性質可知不會有其他正根。\n\n綜合負區間的一個根與正區間的兩個根，方程 $2^x=x^2$ 總共有 3 個實數解（約為 $x\\approx-0.766,\\;2,\\;4$）。",
+        "topic": "math_na_6",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            -3,
+            16,
+            6,
+            -3
+          ],
+          "elements": [
+            {
+              "type": "curve",
+              "equation": "2^x",
+              "domain": [
+                -3,
+                6
+              ]
+            },
+            {
+              "type": "curve",
+              "equation": "x^2",
+              "domain": [
+                -3,
+                6
+              ]
+            },
+            {
+              "type": "point",
+              "coords": [
+                2,
+                4
+              ],
+              "label": "A"
+            },
+            {
+              "type": "point",
+              "coords": [
+                4,
+                16
+              ],
+              "label": "B"
+            },
+            {
+              "type": "point",
+              "coords": [
+                -0.766,
+                0.587
+              ],
+              "label": "P"
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 399,
+          "completion_tokens": 2846,
+          "total_tokens": 3245,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2048,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_na_8",
+      "subtopicName": "不等式",
+      "categoryName": "數與代數",
+      "question": {
+        "question": "若不等式 $\\frac{x^2-5x+6}{x-2}<1$，求實數 $x$ 的解集為何？",
+        "options": [
+          "A. $(-\\infty,2)\\cup(2,4)$",
+          "B. $(-\\infty,4)$",
+          "C. $(2,4)$",
+          "D. $(-\\infty,2)\\cup(4,\\infty)$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "先注意定義域：原式分母不為零，故 $x\\neq 2$。\n\n將不等式同一側化為零：\n$$\\frac{x^2-5x+6}{x-2}-1<0$$\n化簡分子：\n$$\\frac{x^2-5x+6-(x-2)}{x-2}<0\\Rightarrow\\frac{x^2-6x+8}{x-2}<0$$\n分子因式分解得：\n$$\\frac{(x-2)(x-4)}{x-2}<0$$\n由於 $x\\neq2$，可在不改變不等式解集的情況下約去 $(x-2)$，得到：\n$$x-4<0\\Rightarrow x<4.$$\n合併定義域 $x\\neq2$，最終解集為 $(-\\infty,2)\\cup(2,4)$。注意 $x=2$ 在原式中無意義，不能包含在解集中。",
+        "topic": "math_na_8",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 393,
+          "completion_tokens": 2458,
+          "total_tokens": 2851,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2048,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_na_9",
+      "subtopicName": "線性規劃",
+      "categoryName": "數與代數",
+      "question": {
+        "question": "某工廠生產產品 $X$ 與 $Y$。生產每單位 $X$ 需資源 A 用 $2$ 小時、資源 B 用 $1$ 小時；生產每單位 $Y$ 需資源 A 用 $1$ 小時、資源 B 用 $2$ 小時。資源 A 有 $100$ 小時，資源 B 有 $90$ 小時，且必須至少生產 $10$ 單位 $X$。每單位 $X$ 與 $Y$ 的利潤分別為 $60$ 與 $40$。設生產 $X,Y$ 的數量分別為 $x,y$（連續可分），求可取得之最大利潤為多少？",
+        "options": [
+          "A. $\\dfrac{9800}{3}$",
+          "B. $3000$",
+          "C. $2200$",
+          "D. $600$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "設 $x,y\\ge0$ 為生產數量，且 $x\\ge10$。限制式為\n$$2x+y\\le100,\\qquad x+2y\\le90,\\qquad x\\ge10.$$\n利潤為\n$$P=60x+40y.$$\n線性規劃的最優值必出現在可行域的頂點。先找出可行域的頂點：\n1. 與 $x$ 軸交點（$y=0$）由 $2x+0\\le100$ 得到 $x\\le50$，且 $x\\ge10$，故兩端點為 $(10,0)$ 與 $(50,0)$。\n2. 與直線 $x=10$ 的交點：把 $x=10$ 代入 $x+2y=90$ 得 $y=40$，得到點 $(10,40)$（並檢查另一直線 $2x+y=100$ 在此點不成立，因此 $(10,40)$ 在可行域邊界上）。\n3. 兩條資源限制直線的交點由\n$$2x+y=100,\\qquad x+2y=90.$$\n解此方程組：由第二式 $x=90-2y$，代入第一式得\n$$2(90-2y)+y=100\\Rightarrow180-3y=100\\Rightarrow y=\\dfrac{80}{3},$$\n再得 $x=90-2\\cdot\\dfrac{80}{3}=\\dfrac{110}{3}$，所以交點為 $\\left(\\dfrac{110}{3},\\dfrac{80}{3}\\right)$。\n因此可行域的重要頂點為 $(10,0),(50,0),(10,40),\\left(\\dfrac{110}{3},\\dfrac{80}{3}\\right)$。\n計算利潤：\n- $P(10,0)=60\\times10+40\\times0=600$；\n- $P(50,0)=60\\times50+40\\times0=3000$；\n- $P(10,40)=60\\times10+40\\times40=2200$；\n- $P\\left(\\dfrac{110}{3},\\dfrac{80}{3}\\right)=60\\cdot\\dfrac{110}{3}+40\\cdot\\dfrac{80}{3}=\\dfrac{6600+3200}{3}=\\dfrac{9800}{3}\\approx3266.67.$\n最大值為 $P=\\dfrac{9800}{3}$，故選項 A 為正確答案。",
+        "topic": "math_na_9",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            0,
+            100,
+            100,
+            0
+          ],
+          "elements": [
+            {
+              "type": "line",
+              "points": [
+                [
+                  0,
+                  100
+                ],
+                [
+                  50,
+                  0
+                ]
+              ]
+            },
+            {
+              "type": "line",
+              "points": [
+                [
+                  0,
+                  45
+                ],
+                [
+                  90,
+                  0
+                ]
+              ]
+            },
+            {
+              "type": "line",
+              "points": [
+                [
+                  10,
+                  0
+                ],
+                [
+                  10,
+                  100
+                ]
+              ]
+            },
+            {
+              "type": "point",
+              "coords": [
+                10,
+                0
+              ],
+              "label": "(10,0)"
+            },
+            {
+              "type": "point",
+              "coords": [
+                50,
+                0
+              ],
+              "label": "(50,0)"
+            },
+            {
+              "type": "point",
+              "coords": [
+                36.6666667,
+                26.6666667
+              ],
+              "label": "(110/3,80/3)"
+            },
+            {
+              "type": "point",
+              "coords": [
+                10,
+                40
+              ],
+              "label": "(10,40)"
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 395,
+          "completion_tokens": 2979,
+          "total_tokens": 3374,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1856,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_na_10",
+      "subtopicName": "變分",
+      "categoryName": "數與代數",
+      "question": {
+        "question": "已知 $y$ 與 $x$ 成正比，並與 $z^2$ 成反比（即 $y=k\\dfrac{x}{z^2}$）。當 $x=6$，$z=2$ 時，$y=12$。若 $x$ 變為 $9$，$z$ 變為 $3$，則新的 $y$ 值為多少？",
+        "options": [
+          "A. 6",
+          "B. 8",
+          "C. 12",
+          "D. 16"
+        ],
+        "correctAnswer": "B",
+        "explanation": "設 $y=k\\dfrac{x}{z^2}$。由已知當 $x=6$，$z=2$ 時有\n$$12=k\\dfrac{6}{2^2}=k\\dfrac{6}{4}=\\dfrac{3k}{2}.$$\n解得 $k=8$。當 $x=9$，$z=3$ 時，\n$$y=8\\cdot\\dfrac{9}{3^2}=8\\cdot\\dfrac{9}{9}=8.$$\n故答案為 $8$。",
+        "topic": "math_na_10",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 392,
+          "completion_tokens": 943,
+          "total_tokens": 1335,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 640,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_geo_1",
+      "subtopicName": "直線方程",
+      "categoryName": "度量、圖形與空間",
+      "question": {
+        "question": "圖中直線通過點 $A(-4,2)$ 和 $B(6,-3)$。該直線的方程為何？",
+        "options": [
+          "A. $y=-\\frac{1}{2}x$",
+          "B. $y=-\\frac{1}{2}x+1$",
+          "C. $y=-\\frac{1}{2}x-1$",
+          "D. $y=\\frac{1}{2}x$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "步驟：\n1. 計算斜率：\n$m=\\dfrac{y_B-y_A}{x_B-x_A}=\\dfrac{-3-2}{6-(-4)}=\\dfrac{-5}{10}=-\\dfrac{1}{2}$。\n2. 以點斜式代入點 $A(-4,2)$：\n$y-2=-\\dfrac{1}{2}(x+4)$。\n3. 展開並整理：\n$y-2=-\\dfrac{1}{2}x-2\\Rightarrow y=-\\dfrac{1}{2}x$。\n因此正確答案為 A：$y=-\\dfrac{1}{2}x$。",
+        "topic": "math_geo_1",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            -10,
+            10,
+            10,
+            -10
+          ],
+          "elements": [
+            {
+              "type": "point",
+              "coords": [
+                -4,
+                2
+              ],
+              "label": "A"
+            },
+            {
+              "type": "point",
+              "coords": [
+                6,
+                -3
+              ],
+              "label": "B"
+            },
+            {
+              "type": "line",
+              "points": [
+                [
+                  -6,
+                  3
+                ],
+                [
+                  8,
+                  -4
+                ]
+              ]
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 398,
+          "completion_tokens": 1863,
+          "total_tokens": 2261,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1408,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_geo_2",
+      "subtopicName": "圓的方程",
+      "categoryName": "度量、圖形與空間",
+      "question": {
+        "question": "已知圓通過三點 $A(0,1)$、$B(2,3)$、$C(4,1)$。則此圓的方程為何？",
+        "options": [
+          "A. $$(x-2)^2+(y-1)^2=4$$",
+          "B. $$(x-2)^2+(y-1)^2=1$$",
+          "C. $$(x+2)^2+(y-1)^2=4$$",
+          "D. $$x^2+y^2-4x-2y-3=0$$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "因為點 A(0,1) 與 C(4,1) 對稱於直線 $x=2$，圓心必在垂直平分線 $x=2$ 上，設圓心為 $O(2,k)$。圓心到 A 與 B 的距離相等：\n\n$\\sqrt{(2-0)^2+(k-1)^2}=\\sqrt{(2-2)^2+(k-3)^2}$. 去平方得：\n\n$4+(k-1)^2=(k-3)^2$。\n\n展開化簡：$4+k^2-2k+1=k^2-6k+9\\Rightarrow 5-2k=-6k+9\\Rightarrow 4k=4\\Rightarrow k=1$。\n\n故圓心為 $O(2,1)$，半徑為 $OA=\\sqrt{(2-0)^2+(1-1)^2}=2$。圓的方程為\n\n$$(x-2)^2+(y-1)^2=4.$$",
+        "topic": "math_geo_2",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            -1,
+            6,
+            5,
+            -1
+          ],
+          "elements": [
+            {
+              "type": "point",
+              "coords": [
+                0,
+                1
+              ],
+              "label": "A"
+            },
+            {
+              "type": "point",
+              "coords": [
+                2,
+                3
+              ],
+              "label": "B"
+            },
+            {
+              "type": "point",
+              "coords": [
+                4,
+                1
+              ],
+              "label": "C"
+            },
+            {
+              "type": "point",
+              "coords": [
+                2,
+                1
+              ],
+              "label": "O"
+            },
+            {
+              "type": "circle",
+              "center": [
+                2,
+                1
+              ],
+              "radius": 2
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 399,
+          "completion_tokens": 2336,
+          "total_tokens": 2735,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1728,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_geo_3",
+      "subtopicName": "軌跡",
+      "categoryName": "度量、圖形與空間",
+      "question": {
+        "question": "設兩定點 A(2,0)、B(-2,0)。動點 P(x,y) 滿足 $|PA-PB|=2$。則 P 的軌跡為何？",
+        "options": [
+          "A. $x^2-\\dfrac{y^2}{3}=1$",
+          "B. $\\dfrac{x^2}{3}-y^2=1$",
+          "C. $\\dfrac{x^2}{4}+\\dfrac{y^2}{3}=1$",
+          "D. $y^2-\\dfrac{x^2}{3}=1$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "設 $d_1=PA=((x-2)^2+y^2)^{1/2}$，$d_2=PB=((x+2)^2+y^2)^{1/2}$。題意 $|d_1-d_2|=2$，即兩焦點間距的差為 $2$，故為以兩點 A、B 為焦點的雙曲線，且 $2a=2\\Rightarrow a=1$。兩焦點到中心的距離為 $c=2$，由雙曲線關係 $b^2=c^2-a^2$ 得 $b^2=2^2-1^2=3$。因此標準方程為 $$\\frac{x^2}{a^2}-\\frac{y^2}{b^2}=1\\Rightarrow x^2-\\frac{y^2}{3}=1.$$ 選項 A 正確。",
+        "topic": "math_geo_3",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            -6,
+            6,
+            6,
+            -6
+          ],
+          "elements": [
+            {
+              "type": "point",
+              "coords": [
+                2,
+                0
+              ],
+              "label": "A"
+            },
+            {
+              "type": "point",
+              "coords": [
+                -2,
+                0
+              ],
+              "label": "B"
+            },
+            {
+              "type": "point",
+              "coords": [
+                1,
+                0
+              ],
+              "label": "V1"
+            },
+            {
+              "type": "point",
+              "coords": [
+                -1,
+                0
+              ],
+              "label": "V2"
+            },
+            {
+              "type": "curve",
+              "equation": "x=cosh(t), y=sqrt(3)*sinh(t)",
+              "domain": [
+                -2,
+                2
+              ]
+            },
+            {
+              "type": "curve",
+              "equation": "x=-cosh(t), y=sqrt(3)*sinh(t)",
+              "domain": [
+                -2,
+                2
+              ]
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 398,
+          "completion_tokens": 3892,
+          "total_tokens": 4290,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 3264,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_geo_4",
+      "subtopicName": "演繹幾何",
+      "categoryName": "度量、圖形與空間",
+      "question": {
+        "question": "在△ABC中，內切圓與邊$BC$相切於點$D$。已知$AB=13$，$AC=11$，並且$BD=4$。求$BC$的長度。",
+        "options": [
+          "A. $6$",
+          "B. $8$",
+          "C. $10$",
+          "D. $12$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "設邊長$a=BC$，$b=CA=11$，$c=AB=13$，半周長為$s=\\dfrac{a+b+c}{2}$。內切圓與$BC$相切於$D$，則有$BD=s-b$。\\n由已知$BD=4$，得\\n$$s-b=4\\Rightarrow\\frac{a+b+c}{2}-b=4\\Rightarrow\\frac{a-b+c}{2}=4.$$\\n代入$b=11,\\ c=13$，得到\\n$$\\frac{a-11+13}{2}=4\\Rightarrow\\frac{a+2}{2}=4\\Rightarrow a+2=8\\Rightarrow a=6.$$\\n因此$BC=6$。另外檢查三角形不等式：$11+6>13,\\ 13+6>11,\\ 11+13>6$，皆成立，結果合理。",
+        "topic": "math_geo_4",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 400,
+          "completion_tokens": 1775,
+          "total_tokens": 2175,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1408,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_geo_5",
+      "subtopicName": "平面圖形的面積與周界",
+      "categoryName": "度量、圖形與空間",
+      "question": {
+        "question": "如圖，矩形 $ABCD$ 的尺寸為 $AB=10\\ \\text{cm}$，$BC=6\\ \\text{cm}$。以邊 $AB$ 為直徑在矩形外向上構造一個半圓（半圓的弧線不重疊矩形）。求整個圖形的面積（以平方厘米為單位）。",
+        "options": [
+          "A. $60+12.5\\pi\\ \\text{cm}^2$",
+          "B. $60+25\\pi\\ \\text{cm}^2$",
+          "C. $30+12.5\\pi\\ \\text{cm}^2$",
+          "D. $75+12.5\\pi\\ \\text{cm}^2$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "把圖形分成矩形和半圓兩部分計算。\n\n矩形面積：$\\;A_{\\text{矩形}}=AB\\times BC=10\\times6=60\\;\\text{cm}^2$。\n\n半圓的直徑為 $AB=10\\;\\text{cm}$，故半徑 $r=\\dfrac{10}{2}=5\\;\\text{cm}$。半圓面積為全圓面積的一半：\n$$A_{\\text{半圓}}=\\tfrac{1}{2}\\pi r^2=\\tfrac{1}{2}\\pi(5)^2=\\tfrac{25}{2}\\pi=12.5\\pi\\;\\text{cm}^2.$$ \n\n因此總面積為\n$$A_{\\text{總}}=A_{\\text{矩形}}+A_{\\text{半圓}}=60+12.5\\pi\\;\\text{cm}^2.$$ \n\n所以正確答案為 A。",
+        "topic": "math_geo_5",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 404,
+          "completion_tokens": 1379,
+          "total_tokens": 1783,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 896,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_geo_6",
+      "subtopicName": "立體圖形",
+      "categoryName": "度量、圖形與空間",
+      "question": {
+        "question": "一個直圓錐的高為 $12$ cm，底面半徑為 $5$ cm。一個球內切於此圓錐，即球同時內切底面及與錐面的母線相切。求此球的半徑 $r$（以 cm 為單位）。",
+        "options": [
+          "A. $10/3$",
+          "B. $5/2$",
+          "C. $20/7$",
+          "D. $3$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "考慮通過錐體軸的截面（含錐頂和底圓直徑），得到一個等腰三角形，其頂點座標可設為 $(0,12)$，底邊兩端為 $(5,0)$ 和 $(-5,0)$。球心位於軸上，設為 $(0,r)$（距底面高度為 $r$）。球與側面相切，故球心到側邊直線的距離等於 $r$。\n\n過點 $(5,0)$ 與 $(0,12)$ 的直線方程為 $12x+5y-60=0$。點 $(0,r)$ 到此直線的距離為\n$$\\frac{|12\\cdot0+5r-60|}{\\sqrt{12^2+5^2}}=\\frac{|5r-60|}{13}.$$\n因為 $r<12$，可取正號，得 $\\frac{60-5r}{13}=r$。\n解之：$60-5r=13r\\Rightarrow 60=18r\\Rightarrow r=60/18=10/3$。\n\n故答案為 $10/3$ cm。",
+        "topic": "math_geo_6",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 398,
+          "completion_tokens": 1668,
+          "total_tokens": 2066,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1216,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_geo_8",
+      "subtopicName": "相似與全等",
+      "categoryName": "度量、圖形與空間",
+      "question": {
+        "question": "在△ABC中，D 在 AB 上，E 在 AC 上，且 DE ∥ BC。如圖，已知 $AD=3\\,\\text{cm}$，$DB=6\\,\\text{cm}$，$AC=15\\,\\text{cm}$。求 $CE$ 的長度。",
+        "options": [
+          "A. 10 cm",
+          "B. 5 cm",
+          "C. 7.5 cm",
+          "D. 12.5 cm"
+        ],
+        "correctAnswer": "A",
+        "explanation": "因為 DE ∥ BC，故 △ADE 與 △ABC 相似，於是有比例關係 $AD/AB=AE/AC$。\n又 $AB=AD+DB=3+6=9$，所以\n$AE=(AD/AB)\\times AC=(3/9)\\times15=5$ cm。\n因此 $CE=AC-AE=15-5=10$ cm。",
+        "topic": "math_geo_8",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 399,
+          "completion_tokens": 1666,
+          "total_tokens": 2065,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1408,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_trig_1",
+      "subtopicName": "三角比",
+      "categoryName": "三角學",
+      "question": {
+        "question": "在△ABC 中，已知 ∠A = 2∠B，且邊長 $BC=8$，$CA=6$。求角 $A$ 的度數（四捨五入至小數點一位）。",
+        "options": [
+          "A. $96.4^\\circ$",
+          "B. $83.6^\\circ$",
+          "C. $120.0^\\circ$",
+          "D. $72.0^\\circ$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "設對邊長為 $a=BC=8$（對應角 $A$），$b=CA=6$（對應角 $B$）。由正弦定理有\n$$\\frac{a}{\\sin A}=\\frac{b}{\\sin B}.$$\n因為 $A=2B$，故 $\\sin A=\\sin(2B)=2\\sin B\\cos B$。代入得\n$$\\frac{8}{2\\sin B\\cos B}=\\frac{6}{\\sin B}.$$\n注意 $\\sin B\\neq0$（$B$ 不可能為 $0^\\circ$），可約去 $\\sin B$，得到\n$$\\frac{8}{2\\cos B}=6\\quad\\Rightarrow\\quad\\frac{4}{\\cos B}=6\\quad\\Rightarrow\\quad\\cos B=\\frac{2}{3}.$$\n因此\n$$B=\\arccos\\left(\\frac{2}{3}\\right)\\approx48.1897^\\circ.$$\n所以\n$$A=2B\\approx2\\times48.1897^\\circ\\approx96.3794^\\circ\\approx96.4^\\circ.$$\n故正確答案為 A。",
+        "topic": "math_trig_1",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 393,
+          "completion_tokens": 1930,
+          "total_tokens": 2323,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1472,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_trig_2",
+      "subtopicName": "三角函數的圖像",
+      "categoryName": "三角學",
+      "question": {
+        "question": "考慮三角函數 $y=2\\sin(3x-\\pi/2)+1$ 的圖像，以下哪一項描述是正確的？",
+        "options": [
+          "A. 振幅為 $2$，週期為 $\\frac{2\\pi}{3}$，向右平移 $\\frac{\\pi}{6}$，垂直向上平移 $1$",
+          "B. 振幅為 $1$，週期為 $2\\pi$，不平移，垂直向下平移 $1$",
+          "C. 振幅為 $2$，週期為 $3\\pi$，向右平移 $\\frac{\\pi}{6}$，垂直向上平移 $1$",
+          "D. 振幅為 $2$，週期為 $\\frac{2\\pi}{3}$，向左平移 $\\frac{\\pi}{6}$，垂直向上平移 $1$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "首先把函數寫成一般形式 $y=A\\sin(Bx-C)+D$，由此讀出參數：$A=2$，$B=3$，$C=\\pi/2$，$D=1$。\n\n步驟：\n1. 振幅 $=|A|=2$。\n2. 週期 $T=\\dfrac{2\\pi}{|B|}=\\dfrac{2\\pi}{3}$。\n3. 相位平移（水平平移）為 $\\dfrac{C}{B}=\\dfrac{\\pi/2}{3}=\\dfrac{\\pi}{6}$，因為形式為 $\\sin(3x-\\pi/2)=\\sin\\big(3(x-\\frac{\\pi}{6})\\big)$，故為向右平移 $\\frac{\\pi}{6}$。\n4. 垂直平移為 $D=1$，即向上平移 $1$。\n\n因此選項 A 的所有敘述皆正確。其他選項錯誤要點：B 的振幅與週期錯誤且垂直平移方向相反；C 的週期寫成 $3\\pi$（錯誤）；D 將水平平移方向寫成向左（實際應為向右）。",
+        "topic": "math_trig_2",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            -10,
+            10,
+            10,
+            -10
+          ],
+          "elements": [
+            {
+              "type": "curve",
+              "equation": "2*sin(3*x - pi/2) + 1",
+              "domain": [
+                -6.283,
+                6.283
+              ]
+            },
+            {
+              "type": "point",
+              "coords": [
+                0.5236,
+                1
+              ],
+              "label": "P"
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 397,
+          "completion_tokens": 2828,
+          "total_tokens": 3225,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2112,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_trig_3",
+      "subtopicName": "三角恆等式",
+      "categoryName": "三角學",
+      "question": {
+        "question": "若\\theta為銳角且 $\\tan\\theta + \\cot\\theta = 4$，求 $\\sin2\\theta$ 的值。",
+        "options": [
+          "A. $\\tfrac{1}{2}$",
+          "B. $\\tfrac{\\sqrt{3}}{2}$",
+          "C. $\\tfrac{\\sqrt{2}}{2}$",
+          "D. $1$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "由恆等式有\n$$\\tan\\theta+\\cot\\theta=\\frac{\\sin^2\\theta+\\cos^2\\theta}{\\sin\\theta\\cos\\theta}=\\frac{1}{\\sin\\theta\\cos\\theta}.$$\n由題目得\n$$\\frac{1}{\\sin\\theta\\cos\\theta}=4\\quad\\Rightarrow\\quad\\sin\\theta\\cos\\theta=\\tfrac{1}{4}.$$\n因此\n$$\\sin2\\theta=2\\sin\\theta\\cos\\theta=2\\times\\tfrac{1}{4}=\\tfrac{1}{2}.$$\n又因為題中\\theta為銳角，使得\\sin\\theta\\cos\\theta>0，結果無二義性。故答案為 A。 (補充：對應的\\theta為$15^\\circ$或$75^\\circ$，均使\\sin2\\theta=1/2。)",
+        "topic": "math_trig_3",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 396,
+          "completion_tokens": 1976,
+          "total_tokens": 2372,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1600,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_trig_5",
+      "subtopicName": "弧度制與扇形",
+      "categoryName": "三角學",
+      "question": {
+        "question": "一個圓的半徑為 $12\\mathrm{cm}$，一個扇形的弧長為 $8\\pi\\mathrm{cm}$。求該扇形的面積。",
+        "options": [
+          "A. $16\\pi\\mathrm{cm}^2$",
+          "B. $48\\pi\\mathrm{cm}^2$",
+          "C. $32\\pi\\mathrm{cm}^2$",
+          "D. $24\\pi\\mathrm{cm}^2$"
+        ],
+        "correctAnswer": "B",
+        "explanation": "已知弧長與半徑的關係為 $s=r\\theta$（以弧度為單位）。\n因此\n$$\\theta=\\frac{s}{r}=\\frac{8\\pi}{12}=\\frac{2\\pi}{3}\\ \\text{(弧度)}.$$\n扇形面積公式為\n$$A=\\frac{1}{2}r^2\\theta.$$\n代入 $r=12$ 及 $\\theta=\\frac{2\\pi}{3}$ 得：\n$$A=\\frac{1}{2}\\times12^2\\times\\frac{2\\pi}{3}=\\frac{1}{2}\\times144\\times\\frac{2\\pi}{3}=48\\pi\\ \\mathrm{cm}^2.$$\n因此正確答案為 B。",
+        "topic": "math_trig_5",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 398,
+          "completion_tokens": 1773,
+          "total_tokens": 2171,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1408,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_trig_6",
+      "subtopicName": "二維與三維問題",
+      "categoryName": "三角學",
+      "question": {
+        "question": "一個長方體的長、闊、高分別為 $6\\,\\text{m}$、$8\\,\\text{m}$、$10\\,\\text{m}$。設 $A$ 為底面的一個角，$C$ 為與 $A$ 對角的頂角（即經過空間對角線連接的頂點）。求空間對角線 $AC$ 與底面之間的夾角。",
+        "options": [
+          "A. $30^\\circ$",
+          "B. $45^\\circ$",
+          "C. $60^\\circ$",
+          "D. $\\arctan\\left(\\dfrac{5}{3}\\right)$"
+        ],
+        "correctAnswer": "B",
+        "explanation": "設所求角為 $\\theta$，則 $\\theta$ 為空間對角線 $AC$ 與其在底面的投影之間的角。底面上 $A$ 到對角投影的距離為底面對角長：$$\\sqrt{6^2+8^2}=\\sqrt{36+64}=\\sqrt{100}=10\\,\\text{m}.$$ 空間對角線的垂直高度等於長方體的高度 $10\\,\\text{m}$。因此 $$\\tan\\theta=\\frac{\\text{高}}{\\text{投影長}}=\\frac{10}{10}=1.$$ 故 $\\theta=45^\\circ$。因此正確答案為 B。",
+        "topic": "math_trig_6",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 396,
+          "completion_tokens": 1547,
+          "total_tokens": 1943,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1152,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_stat_1",
+      "subtopicName": "統計的表達方式",
+      "categoryName": "數據處理",
+      "question": {
+        "question": "某校對 100 名學生的測驗成績作分組統計，結果如下表：\n\n成績分組（分） | 頻數\n0–19 | 12\n20–39 | 25\n40–59 | 30\n60–79 | 20\n80–99 | 13\n\n試估算該 100 名學生成績的中位數（以分組資料作連續性修正並用線性內插法）。",
+        "options": [
+          "A. 約 $48.2$ 分",
+          "B. 約 $49.0$ 分",
+          "C. 約 $50.0$ 分",
+          "D. 約 $46.5$ 分"
+        ],
+        "correctAnswer": "A",
+        "explanation": "總樣本數 $N=100$，中位數位置為第 $N/2=50$ 個觀察值。\n\n計算累積頻數：\n0–19: 12\n20–39: 12+25=37\n40–59: 37+30=67 → 中位數所在組為 $40$–$59$ 組。\n\n對於分組資料常用連續性修正，將該組下界取為 $L=39.5$，組距 $h=20$，該組頻數 $f=30$，該組之前的累積頻數 $cf_{before}=37$。\n\n用線性內插公式估中位數：\n$$\text{中位數}=L+\\frac{\\frac{N}{2}-cf_{before}}{f}\\times h\n=39.5+\\frac{50-37}{30}\\times20. $$\n計算得：\n$$39.5+\\frac{13}{30}\\times20=39.5+8.666\\dots=48.166\\dots$$\n因此中位數約為 $48.2$ 分。",
+        "topic": "math_stat_1",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 396,
+          "completion_tokens": 1253,
+          "total_tokens": 1649,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 768,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_stat_2",
+      "subtopicName": "集中趨勢的量度",
+      "categoryName": "數據處理",
+      "question": {
+        "question": "某班有 25 名學生，數學測驗分數按分數組錄得如下：\n\n40–49 分：3 人\n50–59 分：7 人\n60–69 分：9 人\n70–79 分：6 人\n\n以組距中點估計該班的平均分數，最接近下列哪一項？",
+        "options": [
+          "A. 61.7 分",
+          "B. 63.3 分",
+          "C. 64.5 分",
+          "D. 62.8 分"
+        ],
+        "correctAnswer": "A",
+        "explanation": "用組距中點估算平均數。各組的中點為：\n40–49 的中點 $=44.5$，頻數 $=3$\n50–59 的中點 $=54.5$，頻數 $=7$\n60–69 的中點 $=64.5$，頻數 $=9$\n70–79 的中點 $=74.5$，頻數 $=6$\n\n計算總和：\n$$\\sum (\\text{中點}\\times\\text{頻數})=44.5\\times3+54.5\\times7+64.5\\times9+74.5\\times6$$\n分別計算得：$133.5+381.5+580.5+447=1542.5$。\n\n平均數估計為：\n$$\\bar{x}=\\dfrac{1542.5}{25}=61.7$$\n\n因此最接近的是 A 選項 $61.7$ 分。\n\n(備註：選項 B $63.3$ 為中位數的插值估計值；C 為眾數組中點；D 為干擾選項。)",
+        "topic": "math_stat_2",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 397,
+          "completion_tokens": 1934,
+          "total_tokens": 2331,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1472,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_stat_3",
+      "subtopicName": "離差的量度",
+      "categoryName": "數據處理",
+      "question": {
+        "question": "某次測驗成績的數據集合 $X$ 的平均數為 $70$，標準差為 $6$。現在把每位學生的分數按公式 $Y=0.9X+5$ 轉換成新分數。試問新分數的標準差為多少？（題目主題：離差的量度）",
+        "options": [
+          "A. $5.4$",
+          "B. $4.86$",
+          "C. $11.4$",
+          "D. $\\sqrt{0.9^{2}\\times36+25}\\approx7.36$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "已知對隨機變量或數據集，若作線性變換 $Y=aX+b$，則方差有關係 $\\mathrm{Var}(Y)=a^{2}\\mathrm{Var}(X)$，而標準差為 $\\sigma_{Y}=|a|\\sigma_{X}$。題中 $a=0.9$，原來的標準差 $\\sigma_{X}=6$，因此 $$\\sigma_{Y}=|0.9|\\times6=0.9\\times6=5.4.$$ 加上常數 $5$ 不會改變離差量度，故正確答案為 $5.4$。",
+        "topic": "math_stat_3",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 395,
+          "completion_tokens": 1180,
+          "total_tokens": 1575,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 832,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_stat_4",
+      "subtopicName": "概率",
+      "categoryName": "數據處理",
+      "question": {
+        "question": "一個袋子內有 $5$ 個紅球、$4$ 個藍球和 $3$ 個綠球，合共 $12$ 個球。從中不放回地隨機抽取 $2$ 個球，求抽得的兩球為同一顏色的機率為多少？",
+        "options": [
+          "A. $\\frac{19}{66}$",
+          "B. $\\frac{7}{24}$",
+          "C. $\\frac{5}{11}$",
+          "D. $\\frac{11}{33}$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "方法一（順序法）：總球數為 $12$。\nP(兩球同色)=P(兩紅)+P(兩藍)+P(兩綠)。\nP(兩紅)=\\frac{5}{12}\\times\\frac{4}{11}=\\frac{20}{132}=\\frac{5}{33}。\nP(兩藍)=\\frac{4}{12}\\times\\frac{3}{11}=\\frac{12}{132}=\\frac{1}{11}。\nP(兩綠)=\\frac{3}{12}\\times\\frac{2}{11}=\\frac{6}{132}=\\frac{1}{22}。\n將三項相加：\\frac{5}{33}+\\frac{1}{11}+\\frac{1}{22}=\\frac{20+12+6}{132}=\\frac{38}{132}=\\frac{19}{66}。\n\n方法二（組合數）：有利情況數為 C(5,2)+C(4,2)+C(3,2)=10+6+3=19，總情況數為 C(12,2)=66，因此機率為 \\frac{19}{66}。\n\n故正確答案為 $\\frac{19}{66}$。",
+        "topic": "math_stat_4",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 391,
+          "completion_tokens": 1369,
+          "total_tokens": 1760,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 896,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_stat_5",
+      "subtopicName": "排列與組合",
+      "categoryName": "數據處理",
+      "question": {
+        "question": "某班有 6 名男生（其中兩位為甲、乙）和 5 名女生，從中選出 4 人組成代表隊，要求至少有 2 名女生，且甲、乙不能同時入選。問有多少種不同的選法？",
+        "options": [
+          "A. 205",
+          "B. 215",
+          "C. 190",
+          "D. 200"
+        ],
+        "correctAnswer": "A",
+        "explanation": "先計算不考慮甲、乙限制、僅以「至少 2 名女生」為條件的選法數：\n- 有 2 女生、2 男生：$\\binom{5}{2}\\binom{6}{2}=10\\times15=150$\n- 有 3 女生、1 男生：$\\binom{5}{3}\\binom{6}{1}=10\\times6=60$\n- 有 4 女生：$\\binom{5}{4}\\binom{6}{0}=5\\times1=5$\n因此合計為 $150+60+5=215$ 種。\n接著扣除違反「甲、乙不能同時入選」的情況。若甲、乙同時入選（即兩位男生已確定），為滿足「至少 2 女生」，剩下的 2 位必須均為女生，這種情況共有 $\\binom{5}{2}=10$ 種。因此有效的選法數為 $215-10=205$。",
+        "topic": "math_stat_5",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 394,
+          "completion_tokens": 2123,
+          "total_tokens": 2517,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1728,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m1_1",
+      "subtopicName": "二項式展開",
+      "categoryName": "M1 微積分與統計",
+      "question": {
+        "question": "將多項式 $ (1+2x)^{7}(1-x)^{4} $ 展開後，常數項與各次項的係數中，$x^{5}$ 的係數為何？",
+        "options": [
+          "A. $-210$",
+          "B. $210$",
+          "C. $-126$",
+          "D. $-120$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "要找 $x^{5}$ 的係數，可用二項式展開後做卷積。設在 $(1+2x)^{7}$ 中取 $x^{k}$ 項，在 $(1-x)^{4}$ 中取 $x^{5-k}$ 項，則該組合對 $x^{5}$ 的貢獻為\n\n$\\displaystyle {7\\choose k}2^{k}\\cdot {4\\choose 5-k}(-1)^{5-k}$。\n\n注意當 $5-k>4$ 時二項式係數為 $0$，因此 $k$ 只需由 $1$ 到 $5$。故 $x^{5}$ 的總係數為\n\n$\\displaystyle \\sum_{k=1}^{5} {7\\choose k}2^{k}{4\\choose 5-k}(-1)^{5-k}$. 計算各項：\n\n- $k=1$：${7\\choose1}2^{1}{4\\choose4}(-1)^{4}=7\\times2\\times1\\times1=14$。\n- $k=2$：${7\\choose2}2^{2}{4\\choose3}(-1)^{3}=21\\times4\\times4\\times(-1)=-336$。\n- $k=3$：${7\\choose3}2^{3}{4\\choose2}(-1)^{2}=35\\times8\\times6\\times1=1680$。\n- $k=4$：${7\\choose4}2^{4}{4\\choose1}(-1)^{1}=35\\times16\\times4\\times(-1)=-2240$。\n- $k=5$：${7\\choose5}2^{5}{4\\choose0}(-1)^{0}=21\\times32\\times1\\times1=672$。\n\n將以上相加：\n\n$14-336+1680-2240+672=-210$。\n\n因此 $x^{5}$ 的係數為 $-210$。",
+        "topic": "math_m1_1",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 400,
+          "completion_tokens": 1512,
+          "total_tokens": 1912,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 896,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m1_2",
+      "subtopicName": "極限與微分",
+      "categoryName": "M1 微積分與統計",
+      "question": {
+        "question": "設函數\n$$f(x)=\\begin{cases}x^{2}\\sin\\left(\\dfrac{1}{x}\\right),&x\\neq0,\\\\[4pt]0,&x=0.\\end{cases}$$\n試問若干關於 $f$ 在 $x=0$ 的性質，下列哪一項正確？",
+        "options": [
+          "A. $f'(0)=0$ 且 $f'$ 在 $0$ 連續。",
+          "B. $f'(0)=0$ 但 $f'$ 在 $0$ 不連續。",
+          "C. $f'(0)$ 不存在。",
+          "D. $f'(0)=1$。"
+        ],
+        "correctAnswer": "B",
+        "explanation": "先計算 $f'(0)$：\n由定義\n$$f'(0)=\\lim_{h\\to0}\\frac{f(h)-f(0)}{h}=\\lim_{h\\to0}\\frac{h^{2}\\sin(1/h)-0}{h}=\\lim_{h\\to0}h\\sin(1/h).$$\n因為 $|h\\sin(1/h)|\\le|h|$，當 $h\\to0$ 時極限為 $0$，故 $f'(0)=0$.\\\n再看 $x\\neq0$ 時的導數：對 $f(x)=x^{2}\\sin(1/x)$ 取導，得\n$$f'(x)=2x\\sin(1/x)+x^{2}\\cdot\\cos(1/x)\\cdot\\left(-\\dfrac{1}{x^{2}}\\right)=2x\\sin(1/x)-\\cos(1/x).$$\n當 $x\\to0$ 時，項 $2x\\sin(1/x)\\to0$，但 $-\\cos(1/x)$ 在 $[-1,1]$ 之間震盪且無極限，因此 $\\lim_{x\\to0}f'(x)$ 不存在，表示 $f'$ 在 $0$ 不連續。\\\n綜上所述，正確選項為 B。",
+        "topic": "math_m1_2",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 400,
+          "completion_tokens": 2005,
+          "total_tokens": 2405,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1472,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m1_4",
+      "subtopicName": "積分",
+      "categoryName": "M1 微積分與統計",
+      "question": {
+        "question": "計算定積分 $I=\\int_0^1 \\frac{x^2}{x^3+1}\\,dx$ 的值。",
+        "options": [
+          "A. $\\frac{1}{3}\\ln 2$",
+          "B. $\\frac{1}{2}\\ln 2$",
+          "C. $\\ln 2$",
+          "D. $\\frac{1}{3}\\ln 3$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "令 $u=x^3+1$，則 $du=3x^2\\,dx$，即 $x^2\\,dx=\\dfrac{1}{3}\\,du$。當 $x=0$ 時 $u=1$；當 $x=1$ 時 $u=2$。因此\n\n$$\nI=\\int_0^1 \\frac{x^2}{x^3+1}\\,dx=\\frac{1}{3}\\int_{1}^{2}\\frac{1}{u}\\,du=\\frac{1}{3}[\\ln u]_{1}^{2}=\\frac{1}{3}\\ln 2.\n$$\n故正確答案為 $\\dfrac{1}{3}\\ln 2$。",
+        "topic": "math_m1_4",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 397,
+          "completion_tokens": 1543,
+          "total_tokens": 1940,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1216,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m1_5",
+      "subtopicName": "定積分的應用",
+      "categoryName": "M1 微積分與統計",
+      "question": {
+        "question": "已知兩曲線 $y=x^{2}$ 與 $y=2x+1$ 所圍成的平面區域。求該區域的面積。",
+        "options": [
+          "A. $\\dfrac{8\\sqrt{2}}{3}$",
+          "B. $\\dfrac{8}{3}$",
+          "C. $\\dfrac{16\\sqrt{2}}{3}$",
+          "D. $\\dfrac{4\\sqrt{2}}{3}$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "先求交點：解 $x^{2}=2x+1$，得 $x^{2}-2x-1=0$，所以兩交點為 $x=1\\pm\\sqrt{2}$。\n所求面積為兩曲線上方減下方之定積分：\n$$\\text{Area}=\\int_{1-\\sqrt{2}}^{1+\\sqrt{2}}\\bigl((2x+1)-x^{2}\\bigr)\\,dx.$$ \n計算不定積分：\n$$\\int(2x+1-x^{2})\\,dx=x^{2}+x-\\frac{x^{3}}{3}+C.$$\n因此\n$$\\begin{aligned}\n\\text{Area}&=\\Bigl[x^{2}+x-\\frac{x^{3}}{3}\\Bigr]_{1-\\sqrt{2}}^{1+\\sqrt{2}} \\\\ \n&=\\bigl(\\alpha^{2}+\\alpha-\\tfrac{\\alpha^{3}}{3}\\bigr)-\\bigl(\\beta^{2}+\\beta-\\tfrac{\\beta^{3}}{3}\\bigr),\\quad\\text{設 }\\alpha=1+\\sqrt{2},\\ \\beta=1-\\sqrt{2}.\\end{aligned}$$\n利用代數關係 $\\alpha-\\beta=2\\sqrt{2}$，$\\alpha+\\beta=2$，$\\alpha\\beta=-1$，可得\n$$\\alpha^{2}-\\beta^{2}=(\\alpha-\\beta)(\\alpha+\\beta)=4\\sqrt{2},$$\n$$\\alpha^{3}-\\beta^{3}=(\\alpha-\\beta)(\\alpha^{2}+\\alpha\\beta+\\beta^{2})=(2\\sqrt{2})(6-1)=10\\sqrt{2}.$$\n故\n$$\\text{Area}=4\\sqrt{2}+2\\sqrt{2}-\\frac{1}{3}\\cdot10\\sqrt{2}=\\frac{8\\sqrt{2}}{3}.$$",
+        "topic": "math_m1_5",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            -1,
+            3,
+            6,
+            -2
+          ],
+          "elements": [
+            {
+              "type": "point",
+              "coords": [
+                -0.4142135624,
+                0.1715728753
+              ],
+              "label": "P"
+            },
+            {
+              "type": "point",
+              "coords": [
+                2.4142135624,
+                5.8284271247
+              ],
+              "label": "Q"
+            },
+            {
+              "type": "curve",
+              "equation": "x^2",
+              "domain": [
+                -1,
+                3
+              ]
+            },
+            {
+              "type": "curve",
+              "equation": "2*x+1",
+              "domain": [
+                -1,
+                3
+              ]
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 401,
+          "completion_tokens": 2938,
+          "total_tokens": 3339,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2112,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m1_7",
+      "subtopicName": "二項分佈",
+      "categoryName": "M1 微積分與統計",
+      "question": {
+        "question": "假設隨機變數 $X\\sim \\text{Bin}(8,0.3)$（有 8 次獨立試驗，每次成功的機率為 0.3）。求至少有 2 次成功的機率 $P(X\\ge 2)$。",
+        "options": [
+          "A. $0.7447$",
+          "B. $0.2553$",
+          "C. $0.4380$",
+          "D. $0.8820$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "設 $X\\sim\\text{Bin}(8,0.3)$，有一般公式 $P(X=k)=C(8,k)\\,0.3^k\\,0.7^{8-k}$。\n\n要計算 $P(X\\ge2)$，較方便用補集：\n$$P(X\\ge2)=1-P(X=0)-P(X=1).$$\n\n計算各項：\n$P(X=0)=0.7^8\\approx0.05764801$，\n$P(X=1)=8\\times0.3\\times0.7^7\\approx8\\times0.3\\times0.0823543\\approx0.19765032$。\n\n因此\n$$P(X\\ge2)=1-0.05764801-0.19765032\\approx0.74470167\\approx0.7447.$$\n\n故正確答案為 A。",
+        "topic": "math_m1_7",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 400,
+          "completion_tokens": 1469,
+          "total_tokens": 1869,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1088,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m1_8",
+      "subtopicName": "正態分佈",
+      "categoryName": "M1 微積分與統計",
+      "question": {
+        "question": "已知隨機變量 $X$ 服從正態分佈 $N(\\mu,\\sigma^2)$，且 $P(X>70)=0.05$ 及 $P(X<50)=0.05$。試求 $\\mu$ 及 $\\sigma$。",
+        "options": [
+          "A. $\\mu=60,\\;\\sigma\\approx6.08$",
+          "B. $\\mu=60,\\;\\sigma=5$",
+          "C. $\\mu=65,\\;\\sigma\\approx6.08$",
+          "D. $\\mu=60,\\;\\sigma\\approx4.83$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "由已知條件，$P(X>70)=0.05$，故標準化得 $\\dfrac{70-\\mu}{\\sigma}=z_{0.05}$，其中上尾機率為 $0.05$ 的標準常態分位數 $z_{0.05}\\approx1.645$。因此有\n$$70-\\mu=1.645\\sigma.\\\\\n(1)$$\n同理由 $P(X<50)=0.05$ 可得\n$$\\dfrac{50-\\mu}{\\sigma}= -1.645\\Rightarrow 50-\\mu=-1.645\\sigma.\\\\\n(2)$$\n將 (2) 從 (1) 相減，得到\n$$20=(70-\\mu)-(50-\\mu)=1.645\\sigma-(-1.645\\sigma)=3.29\\sigma.$$因此\n$$\\sigma=\\dfrac{20}{3.29}\\approx6.078\\approx6.08.$$\n代回 (1)：\n$$\\mu=70-1.645\\times6.078\\approx70-10\\approx60.$$\n所以 $\\mu=60$，$\\sigma\\approx6.08$，故選項 A 正確。",
+        "topic": "math_m1_8",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 400,
+          "completion_tokens": 1264,
+          "total_tokens": 1664,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 768,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m1_9",
+      "subtopicName": "抽樣分佈與估計",
+      "categoryName": "M1 微積分與統計",
+      "question": {
+        "question": "某母體的常態分佈標準差已知為 $\\sigma=10$，從中抽出大小為 $n=25$ 的簡單隨機樣本，樣本平均為 $\\bar{X}=72$。試以 $95\\%$ 信心水準估計母體平均 $\\mu$，下列哪一項為正確的 $95\\%$ 信賴區間？",
+        "options": [
+          "A. $\\;(68.08,\\;75.92)\\;$",
+          "B. $\\;(67.87,\\;76.13)\\;$",
+          "C. $\\;(67.34,\\;76.66)\\;$",
+          "D. $\\;(71.22,\\;72.78)\\;$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "已知母體標準差 $\\sigma=10$，樣本大小 $n=25$，樣本平均 $\\bar{X}=72$。樣本平均數的抽樣分佈為 $\\bar{X}\\sim N\\big(\\mu,\\;\\sigma^2/n\\big)$，故標準誤為\n$$SE=\\frac{\\sigma}{\\sqrt{n}}=\\frac{10}{\\sqrt{25}}=2.$$\n對於 $95\\%$ 信心水準，臨界值為 $z_{0.025}=1.96$。因此 $95\\%$ 信賴區間為\n$$\\bar{X}\\pm z_{0.025}\\,SE=72\\pm 1.96\\times 2=72\\pm 3.92.$$\n計算得信賴區間為\n$$(72-3.92,\\;72+3.92)=(68.08,\\;75.92).$$\n選項 A 正確。\n(備註：選項 B 使用的是 $t$ 值近似，選項 C 使用較大的 $z$ 值，選項 D 錯誤地以 $\\sigma/ n$ 而非 $\\sigma/\\sqrt{n}$ 作為標準誤。)",
+        "topic": "math_m1_9",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 403,
+          "completion_tokens": 1625,
+          "total_tokens": 2028,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1088,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_2",
+      "subtopicName": "二項式定理",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "在展開式 $\\left(x+\\dfrac{2}{x^2}\\right)^8$ 中，求 $x^5$ 的係數。",
+        "options": [
+          "A. 8",
+          "B. 16",
+          "C. 32",
+          "D. 48"
+        ],
+        "correctAnswer": "B",
+        "explanation": "一般第 $k$ 項為：\n$$\\binom{8}{k} x^{k}\\left(\\frac{2}{x^2}\\right)^{8-k}=\\binom{8}{k}2^{8-k} x^{k-2(8-k)}=\\binom{8}{k}2^{8-k} x^{3k-16}.$$\n要使該項為 $x^5$，需滿足 $3k-16=5$，故 $3k=21$，得 $k=7$。\n代回係數為：\n$$\\binom{8}{7}2^{8-7}=\\binom{8}{7}\\cdot2=8\\times2=16.$$",
+        "topic": "math_m2_2",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 401,
+          "completion_tokens": 1576,
+          "total_tokens": 1977,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1280,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_3",
+      "subtopicName": "三角學進階",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "設函數 $f(x)=3\\sin x+4\\cos x$。求 $f(x)$ 在區間 $[0,2\\pi)$ 上的最大值，並選出一個對應的 $x$ 值。",
+        "options": [
+          "A. 最大值為 $5$，且在 $[0,2\\pi)$ 的一個對應值為 $x=\\dfrac{\\pi}{2}-\\arctan\\dfrac{4}{3}$。",
+          "B. 最大值為 $5$，且在 $[0,2\\pi)$ 的一個對應值為 $x=\\dfrac{\\pi}{2}+\\arctan\\dfrac{4}{3}$。",
+          "C. 最大值為 $\\sqrt{7}$，且在 $[0,2\\pi)$ 的一個對應值為 $x=\\arctan\\dfrac{3}{4}$。",
+          "D. 最大值為 $4$，且在 $[0,2\\pi)$ 的一個對應值為 $x=0$。"
+        ],
+        "correctAnswer": "A",
+        "explanation": "將 $f(x)=3\\sin x+4\\cos x$ 化為振幅形式：令 $R=\\sqrt{3^2+4^2}=5$，存在角度 $\\phi$ 使得\n$$\\cos\\phi=\\dfrac{3}{5},\\qquad \\sin\\phi=\\dfrac{4}{5}.$$\n因此\n$$f(x)=5\\bigl(\\sin x\\cos\\phi+\\cos x\\sin\\phi\\bigr)=5\\sin(x+\\phi).$$\n因此 $f(x)$ 的最大值為 $5$，當且僅當 $\\sin(x+\\phi)=1$ 時達到，即\n$$x+\\phi=\\dfrac{\\pi}{2}+2k\\pi\\ (k\\in\\mathbb{Z}).$$\n所以\n$$x=\\dfrac{\\pi}{2}-\\phi+2k\\pi.$$\n由於 $\\phi=\\arctan\\dfrac{4}{3}$，在 $[0,2\\pi)$ 內的一個對應值為\n$$x=\\dfrac{\\pi}{2}-\\arctan\\dfrac{4}{3}.$$\n故選項 A 正確。其餘選項要么給出錯誤的 $x$，要么給出錯誤的最大值。 ",
+        "topic": "math_m2_3",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 401,
+          "completion_tokens": 2216,
+          "total_tokens": 2617,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1600,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_4",
+      "subtopicName": "e 和自然對數",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "已知方程 $\\ln x+\\ln(x-1)=1$，求滿足方程的實數 $x$（以含 $e$ 的代數式表示）。",
+        "options": [
+          "A. $\\dfrac{1+\\sqrt{1+4e}}{2}$",
+          "B. $\\dfrac{1-\\sqrt{1+4e}}{2}$",
+          "C. $e+1$",
+          "D. $e$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "先注意定義域，因為有 $\\ln x$ 與 $\\ln(x-1)$，所以需有 $x>1$.\\n利用對數性質合併：$$\\ln x+\\ln(x-1)=\\ln\\big(x(x-1)\\big)=1.$$兩邊取指數得：$$x(x-1)=e.$$整理得二次方程：$$x^2-x-e=0.$$由二次公式得解：$$x=\\frac{1\\pm\\sqrt{1+4e}}{2}.$$由定義域 $x>1$，計算可知帶 \"+\" 的根為正且大於 1，而帶 \"-\" 的根為負或小於 1，因此符合條件的解為$$x=\\frac{1+\\sqrt{1+4e}}{2}.$$故選 A。",
+        "topic": "math_m2_4",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 401,
+          "completion_tokens": 1904,
+          "total_tokens": 2305,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1536,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_5",
+      "subtopicName": "極限",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "求極限：$$\\lim_{x\\to 0}\\frac{\\sin x - x\\cos x}{x^3}$$",
+        "options": [
+          "A. $\\dfrac{1}{3}$",
+          "B. $0$",
+          "C. $-\\dfrac{1}{3}$",
+          "D. $\\dfrac{1}{6}$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "方法一（泰勒展開）：當 $x\\to0$，有 $\\sin x= x - \\dfrac{x^3}{6}+o(x^3)$，$\\cos x=1-\\dfrac{x^2}{2}+o(x^2)$。故分子\n$$\\sin x - x\\cos x=(x-\\frac{x^3}{6}+o(x^3))-x\\bigl(1-\\frac{x^2}{2}+o(x^2)\\bigr)=\\frac{x^3}{3}+o(x^3).$$\n因此\n$$\\lim_{x\\to0}\\frac{\\sin x - x\\cos x}{x^3}=\\frac{1}{3}.$$方法二（洛必達法則三次）：設 $f(x)=\\sin x - x\\cos x$，則\n$f'(x)=x\\sin x$，$f''(x)=\\sin x + x\\cos x$，$f'''(x)=2\\cos x - x\\sin x$。\n對分母 $g(x)=x^3$，$g'''(x)=6$。由於分子與分母在 $0$ 處皆為 $0$，連續使用洛必達法則三次得\n$$\\lim_{x\\to0}\\frac{f(x)}{g(x)}=\\frac{f'''(0)}{g'''(0)}=\\frac{2}{6}=\\frac{1}{3}.$$因此答案為 $\\dfrac{1}{3}$。",
+        "topic": "math_m2_5",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 398,
+          "completion_tokens": 1965,
+          "total_tokens": 2363,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1472,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_6",
+      "subtopicName": "微分法",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "設函數 $$f(x)=x^3-6x^2+9x+1$$。求曲線 $y=f(x)$ 在 $x=2$ 處的切線方程為何？",
+        "options": [
+          "A. $y=-3x+9$",
+          "B. $y=-3x+3$",
+          "C. $y=3x-3$",
+          "D. $y=x-1$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "先求導數：$$f'(x)=3x^2-12x+9.$$代入 $x=2$ 得切線斜率：$$f'(2)=3(2)^2-12(2)+9=12-24+9=-3.$$函數值為：$$f(2)=2^3-6\\cdot2^2+9\\cdot2+1=8-24+18+1=3.$$因此切線方程為：$$y-3=-3(x-2)\\Rightarrow y=-3x+9.$$故正確答案為 A。",
+        "topic": "math_m2_6",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            -1,
+            6,
+            6,
+            -4
+          ],
+          "elements": [
+            {
+              "type": "curve",
+              "equation": "x^3 - 6*x^2 + 9*x + 1",
+              "domain": [
+                -1,
+                5
+              ]
+            },
+            {
+              "type": "point",
+              "coords": [
+                2,
+                3
+              ],
+              "label": "A"
+            },
+            {
+              "type": "line",
+              "points": [
+                [
+                  1,
+                  6
+                ],
+                [
+                  4,
+                  -3
+                ]
+              ]
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 399,
+          "completion_tokens": 2037,
+          "total_tokens": 2436,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1600,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_7",
+      "subtopicName": "微分的應用",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "在第一象限內，一個矩形的一個角位於原點，另一個對角頂點位於曲線 $$y=4-x^2$$ 上且與坐標軸平行。問該矩形的面積之最大值為何？",
+        "options": [
+          "A. 最大面積為 $\\dfrac{16\\sqrt{3}}{9}$",
+          "B. 最大面積為 $\\dfrac{8}{3}$",
+          "C. 最大面積為 $\\dfrac{32}{9}$",
+          "D. 最大面積為 $\\dfrac{4\\sqrt{3}}{3}$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "設矩形位於第一象限，對角頂點為 $(x,y)$ 在曲線 $y=4-x^2$ 上，且 $x\\ge0,\\ y\\ge0$。矩形面積為 $A=xy$，代入得\n$$A(x)=x(4-x^2)=4x-x^3,\\quad 0\\le x\\le2.$$\n對 $A(x)$ 微分：\n$$A'(x)=4-3x^2.$$\n令 $A'(x)=0$ 得\n$$4-3x^2=0\\Rightarrow x^2=\\frac{4}{3}\\Rightarrow x=\\frac{2}{\\sqrt{3}}\\ (>0).$$\n第二導數為\n$$A''(x)=-6x,$$\n在 $x=\\dfrac{2}{\\sqrt{3}}$ 時 $A''<0$，故為極大值。代回計算最大面積：\n$$A_{\\max}=4\\cdot\\frac{2}{\\sqrt{3}}-\\left(\\frac{2}{\\sqrt{3}}\\right)^3=\\frac{8}{\\sqrt{3}}-\\frac{8}{3\\sqrt{3}}=\\frac{16}{3\\sqrt{3}}=\\frac{16\\sqrt{3}}{9}.$$",
+        "topic": "math_m2_7",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 401,
+          "completion_tokens": 1413,
+          "total_tokens": 1814,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 896,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_8",
+      "subtopicName": "不定積分",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "計算下列不定積分的原函數：\n\n$$\\int \\frac{x^{2}}{x^{3}+1}\\,dx$$",
+        "options": [
+          "A. $\\frac{1}{3}\\ln|x^{3}+1|+C$",
+          "B. $\\ln|x^{3}+1|+C$",
+          "C. $\\tfrac{1}{2}\\ln|x^{3}+1|+C$",
+          "D. $\\tfrac{1}{3}(x^{3}+1)^{-1}+C$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "令 $u=x^{3}+1$，則 $du=3x^{2}\\,dx$。因此\n\n$$\\int \\frac{x^{2}}{x^{3}+1}\\,dx=\\int \\frac{1}{3}\\frac{du}{u}=\\frac{1}{3}\\ln|u|+C=\\frac{1}{3}\\ln|x^{3}+1|+C.$$ \n\n選項說明：B 和 C 的常數因子錯誤；D 則誤把積分結果寫成 $(x^{3}+1)^{-1}$ 的形式，與正確的對數形式不同。",
+        "topic": "math_m2_8",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 400,
+          "completion_tokens": 1679,
+          "total_tokens": 2079,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1344,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_9",
+      "subtopicName": "定積分",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "計算定積分 $I=\\int_{0}^{1}\\dfrac{x^{2}}{x^{3}+1}dx$ 的值為何？",
+        "options": [
+          "A. $\\ln 2$",
+          "B. $\\dfrac{1}{3}\\ln 2$",
+          "C. $\\dfrac{1}{2}\\ln 2$",
+          "D. $\\ln 3 - \\ln 2$"
+        ],
+        "correctAnswer": "B",
+        "explanation": "令 $u=x^{3}+1$，則 $du=3x^{2}\\,dx$。當 $x=0$ 時 $u=1$；當 $x=1$ 時 $u=2$。因此\n\n$$I=\\int_{0}^{1}\\dfrac{x^{2}}{x^{3}+1}dx=\\int_{u=1}^{2}\\dfrac{1}{u}\\cdot\\dfrac{du}{3}=\\dfrac{1}{3}\\int_{1}^{2}\\dfrac{1}{u}\\,du=\\dfrac{1}{3}[\\ln u]_{1}^{2}=\\dfrac{1}{3}\\ln 2.$$",
+        "topic": "math_m2_9",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 399,
+          "completion_tokens": 1396,
+          "total_tokens": 1795,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1088,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_10",
+      "subtopicName": "定積分的應用",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "下列為由曲線 $y=x^2$ 與 $y=2-x$ 所圍成的封閉圖形。求該圖形的面積。",
+        "options": [
+          "A. $\\frac{9}{2}$",
+          "B. $\\frac{7}{2}$",
+          "C. $\\frac{11}{2}$",
+          "D. $5$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "先找交點：解 $x^2=2-x$，得到 $x^2+x-2=0$，因式分解為 $(x+2)(x-1)=0$，所以交點在 $x=-2$ 和 $x=1$。\n\n在區間 $[-2,1]$ 上，$y=2-x$ 在上方，$y=x^2$ 在下方，故面積為兩曲線之差的定積分：\n$$\\text{Area}=\\int_{-2}^{1}\\bigl[(2-x)-x^2\\bigr]\\,dx=\\int_{-2}^{1}(2-x-x^2)\\,dx.$$\n計算不定積分：\n$$\\int(2-x-x^2)\\,dx=2x-\\frac{x^2}{2}-\\frac{x^3}{3}+C.$$\n代入上下限：\n\\begin{align*}\n\\Bigl(2x-\\frac{x^2}{2}-\\frac{x^3}{3}\\Bigr)\\Big|_{-2}^{1}\n&=\\Bigl(2-\\frac{1}{2}-\\frac{1}{3}\\Bigr)-\\Bigl(-4-\\frac{4}{2}-\\frac{-8}{3}\\Bigr) \\\\\n&=\\Bigl(2-\\frac{1}{2}-\\frac{1}{3}\\Bigr)-\\Bigl(-4-2+\\frac{8}{3}\\Bigr) \\\\\n&=\\frac{7}{6}-\\Bigl(-\\frac{10}{3}\\Bigr)=\\frac{7}{6}+\\frac{10}{3}=\\frac{27}{6}=\\frac{9}{2}.\n\\end{align*}\n因此正確答案為 $\\boxed{\\frac{9}{2}}$。",
+        "topic": "math_m2_10",
+        "score": 1,
+        "graphData": {
+          "type": "coordinate",
+          "boundingBox": [
+            -3,
+            -1,
+            3,
+            5
+          ],
+          "elements": [
+            {
+              "type": "curve",
+              "equation": "x^2",
+              "domain": [
+                -3,
+                3
+              ]
+            },
+            {
+              "type": "curve",
+              "equation": "2 - x",
+              "domain": [
+                -3,
+                3
+              ]
+            },
+            {
+              "type": "point",
+              "coords": [
+                -2,
+                4
+              ],
+              "label": "A"
+            },
+            {
+              "type": "point",
+              "coords": [
+                1,
+                1
+              ],
+              "label": "B"
+            }
+          ],
+          "showGrid": true,
+          "showAxis": true
+        },
+        "usage": {
+          "prompt_tokens": 402,
+          "completion_tokens": 2727,
+          "total_tokens": 3129,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1984,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_11",
+      "subtopicName": "矩陣",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "設 $A=\\begin{pmatrix}1 & 1 \\\\ 0 & 1\\end{pmatrix}$，求 $A^{10}$。",
+        "options": [
+          "A. $\\begin{pmatrix}1 & 10 \\\\ 0 & 1\\end{pmatrix}$",
+          "B. $\\begin{pmatrix}1 & 1024 \\\\ 0 & 1\\end{pmatrix}$",
+          "C. $\\begin{pmatrix}1 & 55 \\\\ 0 & 1\\end{pmatrix}$",
+          "D. $\\begin{pmatrix}1 & 1 \\\\ 0 & 1\\end{pmatrix}$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "觀察矩陣 $A$ 可寫成 $A=I+N$，其中\n$$N=\\begin{pmatrix}0 & 1\\\\ 0 & 0\\end{pmatrix}.$$\n注意到 $N^2=\\begin{pmatrix}0 & 0\\\\ 0 & 0\\end{pmatrix}$（即 $N$ 是階數為 2 的 nilpotent 矩陣）。因此利用二項展開：\n$$A^{10}=(I+N)^{10}=\\sum_{k=0}^{10}\\binom{10}{k}I^{10-k}N^k=I+10N,$$\n因為當 $k\\ge2$ 時 $N^k=0$。所以\n$$A^{10}=I+10\\begin{pmatrix}0 & 1\\\\ 0 & 0\\end{pmatrix}=\\begin{pmatrix}1 & 10\\\\ 0 & 1\\end{pmatrix}.$$",
+        "topic": "math_m2_11",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 399,
+          "completion_tokens": 1918,
+          "total_tokens": 2317,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1472,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_12",
+      "subtopicName": "線性方程組",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "已知下列線性方程組（參數為 $t$）：$$\\begin{cases} x + y + z = 6 \\\\ 2x - y + 3z = 14 \\\\ 3x + 4y + tz = 27 \\end{cases}$$ 若 $t=2$，則方程組的解為何？",
+        "options": [
+          "A. $(26,\\,-\\dfrac{11}{2},\\,-\\dfrac{29}{2})$",
+          "B. $(26,\\,\\dfrac{11}{2},\\,\\dfrac{29}{2})$",
+          "C. $(2,\\,1,\\,3)$",
+          "D. $(4,\\,-2,\\,0)$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "先由第一式得 $$z=6-x-y.$$ 將之代入第二式：\n$$2x-y+3(6-x-y)=14.$$ 展開化簡得\n$$2x-y+18-3x-3y=14\\Rightarrow -x-4y=-4\\Rightarrow x+4y=4,$$\n因此 $$x=4-4y.$$ 再代回 $z$ 的表示式得\n$$z=6-(4-4y)-y=2+3y.$$ 將 $x,z$ 表示代入第三式得\n$$3(4-4y)+4y+t(2+3y)=27.$$ 化簡得到\n$$12-12y+4y+2t+3ty=27\\Rightarrow y(-8+3t)=15-2t.$$ 若要求唯一解，需 $-8+3t\\neq0$（即 $t\\neq\\dfrac{8}{3}$），本題給 $t=2$ 可直接代入：\n$$y=\\dfrac{15-2t}{-8+3t}=\\dfrac{15-4}{-8+6}=\\dfrac{11}{-2}=-\\dfrac{11}{2}.$$\n再求 $x$ 和 $z$：\n$$x=4-4y=4-4\\left(-\\dfrac{11}{2}\\right)=4+22=26,$$\n$$z=2+3y=2+3\\left(-\\dfrac{11}{2}\\right)=2-\\dfrac{33}{2}=-\\dfrac{29}{2}.$$ \n因此方程組的解為 $(26, -\\dfrac{11}{2}, -\\dfrac{29}{2})$，即選項 A。",
+        "topic": "math_m2_12",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 401,
+          "completion_tokens": 3329,
+          "total_tokens": 3730,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2688,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    },
+    {
+      "subtopicId": "math_m2_13",
+      "subtopicName": "向量",
+      "categoryName": "M2 代數與微積分",
+      "question": {
+        "question": "設向量 $\\vec{a}=(3,k)$ 與 $\\vec{b}=(1,-2)$。若 $|\\vec{a}+\\vec{b}|=|\\vec{a}-\\vec{b}|$，則 $k$ 等於多少？",
+        "options": [
+          "A. $\\frac{3}{2}$",
+          "B. $-\\frac{3}{2}$",
+          "C. $3$",
+          "D. $0$"
+        ],
+        "correctAnswer": "A",
+        "explanation": "由性質可得\n$$|\\vec{a}+\\vec{b}|^2-|\\vec{a}-\\vec{b}|^2=4\\,\\vec{a}\\cdot\\vec{b}.$$\\n\n若 $|\\vec{a}+\\vec{b}|=|\\vec{a}-\\vec{b}|$，則左邊為 $0$，所以 $4\\,\\vec{a}\\cdot\\vec{b}=0$，即 $\\vec{a}\\cdot\\vec{b}=0$。\\n\n代入 $\\vec{a}=(3,k)$ 與 $\\vec{b}=(1,-2)$，得到\n$$\\vec{a}\\cdot\\vec{b}=3\\times1+k\\times(-2)=3-2k=0.$$\\n\n解得 $k=\\dfrac{3}{2}$。\\n\n(幾何上，這表示 $\\vec{a}$ 與 $\\vec{b}$ 互相垂直。)",
+        "topic": "math_m2_13",
+        "score": 1,
+        "graphData": null,
+        "usage": {
+          "prompt_tokens": 398,
+          "completion_tokens": 1749,
+          "total_tokens": 2147,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1344,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        }
+      }
+    }
+  ]
+}

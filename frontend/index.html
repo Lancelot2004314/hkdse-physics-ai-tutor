@@ -63,6 +63,10 @@
                             Practice</span></a>
                 </li>
                 <li class="nav-item">
+                    <a href="/knowledge-graph.html"><i class="fas fa-project-diagram"></i> <span
+                            data-i18n="nav.knowledgeGraph">Knowledge Graph</span></a>
+                </li>
+                <li class="nav-item">
                     <a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span
                             data-i18n="nav.statistics">Statistics</span></a>
                 </li>
@@ -193,26 +197,32 @@
 
             <!-- Secondary Cards -->
             <section class="secondary-cards">
-                <a href="/statistics.html"
+                <a href="/knowledge-graph.html"
                     class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-1">
+                    <div class="card-icon"><i class="fas fa-project-diagram"></i></div>
+                    <h3 data-i18n="nav.knowledgeGraph">Knowledge Graph</h3>
+                    <p data-i18n="knowledgeGraph.explorePhysics">Explore physics history</p>
+                </a>
+                <a href="/statistics.html"
+                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-2">
                     <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
                     <h3 data-i18n="nav.statistics">Statistics</h3>
                     <p data-i18n="statistics.overview">Overview</p>
                 </a>
                 <a href="/leaderboard.html"
-                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-2">
+                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-3">
                     <div class="card-icon"><i class="fas fa-trophy"></i></div>
                     <h3 data-i18n="nav.leaderboard">Leaderboard</h3>
                     <p data-i18n="leaderboard.topPlayers">Top Players</p>
                 </a>
                 <a href="/bookmarks.html"
-                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-3">
+                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-4">
                     <div class="card-icon"><i class="fas fa-bookmark"></i></div>
                     <h3 data-i18n="nav.bookmarks">Bookmarks</h3>
                     <p data-i18n="bookmarks.saveQuestions">Save questions you want to review later</p>
                 </a>
                 <a href="/practice-history.html"
-                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-4">
+                    class="secondary-card card-lift icon-bounce animate-on-scroll fade-in-up stagger-5">
                     <div class="card-icon"><i class="fas fa-history"></i></div>
                     <h3 data-i18n="nav.history">History</h3>
                     <p data-i18n="history.viewDetails">View Details</p>
@@ -298,9 +308,16 @@
 
         async function checkAuth() {
             try {
+                // #region agent log
+                console.log('[DEBUG] checkAuth: Fetching /api/auth/me');
+                // #endregion
                 const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                const data = await response.json();
+                // #region agent log
+                console.log('[DEBUG] checkAuth response:', { status: response.status, ok: response.ok, data });
+                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'index.html:checkAuth', message: 'Auth me response', data: { status: response.status, ok: response.ok, user: data?.user, hasEmail: !!data?.user?.email }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H9' }) }).catch(() => { });
+                // #endregion
                 if (response.ok) {
-                    const data = await response.json();
                     // Extract user from response - API returns { user: {...} }
                     currentUser = data.user;
                     if (currentUser && currentUser.email) {

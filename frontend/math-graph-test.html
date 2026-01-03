@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Graph Test - JSXGraph</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <script src="/js/math-graph.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .test-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-card h3 {
+            margin-top: 0;
+            color: #3498db;
+        }
+        .graph-container {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background: #fafafa;
+            margin-top: 10px;
+        }
+        .success {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧮 Math Graph Test Suite</h1>
+    <p style="text-align: center; color: #666;">Testing JSXGraph integration for HKDSE Mathematics</p>
+    
+    <div class="test-grid">
+        <!-- Test 1: Basic Coordinate Points -->
+        <div class="test-card">
+            <h3>Test 1: Coordinate Points</h3>
+            <p class="description">Points A(2, 3), B(-3, 1), C(0, -2)</p>
+            <div id="test1" class="graph-container"></div>
+        </div>
+
+        <!-- Test 2: Line and Circle -->
+        <div class="test-card">
+            <h3>Test 2: Line and Circle</h3>
+            <p class="description">Circle center (0,0) radius 3, line through (0,0) and (5,5)</p>
+            <div id="test2" class="graph-container"></div>
+        </div>
+
+        <!-- Test 3: Parabola -->
+        <div class="test-card">
+            <h3>Test 3: Parabola (Locus)</h3>
+            <p class="description">y = x² - 2 with vertex shown</p>
+            <div id="test3" class="graph-container"></div>
+        </div>
+
+        <!-- Test 4: Triangle (Polygon) -->
+        <div class="test-card">
+            <h3>Test 4: Triangle ABC</h3>
+            <p class="description">Triangle with vertices A(0,0), B(6,0), C(3,4)</p>
+            <div id="test4" class="graph-container"></div>
+        </div>
+
+        <!-- Test 5: Function Plot -->
+        <div class="test-card">
+            <h3>Test 5: Trigonometric Function</h3>
+            <p class="description">y = sin(x) from -2π to 2π</p>
+            <div id="test5" class="graph-container"></div>
+        </div>
+
+        <!-- Test 6: Complex Geometry -->
+        <div class="test-card">
+            <h3>Test 6: Complex Scene</h3>
+            <p class="description">Multiple elements: circle, points, segments</p>
+            <div id="test6" class="graph-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Wait for page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Test 1: Coordinate Points
+            window.MathGraph.render('test1', {
+                boundingBox: [-5, 5, 5, -5],
+                showGrid: true,
+                showAxis: true,
+                elements: [
+                    { type: 'point', coords: [2, 3], label: 'A', color: '#e74c3c' },
+                    { type: 'point', coords: [-3, 1], label: 'B', color: '#3498db' },
+                    { type: 'point', coords: [0, -2], label: 'C', color: '#2ecc71' }
+                ]
+            });
+
+            // Test 2: Line and Circle
+            window.MathGraph.render('test2', {
+                boundingBox: [-6, 6, 6, -6],
+                showGrid: true,
+                showAxis: true,
+                elements: [
+                    { type: 'circle', center: [0, 0], radius: 3, color: '#3498db' },
+                    { type: 'line', points: [[0, 0], [5, 5]], color: '#e74c3c' }
+                ]
+            });
+
+            // Test 3: Parabola
+            window.MathGraph.render('test3', {
+                boundingBox: [-5, 5, 5, -5],
+                showGrid: true,
+                showAxis: true,
+                elements: [
+                    { type: 'curve', equation: 'x^2 - 2', domain: [-4, 4], color: '#9b59b6' },
+                    { type: 'point', coords: [0, -2], label: 'V', color: '#e74c3c' }
+                ]
+            });
+
+            // Test 4: Triangle
+            window.MathGraph.render('test4', {
+                boundingBox: [-2, 7, 9, -2],
+                showGrid: true,
+                showAxis: true,
+                elements: [
+                    { 
+                        type: 'polygon', 
+                        vertices: [[0, 0], [6, 0], [3, 4]], 
+                        labels: ['A', 'B', 'C'],
+                        color: '#f39c12',
+                        fill: true
+                    }
+                ]
+            });
+
+            // Test 5: Trig Function
+            window.MathGraph.render('test5', {
+                boundingBox: [-7, 2, 7, -2],
+                showGrid: true,
+                showAxis: true,
+                elements: [
+                    { type: 'curve', equation: 'sin(x)', domain: [-6.28, 6.28], color: '#1abc9c' }
+                ]
+            });
+
+            // Test 6: Complex Scene
+            window.MathGraph.render('test6', {
+                boundingBox: [-6, 6, 6, -6],
+                showGrid: true,
+                showAxis: true,
+                elements: [
+                    { type: 'circle', center: [0, 0], radius: 4, color: '#3498db' },
+                    { type: 'point', coords: [0, 0], label: 'O', color: '#e74c3c' },
+                    { type: 'point', coords: [4, 0], label: 'A', color: '#2ecc71' },
+                    { type: 'point', coords: [0, 4], label: 'B', color: '#2ecc71' },
+                    { type: 'segment', points: [[0, 0], [4, 0]], color: '#f39c12' },
+                    { type: 'segment', points: [[0, 0], [0, 4]], color: '#f39c12' },
+                    { type: 'segment', points: [[4, 0], [0, 4]], color: '#9b59b6' }
+                ]
+            });
+
+            console.log('✅ All tests rendered successfully!');
+        });
+    </script>
+</body>
+</html>
+

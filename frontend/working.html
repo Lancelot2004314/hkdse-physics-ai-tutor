@@ -20,6 +20,9 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- JSXGraph for Math visualizations -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
     <script>
         MathJax = {
             tex: {
@@ -30,6 +33,7 @@
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    <script src="/js/math-graph.js"></script>
     <script src="/js/i18n.js"></script>
 </head>
 
@@ -86,6 +90,13 @@
 
             <div class="question-text" id="questionText">
                 Loading question...
+            </div>
+
+            <!-- Math Graph Container (for coordinate/function/geometry visualizations) -->
+            <div id="mathGraphWrapper" style="display: none;">
+                <div id="mathGraphContainer"
+                    style="width: 100%; max-width: 400px; height: 300px; margin: 16px auto; border: 1px solid var(--border); border-radius: 12px; background: #fafafa;">
+                </div>
             </div>
 
             <!-- MC Options -->
@@ -306,6 +317,9 @@
             // Update question text
             document.getElementById('questionText').innerHTML = formatMath(question.question);
 
+            // Handle Math Graph visualization
+            renderQuestionGraph(question);
+
             // Handle different question types
             const mcOptions = document.getElementById('mcOptions');
             const answerSection = document.getElementById('answerSection');
@@ -331,6 +345,29 @@
 
             // Re-render MathJax
             safeTypesetMath();
+        }
+
+        // Render math graph if question has graphData
+        function renderQuestionGraph(question) {
+            const wrapper = document.getElementById('mathGraphWrapper');
+            const containerId = 'mathGraphContainer';
+
+            // Clean up previous graph
+            if (window.MathGraph) {
+                window.MathGraph.destroy(containerId);
+            }
+
+            // Check if question has valid graphData
+            if (question.graphData && window.MathGraph && window.MathGraph.hasValidData(question.graphData)) {
+                wrapper.style.display = 'block';
+
+                // Small delay to ensure container is visible before rendering
+                setTimeout(() => {
+                    window.MathGraph.render(containerId, question.graphData);
+                }, 50);
+            } else {
+                wrapper.style.display = 'none';
+            }
         }
 
         function safeTypesetMath() {

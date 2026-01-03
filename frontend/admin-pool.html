@@ -4,9 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Question Pool - Admin - HKDSE Physics AI Tutor</title>
+    <title>Question Pool - Admin - HKDSE AI Tutor</title>
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- JSXGraph for math graphs -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
     <!-- MathJax for LaTeX rendering -->
     <script>
         window.MathJax = {
@@ -15,6 +18,7 @@
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    <script src="/js/math-graph.js"></script>
     <style>
         /* High Contrast Pool Styles */
         .pool-container {
@@ -481,6 +485,50 @@
             font-size: 0.75rem;
             color: #666;
         }
+
+        /* Subject selector tabs */
+        .subject-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .subject-tab {
+            padding: 10px 20px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #f5f5f5;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #333;
+            transition: all 0.2s;
+        }
+
+        .subject-tab:hover {
+            background: #e5e5e5;
+        }
+
+        .subject-tab.active {
+            background: #2563eb;
+            color: #fff;
+            border-color: #2563eb;
+        }
+
+        .subject-tab.active.math {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        /* Graph container */
+        .question-graph {
+            width: 100%;
+            height: 300px;
+            margin: 16px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
     </style>
 </head>
 
@@ -575,6 +623,13 @@
                     <h2><i class="fas fa-plus-circle"></i> Generate Questions</h2>
                     <form class="pregen-form" id="pregenForm">
                         <div class="form-group">
+                            <label for="genSubjectSelect">Subject 科目</label>
+                            <select id="genSubjectSelect" onchange="updateGenSubtopics()">
+                                <option value="Physics">Physics 物理</option>
+                                <option value="Mathematics">Mathematics 數學</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="subtopicSelect">Subtopic</label>
                             <select id="subtopicSelect" required>
                                 <option value="">-- Select Subtopic --</option>
@@ -652,6 +707,15 @@
                         <i class="fas fa-sync-alt"></i> Load Questions
                     </button>
                 </div>
+                <!-- Subject Tabs -->
+                <div class="subject-tabs">
+                    <button class="subject-tab active" data-subject="Physics" onclick="selectSubject('Physics')">
+                        <i class="fas fa-atom"></i> Physics 物理
+                    </button>
+                    <button class="subject-tab math" data-subject="Mathematics" onclick="selectSubject('Mathematics')">
+                        <i class="fas fa-calculator"></i> Mathematics 數學
+                    </button>
+                </div>
                 <div class="question-bank-controls">
                     <select id="bankFilterSubtopic" onchange="loadQuestionBank()">
                         <option value="">All Subtopics</option>
@@ -683,6 +747,8 @@
         let selectedJobId = null;
         let pollInterval = null;
         let allSubtopics = [];
+        let currentSubject = 'Physics';
+        let graphCounter = 0;
 
         // Check auth on load
         document.addEventListener('DOMContentLoaded', async () => {
@@ -742,6 +808,26 @@
                 option.value = st.id;
                 option.textContent = `${st.id} - ${st.name}`;
                 select.appendChild(option);
+            }
+        }
+
+        async function updateGenSubtopics() {
+            const subject = document.getElementById('genSubjectSelect').value;
+            try {
+                const response = await fetch(`/api/admin/pool-stats?subject=${subject}`, { credentials: 'include' });
+                if (!response.ok) throw new Error('Failed');
+                const data = await response.json();
+                
+                const select = document.getElementById('subtopicSelect');
+                select.innerHTML = '<option value="">-- Select Subtopic --</option>';
+                for (const st of data.allSubtopics || []) {
+                    const option = document.createElement('option');
+                    option.value = st.id;
+                    option.textContent = `${st.id} - ${st.name}`;
+                    select.appendChild(option);
+                }
+            } catch (err) {
+                console.error('Error updating subtopics:', err);
             }
         }
 
@@ -899,6 +985,7 @@
         document.getElementById('pregenForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const subject = document.getElementById('genSubjectSelect').value;
             const subtopic = document.getElementById('subtopicSelect').value;
             const language = document.getElementById('languageSelect').value;
             const qtype = document.getElementById('qtypeSelect').value;
@@ -919,7 +1006,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
-                    body: JSON.stringify({ subtopic, language, qtype, count, difficulty }),
+                    body: JSON.stringify({ subject, subtopic, language, qtype, count, difficulty }),
                 });
 
                 const data = await response.json();
@@ -942,6 +1029,34 @@
             }
         });
 
+        // Subject Selection
+        function selectSubject(subject) {
+            currentSubject = subject;
+            
+            // Update tab UI
+            document.querySelectorAll('.subject-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.subject === subject);
+            });
+            
+            // Reload subtopics for this subject
+            loadSubtopicsForSubject(subject);
+            
+            // Reload questions
+            loadQuestionBank();
+        }
+
+        async function loadSubtopicsForSubject(subject) {
+            try {
+                const response = await fetch(`/api/admin/pool-stats?subject=${subject}`, { credentials: 'include' });
+                if (!response.ok) throw new Error('Failed to load subtopics');
+                const data = await response.json();
+                allSubtopics = data.allSubtopics || [];
+                populateBankSubtopicFilter();
+            } catch (err) {
+                console.error('Error loading subtopics:', err);
+            }
+        }
+
         // Question Bank Viewer
         async function loadQuestionBank() {
             const container = document.getElementById('questionBankList');
@@ -953,6 +1068,7 @@
 
             try {
                 const params = new URLSearchParams();
+                params.set('subject', currentSubject);
                 if (subtopic) params.set('subtopic', subtopic);
                 if (language) params.set('language', language);
                 if (qtype) params.set('qtype', qtype);
@@ -970,25 +1086,58 @@
 
         function displayQuestions(questions, total) {
             const container = document.getElementById('questionBankList');
+            graphCounter = 0; // Reset counter
 
             if (questions.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:30px;color:#666;">No questions found</div>';
+                const subjectLabel = currentSubject === 'Mathematics' ? '數學' : '物理';
+                container.innerHTML = `<div style="text-align:center;padding:30px;color:#666;">
+                    <i class="fas fa-database" style="font-size:2rem;margin-bottom:10px;display:block;"></i>
+                    No ${subjectLabel} questions found
+                </div>`;
                 return;
             }
 
             container.innerHTML = `<div style="margin-bottom:20px;font-size:0.9rem;color:#64748b;font-weight:500;">
-                <i class="fas fa-list"></i> Showing ${questions.length} of ${total} questions
+                <i class="fas fa-list"></i> Showing ${questions.length} of ${total} ${currentSubject} questions
             </div>` + questions.map(q => renderQuestionCard(q)).join('');
 
             // Trigger MathJax to render LaTeX
             if (window.MathJax && window.MathJax.typesetPromise) {
-                window.MathJax.typesetPromise([container]).catch(err => console.log('MathJax error:', err));
+                window.MathJax.typesetPromise([container]).then(() => {
+                    // After MathJax, render any graphs
+                    renderAllGraphs();
+                }).catch(err => console.log('MathJax error:', err));
+            } else {
+                // Fallback: render graphs anyway
+                setTimeout(renderAllGraphs, 100);
             }
+        }
+
+        function renderAllGraphs() {
+            // Find all graph containers and render their graphs
+            document.querySelectorAll('[data-graph-data]').forEach(el => {
+                try {
+                    const graphData = JSON.parse(el.dataset.graphData);
+                    if (graphData && typeof renderMathGraph === 'function') {
+                        renderMathGraph(el.id, graphData);
+                    }
+                } catch (e) {
+                    console.error('Error rendering graph:', e);
+                }
+            });
         }
 
         function renderQuestionCard(q) {
             const langLabel = q.language === 'en' ? '🇬🇧 EN' : '🇭🇰 ZH';
             const typeLabel = q.qtype === 'mc' ? '📝 MC' : (q.qtype === 'short' ? '✏️ Short' : '📄 Long');
+            const subjectIcon = currentSubject === 'Mathematics' ? '🧮' : '⚛️';
+
+            // Graph rendering (for Math questions)
+            let graphHtml = '';
+            if (q.graphData && typeof q.graphData === 'object') {
+                const graphId = `graph-${++graphCounter}`;
+                graphHtml = `<div id="${graphId}" class="question-graph" data-graph-data='${JSON.stringify(q.graphData).replace(/'/g, "&#39;")}'></div>`;
+            }
 
             let optionsHtml = '';
             if (q.qtype === 'mc' && q.options) {
@@ -1028,7 +1177,7 @@
                 <div class="question-card">
                     <div class="question-card-header">
                         <div class="question-meta">
-                            <span>${q.topicKey}</span>
+                            <span>${subjectIcon} ${q.topicKey}</span>
                             <span>${langLabel}</span>
                             <span>${typeLabel}</span>
                             <span class="status-ready">${q.status}</span>
@@ -1036,6 +1185,7 @@
                         <span class="question-id">${q.id}</span>
                     </div>
                     <div class="question-text">${formatMathText(q.question || '')}</div>
+                    ${graphHtml}
                     ${optionsHtml}
                     ${q.explanation ? `<div class="question-explanation"><strong>💡 Explanation</strong>${formatMathText(q.explanation)}</div>` : ''}
                 </div>

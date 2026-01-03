@@ -14,6 +14,16 @@ import {
   QUIZ_VALIDATE_AND_FIX_PROMPT,
 } from '../../../shared/prompts.js';
 import { getSubtopicNames } from '../../../shared/topics.js';
+import { getMathSubtopicNames } from '../../../shared/mathTopics.js';
+import {
+  MATH_QUIZ_MC_PROMPT,
+  MATH_QUIZ_SHORT_PROMPT,
+  MATH_QUIZ_LONG_PROMPT,
+  MATH_QUIZ_MC_REWRITE_PROMPT,
+  MATH_QUIZ_SHORT_REWRITE_PROMPT,
+  MATH_QUIZ_LONG_REWRITE_PROMPT,
+  MATH_QUIZ_VALIDATE_AND_FIX_PROMPT,
+} from '../../../shared/prompts.js';
 import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
 import { searchKnowledgeBase, enrichKbResultsWithMetadata } from '../../../shared/embedding.js';
 import { checkVertexConfig } from '../../../shared/vertexRag.js';
@@ -43,6 +53,7 @@ export async function onRequestPost(context) {
 
     const body = await request.json();
     const {
+      subject = 'Physics',
       subtopic,
       language = 'zh',
       qtype = 'mc',
@@ -84,14 +95,14 @@ export async function onRequestPost(context) {
       qtype,
       difficulty,
       count,
-      `[${new Date().toISOString()}] Job started: ${count} ${qtype} questions for ${subtopic} (${language})\n`,
+      `[${new Date().toISOString()}] Job started: ${count} ${qtype} ${subject} questions for ${subtopic} (${language})\n`,
       now,
       now
     ).run();
 
     // Start generation in the background (non-blocking)
     // Note: In Cloudflare Workers, we use waitUntil for background tasks
-    context.waitUntil(runPregenJob(env, apiKey, jobId, subtopic, language, qtype, difficulty, count));
+    context.waitUntil(runPregenJob(env, apiKey, jobId, subject, subtopic, language, qtype, difficulty, count));
 
     return new Response(JSON.stringify({
       success: true,
@@ -110,13 +121,16 @@ export async function onRequestPost(context) {
 /**
  * Run the pre-generation job (called via waitUntil for background processing)
  */
-async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, difficulty, count) {
+async function runPregenJob(env, apiKey, jobId, subject, subtopic, language, qtype, difficulty, count) {
   let completedCount = 0;
   let failedCount = 0;
+  const isMath = subject === 'Mathematics';
 
   try {
-    // Get topic names for prompt
-    const topicNames = getSubtopicNames([subtopic], language === 'en' ? 'en' : 'zh');
+    // Get topic names for prompt - use Math or Physics topics
+    const topicNames = isMath 
+      ? getMathSubtopicNames([subtopic], language === 'en' ? 'en' : 'zh')
+      : getSubtopicNames([subtopic], language === 'en' ? 'en' : 'zh');
 
     // Fetch prototype pack for style consistency
     let prototypePack = '';
@@ -129,11 +143,12 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
       kbBackend = vertexConfig.configured ? 'vertex_rag' : (env.VECTORIZE ? 'vectorize' : 'none');
 
       if (kbBackend !== 'none') {
-        const styleQuery = `HKDSE Physics ${topicNames.slice(0, 3).join(' ')} DSE paper question marking scheme`;
+        const subjectLabel = isMath ? 'Mathematics' : 'Physics';
+        const styleQuery = `HKDSE ${subjectLabel} ${topicNames.slice(0, 3).join(' ')} DSE paper question marking scheme`;
         let kbResults = await searchKnowledgeBase(styleQuery, env, {
           topK: 10,
           minScore: 0,
-          filter: { subject: 'Physics', language },
+          filter: { subject: subjectLabel, language },
         });
 
         if (kbResults && kbResults.length > 0) {
@@ -150,14 +165,26 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
       await appendJobLog(env, jobId, `Warning: KB search failed: ${err.message}`);
     }
 
-    // Select prompt based on rewrite mode
+    // Select prompt based on subject and rewrite mode
     let promptTemplate;
-    if (qtype === 'mc') {
-      promptTemplate = usedRewriteMode ? QUIZ_MC_REWRITE_PROMPT : QUIZ_MC_PROMPT;
-    } else if (qtype === 'short') {
-      promptTemplate = usedRewriteMode ? QUIZ_SHORT_REWRITE_PROMPT : QUIZ_SHORT_PROMPT;
+    if (isMath) {
+      // Use Math-specific prompts
+      if (qtype === 'mc') {
+        promptTemplate = usedRewriteMode ? MATH_QUIZ_MC_REWRITE_PROMPT : MATH_QUIZ_MC_PROMPT;
+      } else if (qtype === 'short') {
+        promptTemplate = usedRewriteMode ? MATH_QUIZ_SHORT_REWRITE_PROMPT : MATH_QUIZ_SHORT_PROMPT;
+      } else {
+        promptTemplate = usedRewriteMode ? MATH_QUIZ_LONG_REWRITE_PROMPT : MATH_QUIZ_LONG_PROMPT;
+      }
     } else {
-      promptTemplate = usedRewriteMode ? QUIZ_LONG_REWRITE_PROMPT : QUIZ_LONG_PROMPT;
+      // Use Physics prompts
+      if (qtype === 'mc') {
+        promptTemplate = usedRewriteMode ? QUIZ_MC_REWRITE_PROMPT : QUIZ_MC_PROMPT;
+      } else if (qtype === 'short') {
+        promptTemplate = usedRewriteMode ? QUIZ_SHORT_REWRITE_PROMPT : QUIZ_SHORT_PROMPT;
+      } else {
+        promptTemplate = usedRewriteMode ? QUIZ_LONG_REWRITE_PROMPT : QUIZ_LONG_PROMPT;
+      }
     }
 
     await appendJobLog(env, jobId, `Using ${usedRewriteMode ? 'prototype rewrite' : 'standard'} mode (${kbBackend})`);
@@ -173,7 +200,7 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
 
       try {
         const genResult = await generateQuestions(
-          apiKey, promptTemplate, topicNames, difficulty, batchCount, language, prototypePack
+          apiKey, promptTemplate, topicNames, difficulty, batchCount, language, prototypePack, subject
         );
 
         if (!genResult.success) {
@@ -207,6 +234,7 @@ async function runPregenJob(env, apiKey, jobId, subtopic, language, qtype, diffi
 
             // Write to pool
             const poolId = await writeQuestionToPool(env, q, {
+              subject,
               topicKey: subtopic,
               language,
               qtype,
@@ -273,7 +301,7 @@ async function appendJobLog(env, jobId, message) {
   }
 }
 
-async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty, count, language, styleContext = '') {
+async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty, count, language, styleContext = '', subject = 'Physics') {
   const prompt = promptTemplate
     .replace('{topics}', topicNames.join(', '))
     .replace('{difficulty}', difficulty)
@@ -283,6 +311,10 @@ async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty,
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+  const systemPrompt = subject === 'Mathematics'
+    ? 'You are an expert HKDSE Mathematics examiner. Generate exam-quality questions with proper mathematical notation.'
+    : 'You are an expert HKDSE Physics examiner. Generate exam-quality questions.';
 
   try {
     // Use Gemini API format
@@ -297,7 +329,7 @@ async function generateQuestions(apiKey, promptTemplate, topicNames, difficulty,
         contents: [
           {
             parts: [
-              { text: 'You are an expert HKDSE Physics examiner. Generate exam-quality questions.\n\n' + prompt }
+              { text: systemPrompt + '\n\n' + prompt }
             ]
           }
         ],
@@ -495,11 +527,12 @@ async function writeQuestionToPool(env, question, metadata) {
 
     await env.DB.prepare(`
       INSERT INTO question_bank (
-        id, topic_key, language, qtype, difficulty, question_json, status,
+        id, subject, topic_key, language, qtype, difficulty, question_json, status,
         kb_backend, rewrite_mode, prototype_sources, validator_meta, llm_model
-      ) VALUES (?, ?, ?, ?, ?, ?, 'ready', ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'ready', ?, ?, ?, ?, ?)
     `).bind(
       id,
+      metadata.subject || 'Physics',
       metadata.topicKey || '',
       metadata.language || 'zh',
       metadata.qtype || 'mc',

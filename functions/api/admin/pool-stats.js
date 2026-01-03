@@ -5,6 +5,7 @@
 
 import { getUserFromSession, isAdmin } from '../../../shared/auth.js';
 import { PHYSICS_TOPICS } from '../../../shared/topics.js';
+import { MATH_TOPICS } from '../../../shared/mathTopics.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,7 +31,11 @@ export async function onRequestGet(context) {
       return errorResponse(500, 'Database not configured');
     }
 
-    // Get counts grouped by topic_key, language, qtype, status
+    // Parse subject parameter (Physics or Mathematics)
+    const url = new URL(request.url);
+    const subject = url.searchParams.get('subject') || 'Physics';
+
+    // Get counts grouped by topic_key, language, qtype, status filtered by subject
     const result = await env.DB.prepare(`
       SELECT 
         topic_key,
@@ -39,16 +44,18 @@ export async function onRequestGet(context) {
         status,
         COUNT(*) as count
       FROM question_bank
+      WHERE subject = ?
       GROUP BY topic_key, language, qtype, status
       ORDER BY topic_key, language, qtype, status
-    `).all();
+    `).bind(subject).all();
 
-    // Get total counts by status
+    // Get total counts by status for this subject
     const totalsResult = await env.DB.prepare(`
       SELECT status, COUNT(*) as count
       FROM question_bank
+      WHERE subject = ?
       GROUP BY status
-    `).all();
+    `).bind(subject).all();
 
     // Build a structured response
     const inventory = {};
@@ -65,7 +72,7 @@ export async function onRequestGet(context) {
       if (!inventory[key]) {
         inventory[key] = {
           topicKey: key,
-          topicName: getTopicName(key),
+          topicName: getTopicName(key, subject),
           en: { mc: { ready: 0, reserved: 0, used: 0 }, short: { ready: 0, reserved: 0, used: 0 }, long: { ready: 0, reserved: 0, used: 0 } },
           zh: { mc: { ready: 0, reserved: 0, used: 0 }, short: { ready: 0, reserved: 0, used: 0 }, long: { ready: 0, reserved: 0, used: 0 } },
         };
@@ -80,8 +87,8 @@ export async function onRequestGet(context) {
       }
     }
 
-    // Get list of all subtopics from PHYSICS_TOPICS for reference
-    const allSubtopics = getAllSubtopics();
+    // Get list of all subtopics based on subject
+    const allSubtopics = getAllSubtopics(subject);
 
     // Calculate inventory health: how many subtopics have at least 5 ready questions per type/language
     let healthyCount = 0;
@@ -112,6 +119,7 @@ export async function onRequestGet(context) {
     }
 
     return new Response(JSON.stringify({
+      subject,
       totals,
       inventory: Object.values(inventory),
       allSubtopics: allSubtopics.map(st => ({ id: st.id, name: st.name, parentTopic: st.parentTopic })),
@@ -131,10 +139,10 @@ export async function onRequestGet(context) {
   }
 }
 
-function getTopicName(topicKey) {
+function getTopicName(topicKey, subject = 'Physics') {
   // Parse topic key like "heat_1" to find the subtopic name
-  // PHYSICS_TOPICS is an object, use Object.values() to iterate
-  for (const topic of Object.values(PHYSICS_TOPICS)) {
+  const TOPICS = subject === 'Mathematics' ? MATH_TOPICS : PHYSICS_TOPICS;
+  for (const topic of Object.values(TOPICS)) {
     for (const sub of topic.subtopics || []) {
       if (sub.id === topicKey) {
         return `${topic.name} > ${sub.name}`;
@@ -149,10 +157,10 @@ function getTopicName(topicKey) {
   return topicKey;
 }
 
-function getAllSubtopics() {
+function getAllSubtopics(subject = 'Physics') {
   const result = [];
-  // PHYSICS_TOPICS is an object, use Object.values() to iterate
-  for (const topic of Object.values(PHYSICS_TOPICS)) {
+  const TOPICS = subject === 'Mathematics' ? MATH_TOPICS : PHYSICS_TOPICS;
+  for (const topic of Object.values(TOPICS)) {
     for (const sub of topic.subtopics || []) {
       if (sub.subtopics && sub.subtopics.length > 0) {
         for (const subsub of sub.subtopics) {

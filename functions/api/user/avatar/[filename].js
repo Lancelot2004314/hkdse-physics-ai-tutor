@@ -40,3 +40,4 @@ export async function onRequestGet(context) {
     return new Response('Error serving avatar', { status: 500 });
   }
 }
+

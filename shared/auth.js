@@ -147,37 +147,58 @@ export function isAdmin(email, env) {
   return adminList.includes(email.toLowerCase());
 }
 
-// CORS headers
+// CORS headers - Note: For credentials to work, origin must be specific, not '*'
 export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://hkdse-physics-ai-tutor.pages.dev',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Allow-Credentials': 'true',
 };
 
+// Dynamic CORS headers for requests (uses request origin)
+export function getCorsHeaders(request) {
+  const origin = request?.headers?.get('Origin') || 'https://hkdse-physics-ai-tutor.pages.dev';
+  // Allow the production domain and any pages.dev preview URLs
+  const allowedOrigins = [
+    'https://hkdse-physics-ai-tutor.pages.dev',
+    origin.includes('.hkdse-physics-ai-tutor.pages.dev') ? origin : null,
+  ].filter(Boolean);
+
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : 'https://hkdse-physics-ai-tutor.pages.dev';
+
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Credentials': 'true',
+  };
+}
+
 // Standard error response
-export function errorResponse(status, message) {
+export function errorResponse(status, message, request = null) {
+  const headers = request ? getCorsHeaders(request) : corsHeaders;
   return new Response(
     JSON.stringify({ error: message }),
     {
       status,
       headers: {
         'Content-Type': 'application/json',
-        ...corsHeaders,
+        ...headers,
       },
     }
   );
 }
 
 // Standard success response
-export function jsonResponse(data, status = 200, extraHeaders = {}) {
+export function jsonResponse(data, status = 200, extraHeaders = {}, request = null) {
+  const headers = request ? getCorsHeaders(request) : corsHeaders;
   return new Response(
     JSON.stringify(data),
     {
       status,
       headers: {
         'Content-Type': 'application/json',
-        ...corsHeaders,
+        ...headers,
         ...extraHeaders,
       },
     }

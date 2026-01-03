@@ -205,7 +205,7 @@ export async function onRequestPost(context) {
     } catch (parseErr) {
       console.error('Failed to parse vision response:', parseErr.message);
       console.error('Text that failed to parse:', visionResult.text.substring(0, 1000));
-      
+
       // Fallback: split raw response into readable paragraphs
       const rawText = visionResult.text
         .replace(/```json\s*/g, '')
@@ -613,29 +613,29 @@ async function callQwenVision(apiKey, base64Data, mimeType, systemPrompt, userPr
 
     const data = await response.json();
     console.log('Qwen3-VL raw response structure:', JSON.stringify(data).substring(0, 500));
-    
+
     // OpenAI-compatible format - handle thinking mode
     const message = data.choices?.[0]?.message;
     let text = message?.content;
-    
+
     // If thinking mode is enabled, the reasoning might be in reasoning_content
     // We only need the final content, not the reasoning
     if (!text && message?.reasoning_content) {
       console.log('Found reasoning_content, but no content');
     }
-    
+
     // Sometimes the content might be an array (multimodal response)
     if (Array.isArray(text)) {
       text = text.map(item => item.text || item.content || '').join('');
     }
-    
+
     const usage = data.usage || null;
 
     if (!text) {
       console.error('Empty response from Qwen3-VL:', JSON.stringify(message));
       return { success: false, error: 'Empty response from Qwen3-VL' };
     }
-    
+
     console.log('Qwen3-VL extracted text length:', text.length);
     console.log('Qwen3-VL text preview:', text.substring(0, 300));
 

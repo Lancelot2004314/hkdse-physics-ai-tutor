@@ -31,15 +31,16 @@ export async function onRequestGet(context) {
 
     // Parse query params
     const url = new URL(request.url);
+    const subject = url.searchParams.get('subject') || 'Physics';
     const subtopic = url.searchParams.get('subtopic') || '';
     const language = url.searchParams.get('language') || '';
     const qtype = url.searchParams.get('qtype') || '';
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10), 50);
     const offset = parseInt(url.searchParams.get('offset') || '0', 10);
 
-    // Build query
-    let query = 'SELECT id, topic_key, language, qtype, difficulty, question_json, status, created_at FROM question_bank WHERE 1=1';
-    const params = [];
+    // Build query - filter by subject
+    let query = 'SELECT id, topic_key, language, qtype, difficulty, question_json, status, created_at FROM question_bank WHERE subject = ?';
+    const params = [subject];
 
     if (subtopic) {
       query += ' AND topic_key = ?';
@@ -77,9 +78,9 @@ export async function onRequestGet(context) {
       };
     });
 
-    // Get total count
-    let countQuery = 'SELECT COUNT(*) as total FROM question_bank WHERE 1=1';
-    const countParams = [];
+    // Get total count - filter by subject
+    let countQuery = 'SELECT COUNT(*) as total FROM question_bank WHERE subject = ?';
+    const countParams = [subject];
     if (subtopic) {
       countQuery += ' AND topic_key = ?';
       countParams.push(subtopic);

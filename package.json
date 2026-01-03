@@ -20,5 +20,8 @@
   "license": "MIT",
   "devDependencies": {
     "wrangler": "^4.54.0"
+  },
+  "dependencies": {
+    "form-data": "^4.0.5"
   }
 }

@@ -1,0 +1,916 @@
+/* Knowledge Graph Page Styles */
+
+/* Main Layout */
+.kg-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px);
+    gap: 0;
+}
+
+/* Controls Bar */
+.kg-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+}
+
+.kg-view-toggle {
+    display: flex;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    gap: 4px;
+}
+
+.kg-view-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.kg-view-btn:hover {
+    color: var(--primary);
+}
+
+.kg-view-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: var(--shadow);
+}
+
+.kg-filters {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.kg-filter-select,
+.kg-search-input {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    min-width: 140px;
+}
+
+.kg-search-input {
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.kg-search-input:focus,
+.kg-filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.kg-generate-btn {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--accent-secondary), var(--primary));
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.kg-generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+/* Main Content Area */
+.kg-main {
+    flex: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+/* Graph Container */
+.kg-graph-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#kg-graph {
+    width: 100%;
+    height: 100%;
+    touch-action: none; /* Prevent default touch behaviors */
+    -webkit-overflow-scrolling: touch;
+}
+
+#kg-graph svg {
+    display: block;
+    touch-action: none;
+}
+
+#kg-graph svg g {
+    will-change: transform;
+}
+
+/* Timeline Container */
+.kg-timeline-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+    display: none;
+}
+
+.kg-timeline-container.active {
+    display: block;
+}
+
+.kg-graph-container.hidden {
+    display: none;
+}
+
+/* Timeline Styles */
+.kg-timeline {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-left: 60px;
+}
+
+.kg-timeline::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--primary), var(--accent-secondary));
+    border-radius: 2px;
+}
+
+.kg-timeline-era {
+    margin-bottom: 40px;
+}
+
+.kg-timeline-era-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: var(--radius-sm);
+    display: inline-block;
+}
+
+.kg-timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+    padding-left: 40px;
+}
+
+.kg-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -38px;
+    top: 20px;
+    width: 16px;
+    height: 16px;
+    background: var(--bg-card);
+    border: 4px solid var(--primary);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.kg-timeline-item.scientist::before {
+    border-color: #8b5cf6;
+}
+
+.kg-timeline-item.equation::before {
+    border-color: #22c55e;
+}
+
+.kg-timeline-item.concept::before {
+    border-color: #f59e0b;
+}
+
+.kg-timeline-item.discovery::before {
+    border-color: #06b6d4;
+}
+
+.kg-timeline-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.kg-timeline-card:hover {
+    transform: translateX(8px);
+    box-shadow: var(--shadow-md);
+}
+
+.kg-timeline-card.scientist {
+    border-left-color: #8b5cf6;
+}
+
+.kg-timeline-card.equation {
+    border-left-color: #22c55e;
+}
+
+.kg-timeline-card.concept {
+    border-left-color: #f59e0b;
+}
+
+.kg-timeline-card.discovery {
+    border-left-color: #06b6d4;
+}
+
+.kg-timeline-year {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.kg-timeline-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.kg-timeline-name-zh {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.kg-timeline-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.kg-timeline-formula {
+    font-family: 'Times New Roman', serif;
+    font-size: 1.2rem;
+    color: var(--primary);
+    background: var(--bg-primary);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.kg-timeline-type-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.kg-timeline-type-badge.scientist {
+    background: rgba(139, 92, 246, 0.15);
+    color: #8b5cf6;
+}
+
+.kg-timeline-type-badge.equation {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.kg-timeline-type-badge.concept {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.kg-timeline-type-badge.discovery {
+    background: rgba(6, 182, 212, 0.15);
+    color: #06b6d4;
+}
+
+/* Detail Panel */
+.kg-detail-panel {
+    width: 380px;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+}
+
+.kg-detail-panel.open {
+    transform: translateX(0);
+}
+
+.kg-detail-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--bg-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.kg-detail-close:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.kg-detail-type {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.kg-detail-type.scientist {
+    background: rgba(139, 92, 246, 0.15);
+    color: #8b5cf6;
+}
+
+.kg-detail-type.equation {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.kg-detail-type.concept {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.kg-detail-type.discovery {
+    background: rgba(6, 182, 212, 0.15);
+    color: #06b6d4;
+}
+
+.kg-detail-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.kg-detail-name-zh {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.kg-detail-years {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.kg-detail-years i {
+    color: var(--primary);
+}
+
+.kg-detail-formula {
+    font-family: 'Times New Roman', serif;
+    font-size: 1.8rem;
+    color: var(--primary);
+    background: linear-gradient(135deg, var(--bg-primary), rgba(34, 197, 94, 0.1));
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+    text-align: center;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.kg-detail-section {
+    margin-bottom: 20px;
+}
+
+.kg-detail-section-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.kg-detail-description {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.kg-detail-description-zh {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.kg-detail-connections {
+    margin-top: 24px;
+}
+
+.kg-connection-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.kg-connection-item:hover {
+    background: rgba(34, 197, 94, 0.1);
+    transform: translateX(4px);
+}
+
+.kg-connection-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: white;
+}
+
+.kg-connection-icon.scientist {
+    background: #8b5cf6;
+}
+
+.kg-connection-icon.equation {
+    background: #22c55e;
+}
+
+.kg-connection-icon.concept {
+    background: #f59e0b;
+}
+
+.kg-connection-icon.discovery {
+    background: #06b6d4;
+}
+
+.kg-connection-info {
+    flex: 1;
+}
+
+.kg-connection-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.kg-connection-relation {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Graph Node Styles (D3) */
+.kg-node {
+    cursor: pointer;
+}
+
+.kg-node circle {
+    stroke: #fff;
+    stroke-width: 2px;
+    transition: all 0.2s ease;
+}
+
+.kg-node:hover circle {
+    stroke-width: 4px;
+    filter: drop-shadow(0 0 8px currentColor);
+}
+
+.kg-node text {
+    font-size: 11px;
+    fill: #fff;
+    text-anchor: middle;
+    pointer-events: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.kg-link {
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 1.5px;
+    fill: none;
+}
+
+.kg-link:hover {
+    stroke: rgba(255, 255, 255, 0.5);
+    stroke-width: 2.5px;
+}
+
+.kg-link-label {
+    font-size: 9px;
+    fill: rgba(255, 255, 255, 0.6);
+    text-anchor: middle;
+}
+
+/* Stats Bar */
+.kg-stats {
+    display: flex;
+    gap: 20px;
+    padding: 12px 20px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.kg-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.kg-stat-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.kg-stat-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.kg-stat-dot.scientist {
+    background: #8b5cf6;
+}
+
+.kg-stat-dot.equation {
+    background: #22c55e;
+}
+
+.kg-stat-dot.concept {
+    background: #f59e0b;
+}
+
+.kg-stat-dot.discovery {
+    background: #06b6d4;
+}
+
+/* Loading State */
+.kg-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: white;
+    gap: 16px;
+}
+
+.kg-loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Generate Modal */
+.kg-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.kg-modal.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.kg-modal-content {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    width: 90%;
+    max-width: 500px;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.kg-modal.open .kg-modal-content {
+    transform: translateY(0);
+}
+
+.kg-modal-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.kg-modal-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.kg-modal-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    margin-bottom: 16px;
+    transition: border-color 0.2s ease;
+}
+
+.kg-modal-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.kg-modal-type-select {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.kg-modal-type-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid var(--border);
+    background: transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.kg-modal-type-btn:hover {
+    border-color: var(--primary);
+}
+
+.kg-modal-type-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.kg-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.kg-modal-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.kg-modal-btn.cancel {
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+}
+
+.kg-modal-btn.primary {
+    background: var(--primary);
+    color: white;
+}
+
+.kg-modal-btn:hover {
+    transform: translateY(-2px);
+}
+
+.kg-modal-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Empty State */
+.kg-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    padding: 40px;
+}
+
+.kg-empty i {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.kg-empty h3 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+}
+
+.kg-empty p {
+    font-size: 0.95rem;
+    opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .kg-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .kg-view-toggle {
+        justify-content: center;
+    }
+
+    .kg-filters {
+        flex-direction: column;
+    }
+
+    .kg-search-input {
+        max-width: none;
+    }
+
+    .kg-detail-panel {
+        width: 100%;
+    }
+
+    .kg-timeline {
+        padding-left: 40px;
+    }
+
+    .kg-timeline::before {
+        left: 15px;
+    }
+
+    .kg-timeline-item::before {
+        left: -33px;
+    }
+
+    .kg-stats {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+}
+
+/* Tooltip */
+.kg-tooltip {
+    position: absolute;
+    background: var(--bg-dark);
+    color: white;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    max-width: 250px;
+}
+
+.kg-tooltip.visible {
+    opacity: 1;
+}
+
+/* Legend */
+.kg-legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.kg-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.kg-legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.kg-legend-dot.scientist {
+    background: #8b5cf6;
+}
+
+.kg-legend-dot.equation {
+    background: #22c55e;
+}
+
+.kg-legend-dot.concept {
+    background: #f59e0b;
+}
+
+.kg-legend-dot.discovery {
+    background: #06b6d4;
+}
+
+/* Zoom Controls */
+.kg-zoom-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+}
+
+.kg-zoom-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background 0.2s ease;
+}
+
+.kg-zoom-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
