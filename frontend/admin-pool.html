@@ -756,14 +756,8 @@
         });
 
         async function checkAuth() {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:760',message:'checkAuth started',data:{currentSubject:currentSubject},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C,D'})}).catch(()=>{});
-            // #endregion
             try {
                 const response = await fetch('/api/auth/me', { credentials: 'include' });
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:764',message:'auth/me response',data:{status:response.status,ok:response.ok},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
                 if (!response.ok) throw new Error('Not authenticated');
 
                 const data = await response.json();
@@ -772,20 +766,9 @@
                 document.getElementById('adminEmail').textContent = currentUser.email;
 
                 // Check admin status - default to Physics subject
-                const statsUrl = `/api/admin/pool-stats?subject=${currentSubject}`;
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:776',message:'calling pool-stats',data:{url:statsUrl,currentSubject:currentSubject},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                // #endregion
-                const statsResponse = await fetch(statsUrl, { credentials: 'include' });
-                // #region agent log
-                const errorText = !statsResponse.ok ? await statsResponse.clone().text() : '';
-                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:781',message:'pool-stats response',data:{status:statsResponse.status,ok:statsResponse.ok,errorBody:errorText.substring(0,500)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'F,G,H,I'})}).catch(()=>{});
-                // #endregion
+                const statsResponse = await fetch(`/api/admin/pool-stats?subject=${currentSubject}`, { credentials: 'include' });
                 if (!statsResponse.ok) {
                     if (statsResponse.status === 403) {
-                        // #region agent log
-                        fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:787',message:'403 Forbidden received',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
-                        // #endregion
                         showError('無權限訪問 - 需要管理員權限');
                         return;
                     }
@@ -793,9 +776,6 @@
                 }
 
                 const statsData = await statsResponse.json();
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:797',message:'statsData parsed',data:{hasAllSubtopics:!!statsData.allSubtopics,subtopicCount:statsData.allSubtopics?.length||0,keys:Object.keys(statsData)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-                // #endregion
                 allSubtopics = statsData.allSubtopics || [];
 
                 document.getElementById('loadingState').hidden = true;
@@ -808,9 +788,6 @@
                 loadQuestionBank();
 
             } catch (err) {
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin-pool.html:813',message:'checkAuth error caught',data:{errorMessage:err.message,errorName:err.name,errorStack:err.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});
-                // #endregion
                 console.error('Auth error:', err);
                 showError('請先登入');
             }
