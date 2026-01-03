@@ -41,6 +41,7 @@ export async function onRequestGet(context) {
         SELECT 
           u.id as user_id,
           u.email,
+          u.name,
           COALESCE(SUM(qs.score), 0) as points,
           COALESCE(us.current_streak, 0) as streak
         FROM users u
@@ -67,6 +68,7 @@ export async function onRequestGet(context) {
         SELECT 
           u.id as user_id,
           u.email,
+          u.name,
           COALESCE(SUM(qs.score), 0) as points,
           COALESCE(us.current_streak, 0) as streak
         FROM users u
@@ -85,6 +87,7 @@ export async function onRequestGet(context) {
         SELECT 
           u.id as user_id,
           u.email,
+          u.name,
           COALESCE(us.total_points, 0) as points,
           COALESCE(us.current_streak, 0) as streak,
           us.correct_count,
@@ -106,10 +109,10 @@ export async function onRequestGet(context) {
 }
 
 async function buildResponse(results, user, env, type) {
-  // Format leaderboard entries (hide full email for privacy)
+  // Format leaderboard entries - show name if set, otherwise masked email
   const leaderboard = results.map((row, index) => ({
     rank: index + 1,
-    name: maskEmail(row.email),
+    name: row.name || maskEmail(row.email),
     points: row.points || 0,
     streak: row.streak || 0,
   }));
@@ -122,6 +125,9 @@ async function buildResponse(results, user, env, type) {
         SELECT total_points, current_streak, correct_count FROM user_scores WHERE user_id = ?
       `).bind(user.id).first();
 
+      // Get user's display name
+      const displayName = user.name || maskEmail(user.email);
+
       if (userScores) {
         if (type === 'global') {
           // Calculate user's global rank
@@ -131,22 +137,21 @@ async function buildResponse(results, user, env, type) {
 
           userRank = {
             rank: rankResult?.rank || 1,
-            name: maskEmail(user.email),
+            name: displayName,
             points: userScores.total_points || 0,
             streak: userScores.current_streak || 0,
             isCurrentUser: true,
           };
         } else {
-          // For daily/weekly, find user in results by matching masked email
-          const userMaskedEmail = maskEmail(user.email);
-          const userInList = leaderboard.find(l => l.name === userMaskedEmail);
+          // For daily/weekly, find user in results
+          const userInList = leaderboard.find(l => l.name === displayName);
 
           if (userInList) {
             userRank = { ...userInList, isCurrentUser: true };
           } else {
             userRank = {
               rank: '-',
-              name: userMaskedEmail,
+              name: displayName,
               points: 0,
               streak: userScores.current_streak || 0,
               isCurrentUser: true,
@@ -157,7 +162,7 @@ async function buildResponse(results, user, env, type) {
         // User has no scores yet
         userRank = {
           rank: '-',
-          name: maskEmail(user.email),
+          name: displayName,
           points: 0,
           streak: 0,
           isCurrentUser: true,
