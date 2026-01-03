@@ -519,9 +519,6 @@
             startTimer();
             initEventListeners();
             initInputTools();
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:initQuiz', message: 'initQuiz completed, initInputTools called', data: { questionsCount: quizData.questions.length }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'A' }) }).catch(() => { });
-            // #endregion
         }
 
         function startTimer() {
@@ -587,13 +584,7 @@
             const mcOptions = document.getElementById('mcOptions');
             const answerSection = document.getElementById('answerSection');
 
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:displayQuestion', message: 'Question type check', data: { questionType: question.type, index: index }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'C' }) }).catch(() => { });
-            // #endregion
             if (question.type === 'mc') {
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:displayQuestion:mc-branch', message: 'MC question detected, calling disableInputTools', data: { questionType: question.type }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'B' }) }).catch(() => { });
-                // #endregion
                 mcOptions.hidden = false;
                 answerSection.hidden = true;
                 renderMCOptions(question.options, answers[index]);
@@ -917,9 +908,6 @@
 
         // ==================== Input Tools Control ====================
         function initInputTools() {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:initInputTools', message: 'initInputTools called', data: {}, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'A' }) }).catch(() => { });
-            // #endregion
             // Setup event listeners for input tools
             const insertMathBtn = document.getElementById('insertMathBtn');
             const uploadImageBtn = document.getElementById('uploadImageBtn');
@@ -939,18 +927,12 @@
 
             if (drawBtn) {
                 drawBtn.addEventListener('click', function (e) {
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:drawBtn:click', message: 'Draw button clicked', data: { disabled: this.disabled, pointerEvents: this.style.pointerEvents }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'D' }) }).catch(() => { });
-                    // #endregion
                     if (!this.disabled) openDrawCanvas();
                 });
             }
         }
 
         function disableInputTools() {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:disableInputTools', message: 'disableInputTools called', data: {}, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'B' }) }).catch(() => { });
-            // #endregion
             const tools = ['insertMathBtn', 'uploadImageBtn', 'drawBtn'];
             tools.forEach(id => {
                 const btn = document.getElementById(id);
@@ -958,10 +940,7 @@
                     btn.disabled = true;
                     btn.style.opacity = '0.5';
                     btn.style.cursor = 'not-allowed';
-                    btn.style.pointerEvents = 'none'; // Prevent all clicks
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:disableInputTools:btn', message: 'Button disabled', data: { btnId: id, disabled: btn.disabled, pointerEvents: btn.style.pointerEvents }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'B' }) }).catch(() => { });
-                    // #endregion
+                    btn.style.pointerEvents = 'none';
                 }
             });
         }
@@ -1126,10 +1105,6 @@
         let lastY = 0;
 
         function openDrawCanvas() {
-            // #region agent log
-            const drawBtnState = document.getElementById('drawBtn');
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:openDrawCanvas', message: 'openDrawCanvas called', data: { btnDisabled: drawBtnState?.disabled, btnPointerEvents: drawBtnState?.style?.pointerEvents }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'D' }) }).catch(() => { });
-            // #endregion
             // Check if disabled
             if (document.getElementById('drawBtn')?.disabled) return;
 
@@ -1142,9 +1117,6 @@
         }
 
         function initCanvas() {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:initCanvas', message: 'initCanvas called', data: {}, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'E' }) }).catch(() => { });
-            // #endregion
             drawCanvas = document.getElementById('drawCanvas');
             if (!drawCanvas) {
                 console.error('Canvas element not found');
@@ -1160,11 +1132,6 @@
             // Set white background
             drawCtx.fillStyle = '#ffffff';
             drawCtx.fillRect(0, 0, drawCanvas.width, drawCanvas.height);
-
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/e4c569f0-6ac6-488d-aa92-c575b5a30a4c', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'working.html:initCanvas:success', message: 'Canvas initialized', data: { width: drawCanvas.width, height: drawCanvas.height }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'E' }) }).catch(() => { });
-            // #endregion
-            console.log('Canvas initialized:', drawCanvas.width, 'x', drawCanvas.height);
 
             // Clear any existing listeners by cloning and replacing
             const newCanvas = drawCanvas.cloneNode(true);

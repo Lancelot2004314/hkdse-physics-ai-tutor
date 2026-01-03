@@ -108,6 +108,12 @@
             border-color: rgba(245, 158, 11, 0.35);
         }
 
+        .badge-partial {
+            background: rgba(251, 191, 36, 0.15);
+            color: rgb(180, 130, 0);
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+
         .q-block {
             margin-top: 12px;
             padding-top: 12px;
@@ -390,31 +396,36 @@
                 const maxScore = q.score ?? 1;
 
                 // For MC: simple letter comparison
-                // For SHORT/LONG: use backend grading score if available, otherwise mark as "Needs Review"
+                // For SHORT/LONG: use backend grading score
                 let isCorrect = false;
-                let needsReview = false;
+                let earnedScore = 0;
                 
                 if (data.status === 'completed') {
                     if (isMC) {
                         // MC: direct letter comparison
                         isCorrect = normalizeAnswer(userAnswer) && normalizeAnswer(correctAnswer) && 
                                     normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
-                    } else if (q.earnedScore !== undefined) {
-                        // Backend has graded this - use that score
-                        isCorrect = q.earnedScore >= maxScore;
+                        earnedScore = isCorrect ? maxScore : 0;
                     } else {
-                        // SHORT/LONG without backend grading - can't determine correctness
-                        needsReview = true;
+                        // SHORT/LONG: use backend grading score
+                        earnedScore = q.earnedScore ?? 0;
+                        isCorrect = earnedScore >= maxScore * 0.5; // 50% threshold for "correct"
                     }
                 }
 
                 let badge;
                 if (data.status !== 'completed') {
                     badge = `<span class="badge">In progress</span>`;
-                } else if (needsReview) {
-                    badge = `<span class="badge badge-review">Needs Review</span>`;
                 } else {
-                    badge = `<span class="badge ${isCorrect ? 'badge-correct' : 'badge-wrong'}">${isCorrect ? 'Correct' : 'Incorrect'}</span>`;
+                    // Show score for all completed questions
+                    const scoreDisplay = `${earnedScore}/${maxScore}`;
+                    if (isCorrect) {
+                        badge = `<span class="badge badge-correct">${scoreDisplay}</span>`;
+                    } else if (earnedScore > 0) {
+                        badge = `<span class="badge badge-partial">${scoreDisplay}</span>`;
+                    } else {
+                        badge = `<span class="badge badge-wrong">${scoreDisplay}</span>`;
+                    }
                 }
 
                 // Generate graph HTML if graphData exists
@@ -433,11 +444,21 @@
                 `;
 
                 const mcHtml = isMC ? renderMCReview(q, userAnswer, correctAnswer, data.status) : '';
+                
+                // AI grading feedback for short/long questions
+                const gradingFeedbackHtml = (!isMC && data.status === 'completed' && q.gradingFeedback) ? `
+                    <div class="q-block" style="background: rgba(59, 130, 246, 0.08); border-left: 3px solid rgb(59, 130, 246); padding-left: 12px;">
+                        <h3 style="color: rgb(59, 130, 246);"><i class="fas fa-robot"></i> AI 評分反饋</h3>
+                        <div class="q-content">${formatMath(q.gradingFeedback)}</div>
+                    </div>
+                ` : '';
+
                 const userAnswerHtml = !isMC ? `
                     <div class="q-block">
                         <h3>Your Answer</h3>
                         <div class="q-content">${formatMath(userAnswer || '(empty)')}</div>
                     </div>
+                    ${gradingFeedbackHtml}
                 ` : `
                     <div class="q-block">
                         <h3>Your Answer</h3>

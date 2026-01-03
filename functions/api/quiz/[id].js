@@ -39,6 +39,7 @@ export async function onRequestGet(context) {
 
     let questions = [];
     let answers = [];
+    let gradingResults = [];
 
     try {
       questions = JSON.parse(session.questions || '[]');
@@ -52,13 +53,25 @@ export async function onRequestGet(context) {
       console.error('Error parsing answers:', e);
     }
 
-    // For completed sessions, include answers and explanations
+    try {
+      gradingResults = JSON.parse(session.grading_results || '[]');
+    } catch (e) {
+      console.error('Error parsing grading results:', e);
+    }
+
+    // For completed sessions, include answers, explanations, and grading results
     let questionsWithAnswers = questions;
     if (session.status === 'completed') {
-      questionsWithAnswers = questions.map((q, i) => ({
-        ...q,
-        userAnswer: i < answers.length ? answers[i] : null,
-      }));
+      questionsWithAnswers = questions.map((q, i) => {
+        const grading = gradingResults[i] || {};
+        return {
+          ...q,
+          userAnswer: i < answers.length ? answers[i] : null,
+          earnedScore: grading.score ?? null,
+          gradingFeedback: grading.feedback || null,
+          isCorrect: grading.isCorrect ?? null,
+        };
+      });
     } else {
       // For in-progress, hide correct answers
       questionsWithAnswers = questions.map(q => {

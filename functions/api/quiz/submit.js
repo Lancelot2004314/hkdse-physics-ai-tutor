@@ -191,13 +191,14 @@ export async function onRequestPost(context) {
     const percentage = session.max_score > 0 ? (totalScore / session.max_score) * 100 : 0;
     const grade = calculateGrade(percentage);
 
-    // Update session
+    // Update session with grading results
     await env.DB.prepare(`
       UPDATE quiz_sessions SET
         answers = ?,
         score = ?,
         grade = ?,
         time_spent = ?,
+        grading_results = ?,
         status = 'completed',
         completed_at = datetime('now')
       WHERE id = ?
@@ -206,6 +207,7 @@ export async function onRequestPost(context) {
       totalScore,
       grade,
       timeSpent || 0,
+      JSON.stringify(results),
       sessionId
     ).run();
 
