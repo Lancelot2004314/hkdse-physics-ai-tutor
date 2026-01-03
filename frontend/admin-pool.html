@@ -765,8 +765,8 @@
 
                 document.getElementById('adminEmail').textContent = currentUser.email;
 
-                // Check admin status
-                const statsResponse = await fetch('/api/admin/pool-stats', { credentials: 'include' });
+                // Check admin status - default to Physics subject
+                const statsResponse = await fetch(`/api/admin/pool-stats?subject=${currentSubject}`, { credentials: 'include' });
                 if (!statsResponse.ok) {
                     if (statsResponse.status === 403) {
                         showError('無權限訪問 - 需要管理員權限');
@@ -833,7 +833,7 @@
 
         async function loadPoolStats() {
             try {
-                const response = await fetch('/api/admin/pool-stats', { credentials: 'include' });
+                const response = await fetch(`/api/admin/pool-stats?subject=${currentSubject}`, { credentials: 'include' });
                 if (!response.ok) throw new Error('Failed to load stats');
                 const data = await response.json();
                 displayPoolStats(data);
@@ -1038,8 +1038,9 @@
                 tab.classList.toggle('active', tab.dataset.subject === subject);
             });
             
-            // Reload subtopics for this subject
+            // Reload subtopics and stats for this subject
             loadSubtopicsForSubject(subject);
+            loadPoolStats();
             
             // Reload questions
             loadQuestionBank();
@@ -1051,6 +1052,7 @@
                 if (!response.ok) throw new Error('Failed to load subtopics');
                 const data = await response.json();
                 allSubtopics = data.allSubtopics || [];
+                populateSubtopicSelect();
                 populateBankSubtopicFilter();
             } catch (err) {
                 console.error('Error loading subtopics:', err);
