@@ -102,6 +102,12 @@
             border-color: rgba(239, 68, 68, 0.35);
         }
 
+        .badge-review {
+            background: rgba(245, 158, 11, 0.12);
+            color: rgb(180, 120, 0);
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
         .q-block {
             margin-top: 12px;
             padding-top: 12px;
@@ -363,27 +369,53 @@
                 const userAnswer = q.userAnswer ?? (Array.isArray(data.answers) ? data.answers[idx] : '');
                 // Handle different question types for correct answer
                 let correctAnswer = '';
+                let displayAnswer = ''; // For showing in the UI
                 if (q.type === 'mc') {
                     correctAnswer = q.correctAnswer ?? '';
+                    displayAnswer = correctAnswer;
                 } else if (q.parts && Array.isArray(q.parts)) {
                     // LONG questions with parts structure
-                    correctAnswer = q.parts.map(p =>
+                    displayAnswer = q.parts.map(p =>
                         `(${p.part}) ${p.modelAnswer || ''}`
                     ).join('\n\n');
+                    correctAnswer = ''; // Can't do simple comparison for LONG
                 } else {
-                    // SHORT questions
-                    correctAnswer = q.modelAnswer ?? q.answer ?? '';
+                    // SHORT questions - modelAnswer is full explanation, not just the answer
+                    displayAnswer = q.modelAnswer ?? q.answer ?? '';
+                    // Try to extract just the final answer for comparison
+                    // Look for patterns like "m = 7" or "答案是 7" or just a number at the end
+                    correctAnswer = q.correctAnswer ?? q.answer ?? '';
                 }
                 const isMC = q.type === 'mc';
                 const maxScore = q.score ?? 1;
 
-                const isCorrect = data.status === 'completed'
-                    ? normalizeAnswer(userAnswer) && normalizeAnswer(correctAnswer) && normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer)
-                    : false;
+                // For MC: simple letter comparison
+                // For SHORT/LONG: use backend grading score if available, otherwise mark as "Needs Review"
+                let isCorrect = false;
+                let needsReview = false;
+                
+                if (data.status === 'completed') {
+                    if (isMC) {
+                        // MC: direct letter comparison
+                        isCorrect = normalizeAnswer(userAnswer) && normalizeAnswer(correctAnswer) && 
+                                    normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
+                    } else if (q.earnedScore !== undefined) {
+                        // Backend has graded this - use that score
+                        isCorrect = q.earnedScore >= maxScore;
+                    } else {
+                        // SHORT/LONG without backend grading - can't determine correctness
+                        needsReview = true;
+                    }
+                }
 
-                const badge = data.status === 'completed'
-                    ? `<span class="badge ${isCorrect ? 'badge-correct' : 'badge-wrong'}">${isCorrect ? 'Correct' : 'Incorrect'}</span>`
-                    : `<span class="badge">In progress</span>`;
+                let badge;
+                if (data.status !== 'completed') {
+                    badge = `<span class="badge">In progress</span>`;
+                } else if (needsReview) {
+                    badge = `<span class="badge badge-review">Needs Review</span>`;
+                } else {
+                    badge = `<span class="badge ${isCorrect ? 'badge-correct' : 'badge-wrong'}">${isCorrect ? 'Correct' : 'Incorrect'}</span>`;
+                }
 
                 // Generate graph HTML if graphData exists
                 const graphHtml = (q.graphData && window.MathGraph && window.MathGraph.hasValidData(q.graphData)) ? `
@@ -430,7 +462,7 @@
                 const correctHtml = data.status === 'completed' ? `
                     <div class="q-block">
                         <h3>Correct Answer</h3>
-                        <div class="q-content" style="white-space: pre-wrap;">${isMC ? escapeHtml(String(correctAnswer || '(unknown)')) : formatMath(correctAnswer || '(unknown)')}</div>
+                        <div class="q-content" style="white-space: pre-wrap;">${isMC ? escapeHtml(String(correctAnswer || '(unknown)')) : formatMath(displayAnswer || '(unknown)')}</div>
                         ${markingSchemeHtml ? `<div class="q-content" style="margin-top:12px; padding:12px; background:rgba(34,197,94,0.1); border-radius:8px;"><strong>Marking Scheme:</strong><br>${markingSchemeHtml}</div>` : ''}
                     </div>
                 ` : '';
@@ -516,12 +548,42 @@
 
         function formatMath(text) {
             if (!text) return '';
-            return escapeHtml(String(text)).replace(/\n/g, '<br>');
+            text = String(text);
+            
+            // Protect LaTeX blocks from HTML escaping
+            const latexBlocks = [];
+            let processed = text;
+            
+            // Extract display math ($$...$$) first
+            processed = processed.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
+                const idx = latexBlocks.length;
+                latexBlocks.push(`$$${latex}$$`);
+                return `%%LATEX_BLOCK_${idx}%%`;
+            });
+            
+            // Extract inline math ($...$)
+            processed = processed.replace(/\$([^$]+)\$/g, (match, latex) => {
+                const idx = latexBlocks.length;
+                latexBlocks.push(`$${latex}$`);
+                return `%%LATEX_BLOCK_${idx}%%`;
+            });
+            
+            // Escape HTML in non-LaTeX parts
+            processed = escapeHtml(processed);
+            
+            // Convert newlines to <br>
+            processed = processed.replace(/\n/g, '<br>');
+            
+            // Restore LaTeX blocks
+            latexBlocks.forEach((latex, idx) => {
+                processed = processed.replace(`%%LATEX_BLOCK_${idx}%%`, latex);
+            });
+            
+            return processed;
         }
 
         function escapeHtml(str) {
-            return String(str).replace(/[&<>"']/g, (m) => ({
-                '&': '&amp;',
+            return String(str).replace(/[<>"']/g, (m) => ({
                 '<': '&lt;',
                 '>': '&gt;',
                 '"': '&quot;',

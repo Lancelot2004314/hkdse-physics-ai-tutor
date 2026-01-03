@@ -1062,7 +1062,7 @@ export const MATH_QUIZ_LONG_REWRITE_PROMPT = `Generate HKDSE Mathematics long st
   ]
 }`;
 
-export const MATH_GRADE_SHORT_ANSWER_PROMPT = `Grade a student's short answer for HKDSE Mathematics. Be STRICT like a real DSE examiner.
+export const MATH_GRADE_SHORT_ANSWER_PROMPT = `Grade a student's short answer for HKDSE Mathematics. Be fair and focus on mathematical correctness.
 
 ## Student Answer
 {studentAnswer}
@@ -1076,32 +1076,56 @@ export const MATH_GRADE_SHORT_ANSWER_PROMPT = `Grade a student's short answer fo
 ## Maximum Score
 {maxScore}
 
-## STRICT Grading Rules (MUST FOLLOW)
-1. **Do NOT give marks for effort alone** - only award marks for CORRECT mathematics
-2. **Wrong calculation = 0 marks for that step** - if the method/calculation is wrong, award 0 for that criterion
-3. **Empty or irrelevant answers = 0 marks**
-4. **Method errors are serious** - wrong approach should result in 0 marks for related parts
-5. **Arithmetic errors** - may receive method marks if approach is correct, but answer mark = 0
-6. **Compare carefully with model answer**
-7. **Follow HKDSE marking standards exactly** - 1M = method mark, 1A = answer mark
+## FLEXIBLE Grading Rules (IMPORTANT - Read Carefully!)
 
-## Scoring Guidelines
-- If answer shows NO understanding of the mathematical concept: score = 0
-- If answer has correct method but calculation error: partial marks for method only
-- If answer is partially correct: award proportional marks based on marking scheme
-- If answer is completely correct: full marks
+### 1. Language Flexibility 語言靈活性
+- If the model answer is in Chinese but student answers in English (or vice versa), **STILL GIVE MARKS** if the meaning is correct
+- Examples:
+  - "向上開口" = "opens upward" = "upwards" = "向上" → ALL CORRECT
+  - "頂點" = "vertex" = "turning point" → ALL CORRECT  
+  - "7" = "七" = "seven" → ALL CORRECT
+
+### 2. Concise Answers 簡潔答案
+- If the model answer contains detailed explanation but student only writes the FINAL ANSWER, **GIVE THE FINAL ANSWER MARK (1A)**
+- Examples:
+  - Model: "根據指數法則，$a^3 \\times a^4 = a^{3+4} = a^7$，因此 $m = 7$"
+  - Student: "7" → Award 1A for correct final answer
+  - Model: "頂點坐標為 $(1, -2)$，向上開口"
+  - Student: "(1,-2) upwards" or "upwards" → Award marks for each correct part mentioned
+
+### 3. Semantic Equivalence 語義等價
+- Accept synonyms and equivalent expressions:
+  - "向上" = "upward" = "up" = "positive direction"
+  - "增加" = "increasing" = "gets larger"
+  - "最小值" = "minimum" = "min value"
+  - "$x = 2$" = "x is 2" = "2"
+
+### 4. Partial Credit 部分給分
+- If question has multiple parts (e.g., find vertex AND direction), award marks for each correct part
+- Example: Student answers "向上開口" but misses vertex → Give marks for direction part
+
+## Core Mathematical Rules (Still Apply)
+1. **Wrong calculation = 0 marks for that step**
+2. **Empty or completely irrelevant answers = 0 marks**
+3. **Follow HKDSE marking: 1M = method, 1A = answer**
+
+## Scoring Flow
+1. First, identify what the question asks for (final answer? explanation? multiple parts?)
+2. Check if student's answer SEMANTICALLY matches the expected answer (ignore language)
+3. For concise answers: if student only gives final answer without working, award ONLY the final answer mark (typically 1A)
+4. For complete answers: follow normal marking scheme
 
 ## Output JSON
 {
   "score": 2,
   "maxScore": 4,
-  "feedback": "Correct method (+1M). Calculation error in step 2 led to wrong answer (0A).",
+  "feedback": "Correct final answer (+1A). Missing working steps for method marks.",
   "breakdown": [
-    {"criterion": "Method", "awarded": 1, "max": 1, "reason": "Correct approach"},
-    {"criterion": "Working", "awarded": 1, "max": 1, "reason": "Correct substitution"},
-    {"criterion": "Calculation", "awarded": 0, "max": 1, "reason": "Arithmetic error"},
-    {"criterion": "Final Answer", "awarded": 0, "max": 1, "reason": "Incorrect due to calculation error"}
-  ]
+    {"criterion": "Method", "awarded": 0, "max": 1, "reason": "No working shown"},
+    {"criterion": "Working", "awarded": 0, "max": 1, "reason": "No steps provided"},
+    {"criterion": "Final Answer", "awarded": 1, "max": 1, "reason": "Correct answer: 7"}
+  ],
+  "languageNote": "Student used English, model in Chinese - accepted as equivalent"
 }`;
 
 export const MATH_QUIZ_VALIDATE_AND_FIX_PROMPT = `You are a strict HKDSE Mathematics exam question validator and fixer.

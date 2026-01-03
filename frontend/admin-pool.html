@@ -1196,12 +1196,72 @@
 
         function formatMathText(text) {
             if (!text) return '';
-            // Keep LaTeX $ delimiters intact for MathJax
-            // Only escape < and > for HTML safety, leave & for LaTeX commands
-            return text
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/\n/g, '<br>');
+            // Process text while preserving LaTeX math blocks
+            // We need to avoid replacing \n with <br> inside $ ... $ or $$ ... $$
+            
+            // Split by math delimiters, keeping delimiters
+            // Handle both $$ (display) and $ (inline) math
+            const parts = [];
+            let remaining = text;
+            let inMath = false;
+            let mathDelimiter = '';
+            
+            while (remaining.length > 0) {
+                if (!inMath) {
+                    // Look for start of math: $$ or $
+                    const displayMatch = remaining.indexOf('$$');
+                    const inlineMatch = remaining.indexOf('$');
+                    
+                    let nextMathStart = -1;
+                    if (displayMatch !== -1 && (inlineMatch === -1 || displayMatch <= inlineMatch)) {
+                        nextMathStart = displayMatch;
+                        mathDelimiter = '$$';
+                    } else if (inlineMatch !== -1) {
+                        nextMathStart = inlineMatch;
+                        mathDelimiter = '$';
+                    }
+                    
+                    if (nextMathStart === -1) {
+                        // No more math, process rest as text
+                        parts.push({ type: 'text', content: remaining });
+                        break;
+                    } else {
+                        // Add text before math
+                        if (nextMathStart > 0) {
+                            parts.push({ type: 'text', content: remaining.substring(0, nextMathStart) });
+                        }
+                        remaining = remaining.substring(nextMathStart + mathDelimiter.length);
+                        inMath = true;
+                    }
+                } else {
+                    // Look for end of current math block
+                    const endMatch = remaining.indexOf(mathDelimiter);
+                    if (endMatch === -1) {
+                        // Unclosed math block, treat rest as math
+                        parts.push({ type: 'math', content: mathDelimiter + remaining, delimiter: mathDelimiter });
+                        break;
+                    } else {
+                        // Complete math block
+                        parts.push({ type: 'math', content: mathDelimiter + remaining.substring(0, endMatch) + mathDelimiter, delimiter: mathDelimiter });
+                        remaining = remaining.substring(endMatch + mathDelimiter.length);
+                        inMath = false;
+                    }
+                }
+            }
+            
+            // Now format each part appropriately
+            return parts.map(part => {
+                if (part.type === 'text') {
+                    // For non-math text: escape HTML and convert newlines
+                    return part.content
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/\n/g, '<br>');
+                } else {
+                    // For math: keep as-is (don't escape, don't add <br>)
+                    return part.content;
+                }
+            }).join('');
         }
 
         function populateBankSubtopicFilter() {

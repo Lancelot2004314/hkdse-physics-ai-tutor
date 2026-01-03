@@ -3,7 +3,7 @@
  * Grades answers and saves results
  */
 
-import { GRADE_SHORT_ANSWER_PROMPT } from '../../../shared/prompts.js';
+import { GRADE_SHORT_ANSWER_PROMPT, MATH_GRADE_SHORT_ANSWER_PROMPT } from '../../../shared/prompts.js';
 import { calculateGrade } from '../../../shared/topics.js';
 import { getUserFromSession } from '../../../shared/auth.js';
 import { saveTokenUsage } from '../../../shared/tokenUsage.js';
@@ -80,18 +80,35 @@ export async function onRequestPost(context) {
         // AI-grade short/long answers
         const maxQuestionScore = question.score || question.parts?.reduce((s, p) => s + p.marks, 0) || 5;
 
-        // Check for obviously invalid answers (just numbers, too short, etc.)
+        // Detect if this is a Math question (topic starts with 'math_' or subject is Mathematics)
+        const isMathQuestion = question.topic?.startsWith('math_') || 
+                               question.subject === 'Mathematics' ||
+                               session.subject === 'Mathematics';
+
+        // Check for obviously invalid answers
+        // For Math: allow short numeric answers (like "7" or "x=2")
+        // For Physics: require longer explanations
         const trimmedAnswer = userAnswer.trim();
-        const isObviouslyInvalid =
-          !trimmedAnswer ||
-          trimmedAnswer.length < 10 || // Too short to be a meaningful physics answer
-          /^[\d\s,.]+$/.test(trimmedAnswer) || // Just numbers
-          /^[a-zA-Z]{1,3}$/.test(trimmedAnswer); // Just a few letters
+        let isObviouslyInvalid = !trimmedAnswer;
+
+        if (!isObviouslyInvalid && !isMathQuestion) {
+          // Physics questions require longer answers
+          isObviouslyInvalid = 
+            trimmedAnswer.length < 10 || // Too short to be a meaningful physics answer
+            /^[\d\s,.]+$/.test(trimmedAnswer) || // Just numbers (not valid for physics)
+            /^[a-zA-Z]{1,3}$/.test(trimmedAnswer); // Just a few letters
+        } else if (!isObviouslyInvalid && isMathQuestion) {
+          // Math questions allow concise answers like "7", "x=2", "upwards", "(1,-2)"
+          // Only reject if it's clearly gibberish
+          isObviouslyInvalid = 
+            trimmedAnswer.length < 1 || // Empty
+            /^[^a-zA-Z0-9\u4e00-\u9fff\-+=()\s,.$]+$/.test(trimmedAnswer); // Only special chars
+        }
 
         if (isObviouslyInvalid) {
           score = 0;
           feedback = trimmedAnswer
-            ? 'Answer too short or invalid - please provide a proper physics explanation'
+            ? (isMathQuestion ? 'Answer appears invalid' : 'Answer too short or invalid - please provide a proper physics explanation')
             : 'No answer provided - 0 marks';
           console.log(`[Quiz] Q${i + 1}: Invalid answer detected: "${trimmedAnswer}" => 0 marks`);
         } else if (trimmedAnswer) {
@@ -120,7 +137,8 @@ export async function onRequestPost(context) {
               userAnswer,
               modelAnswer,
               question.markingScheme || question.parts?.map(p => `${p.marks} marks: ${p.question}`).join('\n'),
-              maxQuestionScore
+              maxQuestionScore,
+              isMathQuestion
             );
 
             if (gradeResult.success) {
@@ -301,20 +319,27 @@ Is this student answer RELEVANT to the physics question? Respond with JSON only.
   }
 }
 
-async function gradeShortAnswer(apiKey, studentAnswer, modelAnswer, markingScheme, maxScore) {
+async function gradeShortAnswer(apiKey, studentAnswer, modelAnswer, markingScheme, maxScore, isMathQuestion = false) {
   if (!apiKey) {
     console.log('[Grading] No API key available');
     return { success: false, score: 0, feedback: 'Grading unavailable' };
   }
 
   console.log('[Grading] Starting grading for answer:', studentAnswer.substring(0, 100) + '...');
-  console.log('[Grading] Max score:', maxScore);
+  console.log('[Grading] Max score:', maxScore, ', isMath:', isMathQuestion);
 
-  const prompt = GRADE_SHORT_ANSWER_PROMPT
+  // Choose the appropriate prompt based on subject
+  const basePrompt = isMathQuestion ? MATH_GRADE_SHORT_ANSWER_PROMPT : GRADE_SHORT_ANSWER_PROMPT;
+  const prompt = basePrompt
     .replace('{studentAnswer}', studentAnswer)
     .replace('{modelAnswer}', modelAnswer || 'N/A')
     .replace('{markingScheme}', Array.isArray(markingScheme) ? markingScheme.join('\n') : markingScheme || 'N/A')
     .replace('{maxScore}', maxScore);
+
+  // System prompt based on subject
+  const systemPrompt = isMathQuestion 
+    ? 'You are a fair HKDSE Mathematics examiner. Focus on mathematical correctness. Accept answers in any language (Chinese/English) if the meaning is correct. Award marks for correct final answers even without full working.'
+    : 'You are a STRICT HKDSE Physics examiner. Grade accurately - do NOT give marks for wrong answers or effort alone. Only award marks for correct physics content.';
 
   try {
     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -326,10 +351,10 @@ async function gradeShortAnswer(apiKey, studentAnswer, modelAnswer, markingSchem
       body: JSON.stringify({
         model: 'deepseek-chat',
         messages: [
-          { role: 'system', content: 'You are a STRICT HKDSE Physics examiner. Grade accurately - do NOT give marks for wrong answers or effort alone. Only award marks for correct physics content.' },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: prompt },
         ],
-        temperature: 0.1, // Lower temperature for more consistent strict grading
+        temperature: 0.1, // Lower temperature for more consistent grading
         max_tokens: 1024,
       }),
     });
