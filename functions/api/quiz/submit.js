@@ -52,134 +52,120 @@ export async function onRequestPost(context) {
     }
 
     const questions = JSON.parse(session.questions || '[]');
-    const results = [];
-    let totalScore = 0;
     let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
 
-    // Grade each answer
-    console.log(`[Quiz] Starting grading for ${questions.length} questions, session max_score: ${session.max_score}`);
+    // Helper: check if answer is gibberish (repeated chars, random letters, etc.)
+    const isGibberish = (text) => {
+      const t = text.toLowerCase();
+      if (/^(.)\1{2,}$/.test(t)) return true; // Repeated chars
+      if (/^(qwerty|asdf|zxcv|qazwsx|abc|xyz|test|hello|hi|ok|no|yes|idk|lol|haha|what|why|how|help)$/i.test(t)) return true;
+      if (t.length <= 5 && !/[\d\u4e00-\u9fff+\-=×÷√∑∫]/.test(t)) return true;
+      if (/^[a-z]{2,6}$/i.test(t) && !/^(up|down|left|right|yes|no|true|false|zero|one|two)$/i.test(t)) return true;
+      return false;
+    };
 
-    for (let i = 0; i < questions.length; i++) {
-      const question = questions[i];
-      const userAnswer = answers[i] || '';
+    // Grade a single question - returns { score, feedback, isCorrect, usage }
+    const gradeQuestion = async (question, userAnswer, index) => {
       let score = 0;
       let feedback = '';
       let isCorrect = false;
+      let usage = null;
 
-      console.log(`[Quiz] Q${i + 1}: type=${question.type}, score=${question.score}, userAnswer=${userAnswer?.substring(0, 50)}`);
+      console.log(`[Quiz] Q${index + 1}: type=${question.type}, score=${question.score}, answer="${userAnswer?.substring(0, 30)}"`);
 
       if (question.type === 'mc') {
-        // Auto-grade MC
+        // Auto-grade MC (instant - no API)
         const userAns = (userAnswer || '').trim().toUpperCase();
         const correctAns = (question.correctAnswer || '').trim().toUpperCase();
         isCorrect = userAns === correctAns;
         score = isCorrect ? (question.score || 1) : 0;
         feedback = isCorrect ? 'Correct!' : `Incorrect. The correct answer is ${question.correctAnswer}.`;
-        console.log(`[Quiz] MC Q${i + 1}: user="${userAns}" vs correct="${correctAns}" => ${isCorrect ? 'CORRECT' : 'WRONG'}, score=${score}`);
       } else if (question.type === 'short' || question.type === 'long') {
-        // AI-grade short/long answers
         const maxQuestionScore = question.score || question.parts?.reduce((s, p) => s + p.marks, 0) || 5;
-
-        // Detect if this is a Math question (topic starts with 'math_' or subject is Mathematics)
         const isMathQuestion = question.topic?.startsWith('math_') || 
                                question.subject === 'Mathematics' ||
                                session.subject === 'Mathematics';
-
-        // Check for obviously invalid answers
-        // For Math: allow short numeric answers (like "7" or "x=2")
-        // For Physics: require longer explanations
         const trimmedAnswer = userAnswer.trim();
+        
+        // LOCAL CHECK - no API call needed for obviously invalid answers
         let isObviouslyInvalid = !trimmedAnswer;
+        let invalidReason = '';
 
-        if (!isObviouslyInvalid && !isMathQuestion) {
-          // Physics questions require longer answers
-          isObviouslyInvalid = 
-            trimmedAnswer.length < 10 || // Too short to be a meaningful physics answer
-            /^[\d\s,.]+$/.test(trimmedAnswer) || // Just numbers (not valid for physics)
-            /^[a-zA-Z]{1,3}$/.test(trimmedAnswer); // Just a few letters
+        if (!isObviouslyInvalid && isGibberish(trimmedAnswer)) {
+          isObviouslyInvalid = true;
+          invalidReason = 'Answer appears to be gibberish or irrelevant';
+        } else if (!isObviouslyInvalid && !isMathQuestion) {
+          if (trimmedAnswer.length < 10) {
+            isObviouslyInvalid = true;
+            invalidReason = 'Answer too short for physics question';
+          } else if (/^[\d\s,.]+$/.test(trimmedAnswer)) {
+            isObviouslyInvalid = true;
+            invalidReason = 'Just numbers - physics requires explanation';
+          }
         } else if (!isObviouslyInvalid && isMathQuestion) {
-          // Math questions allow concise answers like "7", "x=2", "upwards", "(1,-2)"
-          // Only reject if it's clearly gibberish
-          isObviouslyInvalid = 
-            trimmedAnswer.length < 1 || // Empty
-            /^[^a-zA-Z0-9\u4e00-\u9fff\-+=()\s,.$]+$/.test(trimmedAnswer); // Only special chars
+          if (/^[^a-zA-Z0-9\u4e00-\u9fff\-+=()\s,.$√∑∫×÷]+$/.test(trimmedAnswer)) {
+            isObviouslyInvalid = true;
+            invalidReason = 'Contains only special characters';
+          }
         }
 
         if (isObviouslyInvalid) {
           score = 0;
-          feedback = trimmedAnswer
-            ? (isMathQuestion ? 'Answer appears invalid' : 'Answer too short or invalid - please provide a proper physics explanation')
-            : 'No answer provided - 0 marks';
-          console.log(`[Quiz] Q${i + 1}: Invalid answer detected: "${trimmedAnswer}" => 0 marks`);
-        } else if (trimmedAnswer) {
-          // Step 1: Quick pre-validation with Qwen-turbo (fast & cheap)
+          feedback = trimmedAnswer ? (invalidReason || 'Answer appears invalid') : 'No answer provided - 0 marks';
+          console.log(`[Quiz] Q${index + 1}: Invalid (local): "${trimmedAnswer}" => 0. Reason: ${invalidReason}`);
+        } else {
+          // AI grading needed - directly use DeepSeek (skip pre-validation for speed)
           const modelAnswer = question.modelAnswer || question.parts?.map(p => p.modelAnswer).join('\n');
-          const questionText = question.question || question.parts?.map(p => p.question).join('\n');
-
-          const preValidation = await quickValidateAnswer(
-            env.QWEN_API_KEY,
-            trimmedAnswer,
+          const gradeResult = await gradeShortAnswer(
+            env.DEEPSEEK_API_KEY,
+            userAnswer,
             modelAnswer,
-            questionText
+            question.markingScheme || question.parts?.map(p => `${p.marks} marks: ${p.question}`).join('\n'),
+            maxQuestionScore,
+            isMathQuestion
           );
 
-          console.log(`[Quiz] Q${i + 1} pre-validation: ${preValidation.isRelevant ? 'RELEVANT' : 'IRRELEVANT'} (${preValidation.reason})`);
-
-          if (!preValidation.isRelevant) {
-            // Answer is completely irrelevant - give 0 marks
-            score = 0;
-            feedback = `Answer appears irrelevant or incorrect: ${preValidation.reason}`;
-            console.log(`[Quiz] Q${i + 1}: Pre-validation failed => 0 marks`);
+          if (gradeResult.success) {
+            score = Math.min(Math.max(gradeResult.score || 0, 0), maxQuestionScore);
+            feedback = gradeResult.feedback || 'Graded by AI';
+            usage = gradeResult.usage;
+            console.log(`[Quiz] Q${index + 1} graded: ${score}/${maxQuestionScore}`);
           } else {
-            // Step 2: Detailed grading with DeepSeek (if pre-validation passed)
-            const gradeResult = await gradeShortAnswer(
-              env.DEEPSEEK_API_KEY,
-              userAnswer,
-              modelAnswer,
-              question.markingScheme || question.parts?.map(p => `${p.marks} marks: ${p.question}`).join('\n'),
-              maxQuestionScore,
-              isMathQuestion
-            );
-
-            if (gradeResult.success) {
-              // Validate score is reasonable (0 to maxScore)
-              score = Math.min(Math.max(gradeResult.score || 0, 0), maxQuestionScore);
-              feedback = gradeResult.feedback || 'Graded by AI';
-              console.log(`[Quiz] Q${i + 1} graded: ${score}/${maxQuestionScore}`);
-              if (gradeResult.usage) {
-                totalUsage.prompt_tokens += gradeResult.usage.prompt_tokens || 0;
-                totalUsage.completion_tokens += gradeResult.usage.completion_tokens || 0;
-                totalUsage.total_tokens += gradeResult.usage.total_tokens || 0;
-              }
-            } else {
-              // Grading failed - give 0 marks, not full marks!
-              score = 0;
-              feedback = gradeResult.feedback || 'Grading failed - 0 marks awarded';
-              console.error(`[Quiz] Q${i + 1} grading failed: ${gradeResult.feedback}`);
-            }
+            score = 0;
+            feedback = gradeResult.feedback || 'Grading failed - 0 marks';
           }
-        } else {
-          // Empty answer = 0 marks
-          score = 0;
-          feedback = 'No answer provided - 0 marks';
         }
-        isCorrect = score >= maxQuestionScore * 0.5; // 50% threshold
+        isCorrect = score >= maxQuestionScore * 0.5;
       }
 
-      totalScore += score;
-      const qMaxScore = question.score || 1;
-      console.log(`[Quiz] Q${i + 1} result: score=${score}/${qMaxScore}, isCorrect=${isCorrect}`);
-
-      results.push({
-        questionIndex: i,
+      return {
+        questionIndex: index,
         userAnswer,
         correctAnswer: question.correctAnswer || question.modelAnswer,
         score,
-        maxScore: qMaxScore,
+        maxScore: question.score || 1,
         isCorrect,
         feedback,
         explanation: question.explanation,
-      });
+        usage,
+      };
+    };
+
+    // Grade ALL questions in PARALLEL for speed
+    console.log(`[Quiz] Starting PARALLEL grading for ${questions.length} questions`);
+    const gradingPromises = questions.map((question, i) => gradeQuestion(question, answers[i] || '', i));
+    const results = await Promise.all(gradingPromises);
+
+    // Aggregate results
+    let totalScore = 0;
+    for (const r of results) {
+      totalScore += r.score;
+      if (r.usage) {
+        totalUsage.prompt_tokens += r.usage.prompt_tokens || 0;
+        totalUsage.completion_tokens += r.usage.completion_tokens || 0;
+        totalUsage.total_tokens += r.usage.total_tokens || 0;
+      }
+      console.log(`[Quiz] Q${r.questionIndex + 1} result: ${r.score}/${r.maxScore}, correct=${r.isCorrect}`);
     }
 
     // Log final summary

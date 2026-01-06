@@ -4,237 +4,498 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard - HKDSE Physics AI Tutor</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/thinka.css">
-    <link rel="stylesheet" href="css/leaderboard.css">
-    <link rel="stylesheet" href="css/ai-agent.css?v=6.3">
+    <title>Leaderboards - DSE Physics AI Tutor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="/js/i18n.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --secondary: #1cb0f6;
+            --gold: #ffc800;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+            --streak: #ff9600;
+            --red: #ff4b4b;
+            --purple: #ce82ff;
+            --bg: #131f24;
+            --bg-secondary: #1a2c35;
+            --card: #1f3640;
+            --card-hover: #253d49;
+            --text: #ffffff;
+            --text-secondary: #afafaf;
+            --border: #37464f;
+            --sidebar-bg: #1a2c35;
+            --sidebar-hover: #233a47;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar - same as learn.html */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 2px solid var(--border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 20px 25px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .sidebar-nav { flex: 1; padding: 15px 0; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 25px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover { background: var(--sidebar-hover); color: var(--text); }
+        .nav-item.active { background: rgba(255, 200, 0, 0.15); color: var(--gold); border-left-color: var(--gold); }
+        .nav-item i { font-size: 22px; width: 28px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 15px 25px;
+            border-top: 2px solid var(--border);
+        }
+
+        .sidebar-footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            display: block;
+            padding: 8px 0;
+        }
+
+        /* Main content */
+        .main-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-header {
+            height: 60px;
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 25px;
+            gap: 20px;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--card);
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Leaderboard specific */
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .trophy-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .trophy-icon {
+            font-size: 50px;
+            transition: transform 0.3s;
+        }
+
+        .trophy-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .trophy-bronze { color: var(--bronze); }
+        .trophy-gold { color: var(--gold); }
+        .trophy-silver { color: var(--silver); }
+
+        .leaderboard-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .leaderboard-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* League selector */
+        .league-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .league-tab {
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .league-tab:hover {
+            background: var(--card-hover);
+            color: var(--text);
+        }
+
+        .league-tab.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: #000;
+        }
+
+        /* Rankings list */
+        .rankings-list {
+            background: var(--card);
+            border-radius: 16px;
+            border: 2px solid var(--border);
+            overflow: hidden;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .ranking-item:last-child {
+            border-bottom: none;
+        }
+
+        .ranking-item:hover {
+            background: var(--card-hover);
+        }
+
+        .ranking-item.current-user {
+            background: rgba(88, 204, 2, 0.1);
+            border-left: 4px solid var(--primary);
+        }
+
+        .rank-number {
+            width: 40px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-secondary);
+        }
+
+        .rank-number.top-1 { color: var(--gold); }
+        .rank-number.top-2 { color: var(--silver); }
+        .rank-number.top-3 { color: var(--bronze); }
+
+        .rank-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            margin-right: 15px;
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .rank-xp-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            max-width: 200px;
+        }
+
+        .rank-xp-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .rank-xp {
+            font-weight: 800;
+            color: var(--gold);
+            font-size: 16px;
+        }
+
+        /* Right sidebar info */
+        .right-sidebar {
+            width: 320px;
+            padding: 25px;
+            border-left: 2px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .info-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .info-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .info-card h3 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .mascot-image {
+            font-size: 80px;
+            text-align: right;
+            margin-top: -30px;
+        }
+
+        .start-lesson-btn {
+            display: block;
+            width: 100%;
+            padding: 14px 20px;
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--primary);
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .start-lesson-btn:hover {
+            background: rgba(88, 204, 2, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* Loading */
+        .loading-state {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 1200px) { .right-sidebar { display: none; } }
+        @media (max-width: 900px) {
+            .sidebar { width: 80px; }
+            .sidebar-logo span, .nav-item span { display: none; }
+            .sidebar-logo { justify-content: center; padding: 20px 10px; }
+            .nav-item { justify-content: center; padding: 14px; }
+            .sidebar-footer { display: none; }
+            .main-wrapper { margin-left: 80px; }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="app-layout">
         <!-- Sidebar -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
                     <i class="fas fa-atom"></i>
+            <span>DSE Physics</span>
                 </div>
-                <div class="user-info" id="userInfo">
-                    <div class="user-name" id="userName">Guest</div>
-                    <div class="user-email" id="userEmail"></div>
-                </div>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> <span
-                            data-i18n="nav.dashboard">Dashboard</span></a></li>
-                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span
-                            data-i18n="nav.aiTutor">AI Tutor</span></a></li>
-                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> <span
-                            data-i18n="nav.freePractice">Free Practice</span></a></li>
-                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span
-                            data-i18n="nav.statistics">Statistics</span></a></li>
-                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> <span
-                            data-i18n="nav.history">History</span></a></li>
-                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span
-                            data-i18n="nav.bookmarks">Bookmarks</span></a></li>
-                <li class="nav-item active"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span
-                            data-i18n="nav.leaderboard">Leaderboard</span></a></li>
-                <li class="nav-item"><a href="/profile.html"><i class="fas fa-user"></i> <span
-                            data-i18n="nav.profile">Profile</span></a></li>
-                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i
-                            class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a></li>
-            </ul>
-            <div class="sidebar-footer">
-                <div class="language-switcher-container" id="langSwitcherContainer"></div>
-                <button class="btn-logout" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.signOut">Sign Out</span>
-                </button>
-            </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="/learn.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span>Learn</span></a>
+            <a href="/leaderboard.html" class="nav-item active"><i class="fas fa-trophy" style="color: var(--gold);"></i><span>Leaderboards</span></a>
+            <a href="/quests.html" class="nav-item"><i class="fas fa-tasks"></i><span>Quests</span></a>
+            <a href="/shop.html" class="nav-item"><i class="fas fa-store"></i><span>Shop</span></a>
+            <a href="/profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
         </nav>
+        <div class="sidebar-footer">
+            <a href="/settings.html"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+        </div>
+    </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="page-header">
-                <h1><i class="fas fa-trophy" style="color: var(--warning);"></i> Leaderboard</h1>
-                <p>看看誰是物理高手！</p>
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="stat-badge" style="color: var(--streak);"><i class="fas fa-fire"></i><span id="streak">0</span></div>
+            <div class="stat-badge" style="color: var(--secondary);"><i class="fas fa-gem"></i><span>500</span></div>
+            <div class="stat-badge" style="color: var(--red);"><i class="fas fa-heart"></i><span id="hearts">5</span></div>
             </header>
 
-            <!-- Tabs -->
-            <div class="leaderboard-tabs">
-                <button class="tab-btn active" data-tab="global">
-                    <i class="fas fa-globe"></i> 總榜
-                </button>
-                <button class="tab-btn" data-tab="weekly">
-                    <i class="fas fa-calendar-week"></i> 本週
-                </button>
-                <button class="tab-btn" data-tab="daily">
-                    <i class="fas fa-calendar-day"></i> 今日
-                </button>
+        <div class="content-wrapper">
+            <main class="main-content">
+                <div class="leaderboard-header">
+                    <div class="trophy-icons">
+                        <span class="trophy-icon trophy-bronze">🥉</span>
+                        <span class="trophy-icon trophy-gold">🥇</span>
+                        <span class="trophy-icon trophy-silver">🥈</span>
             </div>
+                    <h1 class="leaderboard-title">Unlock Leaderboards!</h1>
+                    <p class="leaderboard-subtitle">Complete 10 more lessons to start competing</p>
+                </div>
 
-            <!-- User Rank Card -->
-            <div class="user-rank-card" id="userRankCard" hidden>
-                <div class="user-rank-info">
-                    <span class="rank-badge" id="userRankBadge">#--</span>
-                    <span class="user-name" id="userRankName">--</span>
+                <div class="league-tabs">
+                    <div class="league-tab active">Bronze League</div>
+                    <div class="league-tab">Silver League</div>
+                    <div class="league-tab">Gold League</div>
                 </div>
-                <div class="user-rank-stats">
-                    <span class="stat"><i class="fas fa-star"></i> <span id="userRankPoints">0</span> pts</span>
-                    <span class="stat"><i class="fas fa-fire"></i> <span id="userRankStreak">0</span> streak</span>
-                </div>
-            </div>
 
-            <!-- Leaderboard List -->
-            <div class="leaderboard-container">
-                <div class="leaderboard-loading" id="leaderboardLoading">
-                    <i class="fas fa-spinner fa-spin"></i> 載入中...
-                </div>
-                <div class="leaderboard-list" id="leaderboardList"></div>
-                <div class="leaderboard-empty" id="leaderboardEmpty" hidden>
-                    <i class="fas fa-users"></i>
-                    <p>暫無數據，成為第一個上榜的人！</p>
-                </div>
+                <div class="rankings-list" id="rankingsList">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Loading rankings...</p>
             </div>
-        </main>
+                </div>
+            </main>
+
+            <aside class="right-sidebar">
+                <div class="info-card">
+                    <div class="info-card-title">WHAT ARE LEADERBOARDS?</div>
+                    <h3>Do lessons. Earn XP. Compete.</h3>
+                    <p>Earn XP through lessons, then compete with players in a weekly leaderboard</p>
+                    <div class="mascot-image">🦉</div>
+                </div>
+
+                <a href="/learn.html" class="start-lesson-btn">START A LESSON</a>
+            </aside>
+            </div>
     </div>
 
     <script>
-        const API_BASE = '/api';
-        let currentTab = 'global';
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Initialize i18n first
-            await window.i18n.initI18n();
-            window.i18n.createLanguageSwitcher('langSwitcherContainer');
-
-            await checkAuth();
-
-            // Tab switching
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentTab = btn.dataset.tab;
-                    loadLeaderboard(currentTab);
-                });
-            });
-
-            // Load initial leaderboard
-            loadLeaderboard('global');
-
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', async () => {
-                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
-                window.location.href = '/';
-            });
-        });
-
-        async function checkAuth() {
+        // Load leaderboard data
+        async function loadLeaderboard() {
             try {
-                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
-                if (response.ok) {
+                const response = await fetch('/api/learn/league', { credentials: 'include' });
+                if (!response.ok) throw new Error('Failed to load');
+                
                     const data = await response.json();
-                    const user = data.user;
-                    if (user) {
-                        document.getElementById('userName').textContent = user.name || user.email?.split('@')[0] || 'User';
-                        document.getElementById('userEmail').textContent = user.email || '';
-                    }
-                    checkAdminAccess();
-                }
+                renderRankings(data.rankings || []);
             } catch (err) {
-                console.error('Auth check failed:', err);
+                // Show demo data
+                renderRankings(generateDemoRankings());
             }
         }
 
-        async function checkAdminAccess() {
-            try {
-                const response = await fetch(`${API_BASE}/admin/stats`, { credentials: 'include' });
-                if (response.ok) {
-                    const adminNav = document.getElementById('adminNavItem');
-                    if (adminNav) adminNav.hidden = false;
-                }
-            } catch (err) { /* Not admin */ }
+        function generateDemoRankings() {
+            const names = ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Quinn', 'Avery', 'Parker', 'Drew'];
+            return names.map((name, i) => ({
+                rank: i + 1,
+                name: name,
+                xp: Math.floor(500 - i * 40 + Math.random() * 20),
+                isCurrentUser: i === 4
+            }));
         }
 
-        async function loadLeaderboard(type) {
-            const list = document.getElementById('leaderboardList');
-            const loading = document.getElementById('leaderboardLoading');
-            const empty = document.getElementById('leaderboardEmpty');
-            const userCard = document.getElementById('userRankCard');
-
-            loading.hidden = false;
-            list.innerHTML = '';
-            empty.hidden = true;
-
-            try {
-                const response = await fetch(`${API_BASE}/leaderboard?type=${type}`, {
-                    credentials: 'include',
-                });
-
-                if (!response.ok) throw new Error('Failed to load leaderboard');
-
-                const data = await response.json();
-
-                loading.hidden = true;
-
-                if (data.leaderboard.length === 0) {
-                    empty.hidden = false;
-                    return;
-                }
-
-                // Render leaderboard
-                list.innerHTML = data.leaderboard.map((entry, index) => `
-                    <div class="leaderboard-item ${index < 3 ? 'top-' + (index + 1) : ''}">
-                        <div class="rank">
-                            ${getRankIcon(index + 1)}
-                        </div>
-                        <div class="player-info">
-                            <span class="player-name">${escapeHtml(entry.name)}</span>
-                        </div>
-                        <div class="player-stats">
-                            <span class="points">${entry.points.toLocaleString()} pts</span>
-                            <span class="streak">🔥 ${entry.streak}</span>
+        function renderRankings(rankings) {
+            const container = document.getElementById('rankingsList');
+            const maxXP = rankings[0]?.xp || 500;
+            
+            container.innerHTML = rankings.map(r => `
+                <div class="ranking-item ${r.isCurrentUser ? 'current-user' : ''}">
+                    <div class="rank-number ${r.rank <= 3 ? 'top-' + r.rank : ''}">${r.rank}</div>
+                    <div class="rank-avatar">${r.name[0]}</div>
+                    <div class="rank-info">
+                        <div class="rank-name">${r.name}${r.isCurrentUser ? ' (You)' : ''}</div>
+                        <div class="rank-xp-bar">
+                            <div class="rank-xp-fill" style="width: ${(r.xp / maxXP) * 100}%;"></div>
                         </div>
                     </div>
+                    <div class="rank-xp">${r.xp} XP</div>
+                    </div>
                 `).join('');
-
-                // Show user rank if logged in
-                if (data.userRank) {
-                    userCard.hidden = false;
-                    document.getElementById('userRankBadge').textContent =
-                        typeof data.userRank.rank === 'number' ? `#${data.userRank.rank}` : data.userRank.rank;
-                    document.getElementById('userRankName').textContent = data.userRank.name;
-                    document.getElementById('userRankPoints').textContent = data.userRank.points.toLocaleString();
-                    document.getElementById('userRankStreak').textContent = data.userRank.streak;
-                } else {
-                    userCard.hidden = true;
-                }
-
-            } catch (err) {
-                console.error('Failed to load leaderboard:', err);
-                loading.hidden = true;
-                list.innerHTML = '<div class="error">載入失敗，請重試</div>';
-            }
         }
 
-        function getRankIcon(rank) {
-            if (rank === 1) return '🥇';
-            if (rank === 2) return '🥈';
-            if (rank === 3) return '🥉';
-            return rank;
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        document.addEventListener('DOMContentLoaded', loadLeaderboard);
     </script>
-    <!-- AI Agent - Lancelot Assistant -->
-    <script src="/js/physics-avatar.js?v=6.3"></script>
-    <script src="/js/ai-agent.js?v=6.3"></script>
 </body>
 
 </html>

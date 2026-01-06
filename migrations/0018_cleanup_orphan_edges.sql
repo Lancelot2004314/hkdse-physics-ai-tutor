@@ -11,3 +11,8 @@ DELETE FROM kg_edges
 WHERE target_id NOT IN (SELECT id FROM kg_nodes);
 
 
+
+
+
+
+

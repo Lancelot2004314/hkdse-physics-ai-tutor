@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn - DSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Duolingo-inspired color palette */
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --primary-glow: #7cdf2f;
+            --secondary: #1cb0f6;
+            --secondary-dark: #1899d6;
+            --gold: #ffc800;
+            --gold-dark: #e6b400;
+            --streak: #ff9600;
+            --red: #ff4b4b;
+            --purple: #ce82ff;
+            --pink: #ff86d0;
+            
+            --bg: #131f24;
+            --bg-secondary: #1a2c35;
+            --card: #1f3640;
+            --card-hover: #253d49;
+            --text: #ffffff;
+            --text-secondary: #afafaf;
+            --border: #37464f;
+            --sidebar-bg: #1a2c35;
+            --sidebar-hover: #233a47;
+            --sidebar-active: #58cc02;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ===== LEFT SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 2px solid var(--border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 20px 25px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .sidebar-logo i {
+            font-size: 28px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 25px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(88, 204, 2, 0.15);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            width: 28px;
+            text-align: center;
+        }
+
+        .nav-item .nav-icon-learn { color: #ff4b4b; }
+        .nav-item .nav-icon-leaderboard { color: #ffc800; }
+        .nav-item .nav-icon-quests { color: #ff9600; }
+        .nav-item .nav-icon-shop { color: #ce82ff; }
+        .nav-item .nav-icon-profile { color: #ff86d0; }
+        .nav-item .nav-icon-more { color: #1cb0f6; }
+        .nav-item .nav-icon-home { color: #58cc02; }
+
+        .nav-item.active .nav-icon-learn,
+        .nav-item.active .nav-icon-leaderboard,
+        .nav-item.active .nav-icon-quests,
+        .nav-item.active .nav-icon-shop,
+        .nav-item.active .nav-icon-profile,
+        .nav-item.active .nav-icon-more,
+        .nav-item.active .nav-icon-home { color: var(--primary); }
+
+        .sidebar-footer {
+            padding: 15px 25px;
+            border-top: 2px solid var(--border);
+        }
+
+        .sidebar-footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            display: block;
+            padding: 8px 0;
+        }
+
+        .sidebar-footer a:hover {
+            color: var(--text);
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TOP HEADER ===== */
+        .top-header {
+            height: 60px;
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 25px;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--card);
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stat-badge:hover {
+            background: var(--card-hover);
+            transform: translateY(-1px);
+        }
+
+        .stat-badge i {
+            font-size: 18px;
+        }
+
+        .stat-streak { color: var(--streak); }
+        .stat-gems { color: var(--secondary); }
+        .stat-hearts { color: var(--red); }
+
+        .hearts-display {
+            display: flex;
+            gap: 2px;
+        }
+
+        .heart-icon {
+            font-size: 16px;
+            color: var(--red);
+        }
+
+        .heart-icon.empty {
+            opacity: 0.3;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .user-menu:hover {
+            background: var(--card);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        /* ===== CONTENT AREA ===== */
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* ===== SKILL TREE AREA ===== */
+        .skill-tree-container {
+            flex: 1;
+            padding: 30px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .unit-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 16px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .unit-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .unit-banner-back {
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .unit-banner-back:hover {
+            opacity: 1;
+        }
+
+        .unit-banner-info h2 {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .unit-banner-info h1 {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .guidebook-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .guidebook-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* ===== WINDING SKILL PATH ===== */
+        .skill-path {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .skill-row {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            position: relative;
+        }
+
+        .skill-row.left { justify-content: flex-start; padding-left: 50px; }
+        .skill-row.center { justify-content: center; }
+        .skill-row.right { justify-content: flex-end; padding-right: 50px; }
+
+        .skill-node {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 2;
+        }
+
+        .skill-node:hover:not(.locked) {
+            transform: scale(1.08);
+        }
+
+        .skill-node.locked {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .skill-circle {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            position: relative;
+            border: 5px solid;
+            transition: all 0.3s;
+            background: var(--card);
+            border-color: var(--border);
+        }
+
+        .skill-node.available .skill-circle {
+            background: var(--primary);
+            border-color: var(--primary-dark);
+            box-shadow: 0 6px 0 var(--primary-dark), 0 0 20px rgba(88, 204, 2, 0.3);
+        }
+
+        .skill-node.in_progress .skill-circle {
+            background: var(--secondary);
+            border-color: var(--secondary-dark);
+            box-shadow: 0 6px 0 var(--secondary-dark);
+        }
+
+        .skill-node.needs_review .skill-circle {
+            background: var(--streak);
+            border-color: #cc7a00;
+            box-shadow: 0 6px 0 #cc7a00;
+            animation: reviewPulse 2s infinite;
+        }
+
+        .skill-node.legendary .skill-circle {
+            background: linear-gradient(135deg, var(--gold), var(--streak));
+            border-color: var(--gold-dark);
+            box-shadow: 0 6px 0 var(--gold-dark), 0 0 25px rgba(255, 200, 0, 0.5);
+        }
+
+        @keyframes reviewPulse {
+            0%, 100% { box-shadow: 0 6px 0 #cc7a00, 0 0 0 rgba(255, 150, 0, 0.4); }
+            50% { box-shadow: 0 6px 0 #cc7a00, 0 0 20px rgba(255, 150, 0, 0.6); }
+        }
+
+        .skill-node.selected .skill-circle {
+            transform: scale(1.1);
+        }
+
+        .skill-node.current::before {
+            content: 'START';
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 3px 0 var(--primary-dark);
+        }
+
+        /* Crown/Level indicators */
+        .skill-crowns {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2px;
+            background: var(--bg);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .crown-icon {
+            font-size: 12px;
+            color: var(--gold);
+        }
+
+        .crown-icon.empty {
+            opacity: 0.3;
+        }
+
+        /* Path connector lines */
+        .path-line {
+            position: absolute;
+            width: 4px;
+            background: var(--border);
+            z-index: 1;
+        }
+
+        .path-line.active {
+            background: var(--primary);
+        }
+
+        /* Mascot/Character */
+        .mascot {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            z-index: 3;
+            animation: mascotBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes mascotBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .mascot-owl {
+            font-size: 60px;
+        }
+
+        /* Treasure chest */
+        .treasure-node {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+
+        .treasure-node.unlocked {
+            opacity: 1;
+            animation: treasureGlow 2s infinite;
+        }
+
+        @keyframes treasureGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 200, 0, 0.5)); }
+            50% { filter: drop-shadow(0 0 15px rgba(255, 200, 0, 0.8)); }
+        }
+
+        /* ===== RIGHT SIDEBAR ===== */
+        .right-sidebar {
+            width: 320px;
+            padding: 25px;
+            border-left: 2px solid var(--border);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+        }
+
+        .sidebar-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .sidebar-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .sidebar-card-title {
+            font-size: 18px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-card-link {
+            color: var(--secondary);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Leaderboard preview */
+        .leaderboard-locked {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .leaderboard-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .leaderboard-locked p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Daily quests */
+        .quest-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .quest-item:last-child {
+            border-bottom: none;
+        }
+
+        .quest-icon {
+            font-size: 28px;
+            color: var(--gold);
+        }
+
+        .quest-info {
+            flex: 1;
+        }
+
+        .quest-name {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .quest-progress-bar {
+            height: 10px;
+            background: var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .quest-progress-fill {
+            height: 100%;
+            background: var(--gold);
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+
+        .quest-reward {
+            font-size: 24px;
+        }
+
+        /* CTA card */
+        .cta-card {
+            text-align: center;
+            padding: 25px 20px;
+        }
+
+        .cta-card h3 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .cta-btn {
+            display: block;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 14px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .cta-btn.primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+
+        .cta-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--primary-dark);
+        }
+
+        .cta-btn.secondary {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+
+        .cta-btn.secondary:hover {
+            background: rgba(28, 176, 246, 0.1);
+        }
+
+        /* ===== FLOATING START BUTTON ===== */
+        .floating-start {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 18px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--primary-dark), 0 10px 30px rgba(88, 204, 2, 0.3);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .floating-start.visible {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .floating-start:hover {
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 9px 0 var(--primary-dark), 0 15px 35px rgba(88, 204, 2, 0.4);
+        }
+
+        .floating-start:active {
+            transform: translateX(-50%) translateY(2px);
+            box-shadow: 0 3px 0 var(--primary-dark);
+        }
+
+        /* ===== LOADING STATE ===== */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            gap: 20px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .right-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 80px;
+            }
+            .sidebar-logo span,
+            .nav-item span {
+                display: none;
+            }
+            .sidebar-logo {
+                justify-content: center;
+                padding: 20px 10px;
+            }
+            .nav-item {
+                justify-content: center;
+                padding: 14px;
+            }
+            .nav-item i {
+                margin: 0;
+            }
+            .sidebar-footer {
+                display: none;
+            }
+            .main-wrapper {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                display: none;
+            }
+            .main-wrapper {
+                margin-left: 0;
+            }
+            .skill-circle {
+                width: 70px;
+                height: 70px;
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Left Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-atom"></i>
+            <span>DSE Physics</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item">
+                <i class="fas fa-home nav-icon-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/learn.html" class="nav-item active">
+                <i class="fas fa-graduation-cap nav-icon-learn"></i>
+                <span>Learn</span>
+            </a>
+            <a href="/leaderboard.html" class="nav-item">
+                <i class="fas fa-trophy nav-icon-leaderboard"></i>
+                <span>Leaderboards</span>
+            </a>
+            <a href="/quests.html" class="nav-item">
+                <i class="fas fa-tasks nav-icon-quests"></i>
+                <span>Quests</span>
+            </a>
+            <a href="/shop.html" class="nav-item">
+                <i class="fas fa-store nav-icon-shop"></i>
+                <span>Shop</span>
+            </a>
+            <a href="/profile.html" class="nav-item">
+                <i class="fas fa-user nav-icon-profile"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="/settings.html"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+            <a href="/free-practice.html"><i class="fas fa-dumbbell"></i> Free Practice</a>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <!-- Top Header with Stats -->
+        <header class="top-header">
+            <div class="stat-badge stat-streak" id="streakBadge">
+                <i class="fas fa-fire"></i>
+                <span id="streakCount">0</span>
+            </div>
+            <div class="stat-badge stat-gems" id="gemsBadge">
+                <i class="fas fa-gem"></i>
+                <span id="gemsCount">500</span>
+            </div>
+            <div class="stat-badge stat-hearts" id="heartsBadge">
+                <div class="hearts-display" id="heartsDisplay">
+                    <!-- Hearts rendered by JS -->
+                </div>
+            </div>
+            <div class="user-menu" onclick="toggleUserMenu()">
+                <div class="user-avatar" id="userAvatar">?</div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-wrapper">
+            <!-- Skill Tree Container -->
+            <main class="skill-tree-container" id="skillTreeContainer">
+                <div class="loading-state" id="loadingState">
+                    <div class="loading-spinner"></div>
+                    <div>Loading your learning path...</div>
+                </div>
+            </main>
+
+            <!-- Right Sidebar -->
+            <aside class="right-sidebar">
+                <!-- Leaderboard Card -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <div class="sidebar-card-title">
+                            <i class="fas fa-trophy" style="color: var(--gold);"></i>
+                            Unlock Leaderboards!
+                        </div>
+                    </div>
+                    <div class="leaderboard-locked">
+                        <div class="leaderboard-icon">🏆</div>
+                        <p>Complete 10 more lessons to start competing</p>
+                    </div>
+                </div>
+
+                <!-- Daily Quests Card -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <div class="sidebar-card-title">Daily Quests</div>
+                        <span class="sidebar-card-link" onclick="location.href='/quests.html'">VIEW ALL</span>
+                    </div>
+                    
+                    <div class="quest-item">
+                        <div class="quest-icon">⚡</div>
+                        <div class="quest-info">
+                            <div class="quest-name">Earn 10 XP</div>
+                            <div class="quest-progress-bar">
+                                <div class="quest-progress-fill" id="questProgress" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                        <div class="quest-reward">🎁</div>
+                    </div>
+                </div>
+
+                <!-- Streak Card -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <div class="sidebar-card-title">
+                            <i class="fas fa-fire" style="color: var(--streak);"></i>
+                            連續學習
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 10px 0;">
+                        <div style="font-size: 48px; font-weight: 800; color: var(--streak);" id="streakDays">0</div>
+                        <div style="color: var(--text-secondary);">days</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Floating Start Button -->
+    <button class="floating-start" id="floatingStart" onclick="startLesson()">
+        <i class="fas fa-play"></i>
+        <span id="startBtnText">Start</span>
+    </button>
+
+    <script>
+        const API_BASE = '/api';
+        let skillTreeData = null;
+        let selectedNode = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadSkillTree();
+        });
+
+        // Load skill tree data
+        async function loadSkillTree() {
+            try {
+                const response = await fetch(`${API_BASE}/learn/skill-tree`, {
+                    credentials: 'include',
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login.html?redirect=/learn.html';
+                        return;
+                    }
+                    throw new Error('Failed to load skill tree');
+                }
+
+                skillTreeData = await response.json();
+                renderSkillTree();
+                updateStats();
+
+            } catch (err) {
+                console.error('Error loading skill tree:', err);
+                document.getElementById('loadingState').innerHTML = `
+                    <div style="text-align: center; color: var(--red);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 48px; margin-bottom: 16px;"></i>
+                        <p>Failed to load: ${err.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 16px; padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700;">
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Update header stats
+        function updateStats() {
+            const { user, hearts } = skillTreeData;
+
+            document.getElementById('streakCount').textContent = user.currentStreak || 0;
+            document.getElementById('streakDays').textContent = user.currentStreak || 0;
+            document.getElementById('gemsCount').textContent = user.gems || 500;
+            document.getElementById('userAvatar').textContent = (user.displayName || 'U')[0].toUpperCase();
+
+            // Render hearts
+            const heartsContainer = document.getElementById('heartsDisplay');
+            heartsContainer.innerHTML = '';
+            for (let i = 0; i < hearts.max; i++) {
+                const heartIcon = document.createElement('i');
+                heartIcon.className = `fas fa-heart heart-icon ${i < hearts.current ? '' : 'empty'}`;
+                heartsContainer.appendChild(heartIcon);
+            }
+
+            // Update quest progress (example: based on daily XP)
+            const dailyXP = user.dailyXP || 0;
+            const questProgress = Math.min(100, (dailyXP / 10) * 100);
+            document.getElementById('questProgress').style.width = `${questProgress}%`;
+        }
+
+        // Render skill tree with winding path
+        function renderSkillTree() {
+            const container = document.getElementById('skillTreeContainer');
+            container.innerHTML = '';
+
+            for (const unit of skillTreeData.units) {
+                // Unit banner
+                const banner = document.createElement('div');
+                banner.className = 'unit-banner';
+                banner.style.background = `linear-gradient(135deg, ${unit.color}, ${adjustColor(unit.color, -20)})`;
+                banner.innerHTML = `
+                    <div class="unit-banner-left">
+                        <div class="unit-banner-info">
+                            <h2>UNIT ${unit.id.split('-')[1] || '1'}</h2>
+                            <h1><i class="fas fa-${unit.icon}"></i> ${unit.name_zh || unit.name}</h1>
+                        </div>
+                    </div>
+                    <button class="guidebook-btn">
+                        <i class="fas fa-book"></i> Guidebook
+                    </button>
+                `;
+                container.appendChild(banner);
+
+                // Skill path
+                const path = document.createElement('div');
+                path.className = 'skill-path';
+
+                // Create winding path
+                const positions = ['center', 'left', 'center', 'right', 'center'];
+                let currentNodeIndex = 0;
+                
+                unit.nodes.forEach((node, index) => {
+                    const row = document.createElement('div');
+                    const posIndex = index % positions.length;
+                    row.className = `skill-row ${positions[posIndex]}`;
+                    
+                    // Check if this is the first available node (current)
+                    const isCurrent = node.status === 'available' && 
+                        (index === 0 || unit.nodes[index - 1]?.status !== 'available');
+
+                    const nodeEl = createSkillNode(node, unit.color, isCurrent);
+                    row.appendChild(nodeEl);
+                    path.appendChild(row);
+
+                    // Add mascot near current node
+                    if (isCurrent && index > 0) {
+                        const mascot = document.createElement('div');
+                        mascot.className = 'mascot';
+                        mascot.innerHTML = '<div class="mascot-owl">🦉</div>';
+                        mascot.style.right = positions[posIndex] === 'left' ? '-90px' : 'auto';
+                        mascot.style.left = positions[posIndex] === 'right' ? '-90px' : 'auto';
+                        row.style.position = 'relative';
+                        row.appendChild(mascot);
+                    }
+
+                    currentNodeIndex++;
+                });
+
+                // Add treasure chest every 5 nodes
+                if (unit.nodes.length >= 5) {
+                    const treasureRow = document.createElement('div');
+                    treasureRow.className = 'skill-row center';
+                    treasureRow.innerHTML = `
+                        <div class="treasure-node ${unit.completedNodes >= 5 ? 'unlocked' : ''}">
+                            📦
+                        </div>
+                    `;
+                    path.appendChild(treasureRow);
+                }
+
+                container.appendChild(path);
+            }
+        }
+
+        // Create skill node element
+        function createSkillNode(node, color, isCurrent = false) {
+            const div = document.createElement('div');
+            div.className = `skill-node ${node.status} ${isCurrent ? 'current' : ''}`;
+            div.dataset.nodeId = node.id;
+            div.onclick = () => selectNode(node);
+
+            // Icon mapping
+            const icons = {
+                'thermometer': '🌡️', 'fire-alt': '🔥', 'calculator': '🧮',
+                'grip-lines': '〰️', 'water': '💧', 'sun': '☀️',
+                'snowflake': '❄️', 'tint': '💦', 'cloud': '☁️', 'superscript': '∑',
+                'route': '🛤️', 'tachometer-alt': '⏱️', 'chart-line': '📈',
+                'square-root-alt': '√', 'hand-rock': '✊', 'balance-scale': '⚖️',
+                'arrows-alt': '↔️', 'exchange-alt': '🔄', 'basketball-ball': '🏀',
+                'hammer': '🔨', 'battery-full': '🔋', 'sync-alt': '♻️',
+                'bolt': '⚡', 'truck-moving': '🚚', 'fist-raised': '✊',
+                'random': '🎲', 'circle-notch': '⭕', 'globe': '🌍',
+                'wave-square': '〰️', 'arrows-alt-h': '↔️', 'project-diagram': '📊',
+                'lightbulb': '💡', 'glass-martini': '🔬', 'search': '🔍',
+                'volume-up': '🔊', 'music': '🎵', 'guitar': '🎸',
+                'charging-station': '🔌', 'broadcast-tower': '📡', 'mountain': '⛰️',
+                'plug': '🔌', 'home': '🏠', 'magnet': '🧲', 'cog': '⚙️',
+                'atom': '⚛️', 'radiation-alt': '☢️', 'hourglass-half': '⏳',
+                'balance-scale-right': '⚖️', 'infinity': '∞', 'industry': '🏭',
+                'hospital': '🏥', 'star': '⭐', 'redo': '🔄', 'meteor': '☄️',
+                'expand': '🌌', 'globe-americas': '🌎', 'rainbow': '🌈'
+            };
+            const icon = icons[node.icon] || '📚';
+
+            div.innerHTML = `
+                <div class="skill-circle">
+                    <span>${node.status === 'locked' ? '🔒' : icon}</span>
+                </div>
+                <div class="skill-crowns">
+                    ${renderCrowns(node.currentLevel || 0)}
+                </div>
+            `;
+
+            return div;
+        }
+
+        // Render crowns
+        function renderCrowns(level) {
+            let html = '';
+            for (let i = 0; i < 5; i++) {
+                html += `<i class="fas fa-crown crown-icon ${i < level ? '' : 'empty'}"></i>`;
+            }
+            return html;
+        }
+
+        // Select a node
+        function selectNode(node) {
+            if (node.status === 'locked') return;
+
+            selectedNode = node;
+
+            // Update visual selection
+            document.querySelectorAll('.skill-node').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector(`[data-node-id="${node.id}"]`)?.classList.add('selected');
+
+            // Show floating start button
+            const startBtn = document.getElementById('floatingStart');
+            const startBtnText = document.getElementById('startBtnText');
+            
+            startBtn.classList.add('visible');
+            
+            if (node.status === 'needs_review') {
+                startBtnText.textContent = `Review ${node.name_zh || node.name}`;
+            } else if (node.status === 'legendary') {
+                startBtnText.textContent = `Practice ${node.name_zh || node.name}`;
+            } else {
+                startBtnText.textContent = `Start ${node.name_zh || node.name}`;
+            }
+        }
+
+        // Start lesson
+        function startLesson() {
+            if (!selectedNode) return;
+            const lessonType = selectedNode.status === 'needs_review' ? 'review' : 'practice';
+            window.location.href = `/lesson.html?skill=${selectedNode.id}&type=${lessonType}`;
+        }
+
+        // Toggle user menu
+        function toggleUserMenu() {
+            // TODO: Implement dropdown menu
+            window.location.href = '/profile.html';
+        }
+
+        // Adjust color brightness
+        function adjustColor(color, amount) {
+            const hex = color.replace('#', '');
+            const num = parseInt(hex, 16);
+            const r = Math.min(255, Math.max(0, (num >> 16) + amount));
+            const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
+            const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
+            return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
+        }
+    </script>
+</body>
+
+</html>

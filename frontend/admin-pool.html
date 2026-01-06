@@ -727,9 +727,57 @@
                     </select>
                     <select id="bankFilterType" onchange="loadQuestionBank()">
                         <option value="">All Types</option>
-                        <option value="mc">MC</option>
-                        <option value="short">Short</option>
-                        <option value="long">Long</option>
+                        <option value="mc">MC 選擇題</option>
+                        <option value="short">Short 簡答</option>
+                        <option value="long">Long 長題目</option>
+                    </select>
+                    <select id="bankFilterLearnType" onchange="loadQuestionBank()">
+                        <option value="">All Learn Types</option>
+                        <option value="fill-in">🔤 Fill-in 填空</option>
+                        <option value="matching">🔗 Matching 配對</option>
+                        <option value="ordering">📊 Ordering 排序</option>
+                        <option value="none">📝 Traditional 傳統</option>
+                    </select>
+                    <select id="bankFilterDifficulty" onchange="loadQuestionBank()">
+                        <option value="">All Difficulties</option>
+                        <option value="1">D1 ⭐ Very Easy</option>
+                        <option value="2">D2 ⭐⭐ Easy</option>
+                        <option value="3">D3 ⭐⭐⭐ Medium</option>
+                        <option value="4">D4 ⭐⭐⭐⭐ Hard</option>
+                        <option value="5">D5 ⭐⭐⭐⭐⭐ Very Hard</option>
+                    </select>
+                    <select id="bankFilterSkillNode" onchange="loadQuestionBank()">
+                        <option value="">All Skill Nodes</option>
+                        <optgroup label="Heat and Gases 熱和氣體">
+                            <option value="heat-1a">heat-1a 溫度熱內能</option>
+                            <option value="heat-1b">heat-1b 傳熱過程</option>
+                            <option value="heat-1c">heat-1c 物態變化</option>
+                            <option value="heat-1d">heat-1d 氣體</option>
+                        </optgroup>
+                        <optgroup label="Force and Motion 力學">
+                            <option value="motion-2a">motion-2a 位置運動</option>
+                            <option value="motion-2b">motion-2b 力與運動</option>
+                            <option value="motion-2c">motion-2c 拋體運動</option>
+                            <option value="motion-2d">motion-2d 功能功率</option>
+                            <option value="motion-2e">motion-2e 動量</option>
+                            <option value="motion-2f">motion-2f 圓周運動</option>
+                            <option value="motion-2g">motion-2g 萬有引力</option>
+                        </optgroup>
+                        <optgroup label="Wave Motion 波動">
+                            <option value="wave-3a">wave-3a 波的性質</option>
+                            <option value="wave-3b">wave-3b 光學</option>
+                            <option value="wave-3c">wave-3c 聲學</option>
+                        </optgroup>
+                        <optgroup label="Electricity and Magnetism 電磁學">
+                            <option value="em-4a">em-4a 靜電學</option>
+                            <option value="em-4b">em-4b 電路</option>
+                            <option value="em-4c">em-4c 電磁學</option>
+                        </optgroup>
+                        <optgroup label="Radioactivity 放射性">
+                            <option value="nuclear-5a">nuclear-5a 輻射</option>
+                            <option value="nuclear-5b">nuclear-5b 原子模型</option>
+                            <option value="nuclear-5c">nuclear-5c 核能</option>
+                        </optgroup>
                     </select>
                 </div>
                 <div id="questionBankList">
@@ -1067,6 +1115,9 @@
             const subtopic = document.getElementById('bankFilterSubtopic').value;
             const language = document.getElementById('bankFilterLang').value;
             const qtype = document.getElementById('bankFilterType').value;
+            const learnType = document.getElementById('bankFilterLearnType')?.value || '';
+            const difficulty = document.getElementById('bankFilterDifficulty')?.value || '';
+            const skillNode = document.getElementById('bankFilterSkillNode')?.value || '';
 
             try {
                 const params = new URLSearchParams();
@@ -1074,6 +1125,9 @@
                 if (subtopic) params.set('subtopic', subtopic);
                 if (language) params.set('language', language);
                 if (qtype) params.set('qtype', qtype);
+                if (learnType) params.set('learnType', learnType);
+                if (difficulty) params.set('difficulty', difficulty);
+                if (skillNode) params.set('skillNode', skillNode);
                 params.set('limit', '20');
 
                 const response = await fetch(`/api/admin/questions?${params}`, { credentials: 'include' });
@@ -1134,6 +1188,25 @@
             const typeLabel = q.qtype === 'mc' ? '📝 MC' : (q.qtype === 'short' ? '✏️ Short' : '📄 Long');
             const subjectIcon = currentSubject === 'Mathematics' ? '🧮' : '⚛️';
 
+            // Learn type label for gamified questions
+            const learnTypeLabels = {
+                'fill-in': '🔤 Fill-in',
+                'matching': '🔗 Matching',
+                'ordering': '📊 Ordering',
+            };
+            const learnTypeLabel = q.learn_qtype ? learnTypeLabels[q.learn_qtype] || q.learn_qtype : '';
+
+            // Calibrated difficulty display
+            const difficultyStars = q.calibrated_difficulty
+                ? '⭐'.repeat(q.calibrated_difficulty)
+                : (q.difficulty ? '⭐'.repeat(q.difficulty) : '');
+            const difficultyLabel = q.calibrated_difficulty || q.difficulty
+                ? `D${q.calibrated_difficulty || q.difficulty}`
+                : '';
+
+            // Skill node display
+            const skillNodeLabel = q.skill_node_id ? `🎯 ${q.skill_node_id}` : '';
+
             // Graph rendering (for Math questions)
             let graphHtml = '';
             if (q.graphData && typeof q.graphData === 'object') {
@@ -1182,6 +1255,9 @@
                             <span>${subjectIcon} ${q.topicKey}</span>
                             <span>${langLabel}</span>
                             <span>${typeLabel}</span>
+                            ${learnTypeLabel ? `<span style="background:#8b5cf6;">${learnTypeLabel}</span>` : ''}
+                            ${difficultyLabel ? `<span style="background:#f59e0b;" title="${difficultyStars}">${difficultyLabel}</span>` : ''}
+                            ${skillNodeLabel ? `<span style="background:#10b981;">${skillNodeLabel}</span>` : ''}
                             <span class="status-ready">${q.status}</span>
                         </div>
                         <span class="question-id">${q.id}</span>
@@ -1190,13 +1266,64 @@
                     ${graphHtml}
                     ${optionsHtml}
                     ${q.explanation ? `<div class="question-explanation"><strong>💡 Explanation</strong>${formatMathText(q.explanation)}</div>` : ''}
+                    ${renderLearnTypeContent(q)}
                 </div>
             `;
         }
 
+        // Render content for gamified question types
+        function renderLearnTypeContent(q) {
+            if (!q.learn_qtype) return '';
+
+            let content = '';
+
+            switch (q.learn_qtype) {
+                case 'fill-in':
+                    if (q.blanks) {
+                        const blanksArr = Array.isArray(q.blanks) ? q.blanks : [q.blanks];
+                        content = `
+                            <div class="question-explanation" style="background: #ede9fe; border-color: #8b5cf6;">
+                                <strong>🔤 Fill-in Answers:</strong><br>
+                                ${blanksArr.map((b, i) => `• Blank ${i + 1}: <code style="background:#fff;padding:2px 8px;border-radius:4px;">${b}</code>`).join('<br>')}
+                                ${q.hints ? `<br><br><strong>💡 Hints:</strong><br>${q.hints.map(h => `• ${h}`).join('<br>')}` : ''}
+                            </div>
+                        `;
+                    }
+                    break;
+
+                case 'matching':
+                    if (q.leftItems && q.rightItems && q.correctPairs) {
+                        content = `
+                            <div class="question-explanation" style="background: #dbeafe; border-color: #3b82f6;">
+                                <strong>🔗 Matching Pairs:</strong><br>
+                                ${q.correctPairs.map(([l, r]) =>
+                            `• ${q.leftItems[l]} ↔️ ${q.rightItems[r]}`
+                        ).join('<br>')}
+                            </div>
+                        `;
+                    }
+                    break;
+
+                case 'ordering':
+                    if (q.items && q.correctOrder) {
+                        content = `
+                            <div class="question-explanation" style="background: #d1fae5; border-color: #10b981;">
+                                <strong>📊 Correct Order:</strong><br>
+                                ${q.correctOrder.map((idx, pos) =>
+                            `${pos + 1}. ${q.items[idx]}`
+                        ).join('<br>')}
+                            </div>
+                        `;
+                    }
+                    break;
+            }
+
+            return content;
+        }
+
         function formatMathText(text) {
             if (!text) return '';
-            
+
             // First, auto-wrap LaTeX commands that are not inside $...$
             // Common LaTeX patterns that should be wrapped
             const latexPatterns = [
@@ -1206,10 +1333,10 @@
                 /[a-zA-Z]\^\{?[0-9a-zA-Z°]+\}?/g,  // superscripts like x^2, 30°
                 /\d+\\?°/g,  // degrees like 30° or 30\circ
             ];
-            
+
             // Check if text already has $ delimiters
             const hasDollarDelimiters = text.includes('$');
-            
+
             // If no $ delimiters but has LaTeX commands, try to wrap them
             if (!hasDollarDelimiters) {
                 // Wrap segments containing LaTeX commands
@@ -1218,11 +1345,11 @@
                     if (match.startsWith('$') || match.endsWith('$')) return match;
                     return '$' + match + '$';
                 });
-                
+
                 // Also wrap common math expressions like "n_1 = 1" 
                 text = text.replace(/([a-zA-Z]_\d\s*=\s*[\d.]+)/g, '$$$1$$');
             }
-            
+
             // Process text while preserving LaTeX math blocks
             const parts = [];
             let remaining = text;

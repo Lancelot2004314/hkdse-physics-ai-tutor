@@ -1,0 +1,1 @@
+SELECT id, topic_key, language, qtype, difficulty, question_json, calibrated_difficulty, skill_node_id FROM question_bank WHERE status = 'ready' AND calibrated_difficulty IS NULL LIMIT 500;

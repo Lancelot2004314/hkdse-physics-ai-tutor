@@ -349,3 +349,8 @@ INSERT INTO kg_edges (id, source_id, target_id, relationship, description) VALUE
 ('cmb_cosmo', 'cmb_discovery', 'astrophysics', 'part_of', 'CMB crucial evidence for cosmology');
 
 
+
+
+
+
+

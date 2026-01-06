@@ -35,11 +35,14 @@ export async function onRequestGet(context) {
     const subtopic = url.searchParams.get('subtopic') || '';
     const language = url.searchParams.get('language') || '';
     const qtype = url.searchParams.get('qtype') || '';
+    const learnType = url.searchParams.get('learnType') || '';
+    const difficulty = url.searchParams.get('difficulty') || '';
+    const skillNode = url.searchParams.get('skillNode') || '';
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10), 50);
     const offset = parseInt(url.searchParams.get('offset') || '0', 10);
 
-    // Build query - filter by subject
-    let query = 'SELECT id, topic_key, language, qtype, difficulty, question_json, status, created_at FROM question_bank WHERE subject = ?';
+    // Build query - filter by subject, include new columns
+    let query = 'SELECT id, topic_key, language, qtype, difficulty, calibrated_difficulty, skill_node_id, learn_qtype, question_json, status, created_at FROM question_bank WHERE subject = ?';
     const params = [subject];
 
     if (subtopic) {
@@ -53,6 +56,22 @@ export async function onRequestGet(context) {
     if (qtype) {
       query += ' AND qtype = ?';
       params.push(qtype);
+    }
+    if (learnType) {
+      if (learnType === 'none') {
+        query += ' AND (learn_qtype IS NULL OR learn_qtype = "")';
+      } else {
+        query += ' AND learn_qtype = ?';
+        params.push(learnType);
+      }
+    }
+    if (difficulty) {
+      query += ' AND (calibrated_difficulty = ? OR (calibrated_difficulty IS NULL AND difficulty = ?))';
+      params.push(parseInt(difficulty), parseInt(difficulty));
+    }
+    if (skillNode) {
+      query += ' AND skill_node_id = ?';
+      params.push(skillNode);
     }
 
     query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
@@ -72,13 +91,16 @@ export async function onRequestGet(context) {
         language: row.language,
         qtype: row.qtype,
         difficulty: row.difficulty,
+        calibrated_difficulty: row.calibrated_difficulty,
+        skill_node_id: row.skill_node_id,
+        learn_qtype: row.learn_qtype,
         status: row.status,
         createdAt: row.created_at,
         ...parsed,
       };
     });
 
-    // Get total count - filter by subject
+    // Get total count - filter by subject with all filters
     let countQuery = 'SELECT COUNT(*) as total FROM question_bank WHERE subject = ?';
     const countParams = [subject];
     if (subtopic) {
@@ -92,6 +114,22 @@ export async function onRequestGet(context) {
     if (qtype) {
       countQuery += ' AND qtype = ?';
       countParams.push(qtype);
+    }
+    if (learnType) {
+      if (learnType === 'none') {
+        countQuery += ' AND (learn_qtype IS NULL OR learn_qtype = "")';
+      } else {
+        countQuery += ' AND learn_qtype = ?';
+        countParams.push(learnType);
+      }
+    }
+    if (difficulty) {
+      countQuery += ' AND (calibrated_difficulty = ? OR (calibrated_difficulty IS NULL AND difficulty = ?))';
+      countParams.push(parseInt(difficulty), parseInt(difficulty));
+    }
+    if (skillNode) {
+      countQuery += ' AND skill_node_id = ?';
+      countParams.push(skillNode);
     }
 
     const countResult = await env.DB.prepare(countQuery).bind(...countParams).first();

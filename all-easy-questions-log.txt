@@ -1,0 +1,1285 @@
+🚀 Generating easy questions for ALL skill nodes...
+📚 Total nodes: 70
+📝 Questions per node: 5 (diff 1) + 3 (diff 2) = 8
+🎯 Expected total: ~560 questions
+
+
+[1/70] 📚 Temperature Scales (溫標)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[2/70] 📚 Heat and Internal Energy (熱量與內能)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[3/70] 📚 Specific Heat Capacity (比熱容量)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[4/70] 📚 Conduction (傳導)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[5/70] 📚 Convection (對流)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[6/70] 📚 Radiation (輻射)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[7/70] 📚 States of Matter (物質狀態)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[8/70] 📚 Latent Heat (潛熱)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[9/70] 📚 Gas Laws (氣體定律)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[10/70] 📚 Ideal Gas Equation (理想氣體方程)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+📊 Progress: 10/70 nodes, 0 questions, 16 min elapsed
+
+[11/70] 📚 Distance and Displacement (距離與位移)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[12/70] 📚 Speed and Velocity (速率與速度)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[13/70] 📚 Acceleration (加速度)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[14/70] 📚 Equations of Motion (運動方程式)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[15/70] 📚 Types of Forces (力的種類)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[16/70] 📚 Newton's First Law (牛頓第一定律)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[17/70] 📚 Newton's Second Law (牛頓第二定律)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[18/70] 📚 Newton's Third Law (牛頓第三定律)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[19/70] 📚 Projectile Motion Basics (拋體運動基礎)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[20/70] 📚 Projectile Calculations (拋體運動計算)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+📊 Progress: 20/70 nodes, 0 questions, 32 min elapsed
+
+[21/70] 📚 Work Done (作功)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[22/70] 📚 Kinetic and Potential Energy (動能與勢能)
+  D1 mc 1/5...   ❌ Error: fetch failed
+❌ API fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[23/70] 📚 Conservation of Energy (能量守恆)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[24/70] 📚 Power (功率)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[25/70] 📚 Momentum (動量)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[26/70] 📚 Impulse (衝量)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[27/70] 📚 Conservation of Momentum (動量守恆)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[28/70] 📚 Circular Motion (圓周運動)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[29/70] 📚 Gravitational Field (重力場)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[30/70] 📚 Wave Properties (波的特性)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+📊 Progress: 30/70 nodes, 0 questions, 66 min elapsed
+
+[31/70] 📚 Transverse and Longitudinal (橫波與縱波)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[32/70] 📚 Wave Equation (波動方程)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[33/70] 📚 Wave Phenomena (波動現象)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[34/70] 📚 Reflection of Light (光的反射)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[35/70] 📚 Refraction of Light (光的折射)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[36/70] 📚 Lenses (透鏡)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[37/70] 📚 Sound Waves (聲波)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[38/70] 📚 Sound Properties (聲音特性)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[39/70] 📚 Resonance (共振)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[40/70] 📚 Electric Charge (電荷)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+📊 Progress: 40/70 nodes, 0 questions, 84 min elapsed
+
+[41/70] 📚 Electric Field (電場)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[42/70] 📚 Electric Potential (電勢)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[43/70] 📚 Current and Resistance (電流與電阻)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[44/70] 📚 Series and Parallel (串聯與並聯)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[45/70] 📚 Electrical Power (電功率)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[46/70] 📚 Domestic Circuits (家居電路)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[47/70] 📚 Magnetic Fields (磁場)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[48/70] 📚 Motor Effect (電動機效應)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[49/70] 📚 Electromagnetic Induction (電磁感應)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[50/70] 📚 Transformers (變壓器)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+📊 Progress: 50/70 nodes, 0 questions, 105 min elapsed
+
+[51/70] 📚 AC Circuits (交流電路)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[52/70] 📚 Atomic Structure (原子結構)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[53/70] 📚 Radioactive Decay (放射性衰變)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[54/70] 📚 Half-life (半衰期)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[55/70] 📚 Nuclear Equations (核方程式)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[56/70] 📚 Mass-Energy Equivalence (質能等價)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[57/70] 📚 Nuclear Fission (核裂變)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[58/70] 📚 Nuclear Fusion (核聚變)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[59/70] 📚 Applications of Radiation (輻射應用)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[60/70] 📚 Solar System (太陽系)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+📊 Progress: 60/70 nodes, 0 questions, 119 min elapsed
+
+[61/70] 📚 Kepler's Laws (開普勒定律)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[62/70] 📚 Stellar Properties (恆星性質)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[63/70] 📚 Stellar Evolution (恆星演化)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[64/70] 📚 Galaxies and Universe (星系與宇宙)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[65/70] 📚 Cosmology (宇宙學)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[66/70] 📚 Rutherford Model (盧瑟福模型)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[67/70] 📚 Bohr Model (玻爾模型)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[68/70] 📚 Photoelectric Effect (光電效應)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[69/70] 📚 Atomic Spectra (原子光譜)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+[70/70] 📚 Wave-Particle Duality (波粒二象性)
+  D1 mc 1/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 2/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 short 3/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 mc 4/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D1 fill_blank 5/5...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 mc 1/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 fill_blank 2/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+  D2 short 3/3...   ❌ DB Error: Command failed: cd "/Users/lance/new project/hkdse-physics-ai-tutor" && npx wrangler d1 execute hkds
+⚠️ DB fail
+
+📊 Progress: 70/70 nodes, 0 questions, 136 min elapsed
+
+
+✨ DONE!
+📊 Generated: 0 questions
+❌ Failed: 560
+⏱️ Time: 136 minutes

@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson - DSE Physics AI Tutor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --secondary: #1cb0f6;
+            --gold: #ffc800;
+            --red: #ff4b4b;
+            --bg: #131f24;
+            --card: #1a2c35;
+            --text: #ffffff;
+            --text-secondary: #afafaf;
+            --border: #3c5a69;
+            --correct: #58cc02;
+            --incorrect: #ff4b4b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DIN Round Pro', 'Nunito', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header with progress */
+        .lesson-header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--card);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .close-btn {
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 12px;
+            background: var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .hearts-display {
+            display: flex;
+            gap: 4px;
+        }
+
+        .heart {
+            font-size: 22px;
+            color: var(--red);
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .heart.empty {
+            opacity: 0.3;
+        }
+
+        .heart.losing {
+            animation: heartBreak 0.5s ease;
+        }
+
+        @keyframes heartBreak {
+            0% {
+                transform: scale(1);
+            }
+
+            25% {
+                transform: scale(1.3);
+            }
+
+            50% {
+                transform: scale(0.8);
+                color: #fff;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+        }
+
+        /* Main content */
+        .lesson-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Question area */
+        .question-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-text {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        /* MC Options */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: var(--secondary);
+            background: rgba(28, 176, 246, 0.1);
+        }
+
+        .option.selected {
+            border-color: var(--secondary);
+            background: rgba(28, 176, 246, 0.2);
+        }
+
+        .option.correct {
+            border-color: var(--correct);
+            background: rgba(88, 204, 2, 0.2);
+        }
+
+        .option.incorrect {
+            border-color: var(--incorrect);
+            background: rgba(255, 75, 75, 0.2);
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .option-letter {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-letter {
+            background: var(--secondary);
+        }
+
+        .option.correct .option-letter {
+            background: var(--correct);
+        }
+
+        .option.incorrect .option-letter {
+            background: var(--incorrect);
+        }
+
+        /* Fill-in-the-blank */
+        .fill-in-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .blank-input {
+            padding: 15px 20px;
+            font-size: 18px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .blank-input:focus {
+            border-color: var(--secondary);
+        }
+
+        .blank-input.correct {
+            border-color: var(--correct);
+            background: rgba(88, 204, 2, 0.1);
+        }
+
+        .blank-input.incorrect {
+            border-color: var(--incorrect);
+            background: rgba(255, 75, 75, 0.1);
+        }
+
+        .hint-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* Short Answer */
+        .short-answer-container {
+            margin-top: 20px;
+        }
+
+        .short-answer-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            outline: none;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .short-answer-input:focus {
+            border-color: var(--secondary);
+        }
+
+        .short-answer-input.correct {
+            border-color: var(--correct);
+            background: rgba(88, 204, 2, 0.1);
+        }
+
+        .short-answer-input.incorrect {
+            border-color: var(--incorrect);
+            background: rgba(255, 75, 75, 0.1);
+        }
+
+        /* Matching */
+        .matching-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .matching-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .matching-item {
+            padding: 15px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .matching-item.selected {
+            border-color: var(--secondary);
+            background: rgba(28, 176, 246, 0.2);
+        }
+
+        .matching-item.matched {
+            border-color: var(--primary);
+            background: rgba(88, 204, 2, 0.2);
+        }
+
+        .matching-item.incorrect-match {
+            border-color: var(--incorrect);
+        }
+
+        /* Ordering */
+        .ordering-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ordering-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: grab;
+            transition: all 0.2s;
+        }
+
+        .ordering-item:active {
+            cursor: grabbing;
+        }
+
+        .ordering-item.dragging {
+            opacity: 0.5;
+            border-color: var(--secondary);
+        }
+
+        .ordering-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 15px;
+            font-size: 14px;
+        }
+
+        .ordering-item.correct-pos .ordering-number {
+            background: var(--correct);
+        }
+
+        .ordering-item.incorrect-pos .ordering-number {
+            background: var(--incorrect);
+        }
+
+        /* Footer */
+        .lesson-footer {
+            padding: 20px;
+            background: var(--card);
+            border-top: 2px solid var(--border);
+        }
+
+        .feedback-container {
+            display: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .feedback-container.correct {
+            display: block;
+            background: rgba(88, 204, 2, 0.2);
+            border: 2px solid var(--correct);
+        }
+
+        .feedback-container.incorrect {
+            display: block;
+            background: rgba(255, 75, 75, 0.2);
+            border: 2px solid var(--incorrect);
+        }
+
+        .feedback-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-container.correct .feedback-title {
+            color: var(--correct);
+        }
+
+        .feedback-container.incorrect .feedback-title {
+            color: var(--incorrect);
+        }
+
+        .feedback-text {
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:disabled {
+            background: var(--border);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .submit-btn:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+
+        .submit-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--primary-dark);
+        }
+
+        .submit-btn:not(:disabled):active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--primary-dark);
+        }
+
+        /* Results screen */
+        .results-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            min-height: 60vh;
+        }
+
+        .results-screen.visible {
+            display: flex;
+        }
+
+        .results-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .results-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .results-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .results-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .result-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .result-stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .result-stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .xp-animation {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--gold);
+            animation: xpPop 0.5s ease;
+        }
+
+        @keyframes xpPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .continue-btn {
+            padding: 18px 60px;
+            font-size: 18px;
+            font-weight: 700;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(19, 31, 36, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p style="margin-top: 20px;">Loading lesson...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="lesson-header">
+        <a href="/learn.html" class="close-btn" id="closeBtn">
+            <i class="fas fa-times"></i>
+        </a>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <div class="hearts-display" id="heartsDisplay"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="lesson-content" id="lessonContent">
+        <!-- Question Container - filled by JS -->
+        <div class="question-container" id="questionContainer"></div>
+    </main>
+
+    <!-- Results Screen -->
+    <div class="results-screen" id="resultsScreen">
+        <div class="results-icon" id="resultsIcon">🎉</div>
+        <div class="results-title" id="resultsTitle">Lesson Complete!</div>
+        <div class="results-subtitle" id="resultsSubtitle">Great job!</div>
+
+        <div class="results-stats">
+            <div class="result-stat">
+                <div class="result-stat-value" id="resultAccuracy">0%</div>
+                <div class="result-stat-label">Accuracy</div>
+            </div>
+            <div class="result-stat">
+                <div class="result-stat-value xp-animation" id="resultXP">+0</div>
+                <div class="result-stat-label">XP Earned</div>
+            </div>
+        </div>
+
+        <div id="achievementsContainer" style="margin-bottom: 20px;"></div>
+
+        <button class="continue-btn" onclick="window.location.href='/learn.html'">
+            Continue
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="lesson-footer" id="lessonFooter">
+        <div class="feedback-container" id="feedbackContainer">
+            <div class="feedback-title" id="feedbackTitle"></div>
+            <div class="feedback-text" id="feedbackText"></div>
+        </div>
+        <button class="submit-btn" id="submitBtn" disabled onclick="handleSubmit()">
+            Check
+        </button>
+    </footer>
+
+    <script>
+        const API_BASE = '/api';
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const skillNodeId = urlParams.get('skill');
+        const lessonType = urlParams.get('type') || 'practice';
+
+        // Lesson state
+        let sessionId = null;
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let currentAnswer = null;
+        let isChecked = false;
+        let hearts = 5;
+        let xpConfig = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!skillNodeId) {
+                alert('No skill selected');
+                window.location.href = '/learn.html';
+                return;
+            }
+            await startLesson();
+        });
+
+        // Start lesson
+        async function startLesson() {
+            try {
+                const response = await fetch(`${API_BASE}/learn/lesson/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ skillNodeId, lessonType }),
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    if (response.status === 401) {
+                        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+                        return;
+                    }
+                    // #region agent log
+                    console.error('[DEBUG] Start lesson error:', data);
+                    // #endregion
+                    throw new Error(data.error + (data.debug ? '\nDebug: ' + JSON.stringify(data.debug) : ''));
+                }
+
+                const data = await response.json();
+                sessionId = data.sessionId;
+                questions = data.questions;
+                hearts = data.hearts;
+                xpConfig = data.xpConfig;
+
+                updateHeartsDisplay();
+                showQuestion(0);
+                document.getElementById('loadingOverlay').classList.add('hidden');
+
+            } catch (err) {
+                console.error('Start lesson error:', err);
+                alert('Error: ' + err.message);
+                window.location.href = '/learn.html';
+            }
+        }
+
+        // Update hearts display
+        function updateHeartsDisplay() {
+            const container = document.getElementById('heartsDisplay');
+            container.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const heart = document.createElement('i');
+                heart.className = `fas fa-heart heart ${i < hearts ? '' : 'empty'}`;
+                container.appendChild(heart);
+            }
+        }
+
+        // Show question
+        function showQuestion(index) {
+            if (index >= questions.length) {
+                completeLesson();
+                return;
+            }
+
+            currentQuestionIndex = index;
+            currentAnswer = null;
+            isChecked = false;
+
+            const question = questions[index];
+            const container = document.getElementById('questionContainer');
+
+            // Update progress
+            const progress = ((index) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+
+            // Reset feedback
+            document.getElementById('feedbackContainer').className = 'feedback-container';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'Check';
+
+            // Render question based on type
+            switch (question.type) {
+                case 'mc':
+                    container.innerHTML = renderMCQuestion(question);
+                    break;
+                case 'fill-in':
+                    container.innerHTML = renderFillInQuestion(question);
+                    break;
+                case 'short-answer':
+                    container.innerHTML = renderShortAnswerQuestion(question);
+                    break;
+                case 'matching':
+                    container.innerHTML = renderMatchingQuestion(question);
+                    initMatching(question);
+                    break;
+                case 'ordering':
+                    container.innerHTML = renderOrderingQuestion(question);
+                    initOrdering();
+                    break;
+                default:
+                    console.warn('[DEBUG] Unknown question type:', question.type, question);
+                    container.innerHTML = renderShortAnswerQuestion(question);
+            }
+
+            // Render LaTeX
+            setTimeout(() => {
+                renderMathInElement(container, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\[', right: '\\]', display: true },
+                        { left: '\\(', right: '\\)', display: false },
+                    ],
+                });
+            }, 100);
+        }
+
+        // Render MC question
+        function renderMCQuestion(q) {
+            const options = q.options || [];
+            if (options.length === 0) {
+                console.error('[DEBUG] MC question missing options:', q);
+                return `<div class="question-text">${q.question || 'Error loading question'}</div><div class="error-text">題目選項載入失敗</div>`;
+            }
+            return `
+                <div class="question-text">${q.question || ''}</div>
+                <div class="options-container">
+                    ${options.map((opt, i) => `
+                        <div class="option" data-value="${String.fromCharCode(65 + i)}" onclick="selectMCOption(this)">
+                            <div class="option-letter">${String.fromCharCode(65 + i)}</div>
+                            <div class="option-text">${(opt || '').replace(/^[A-D]\.\s*/, '')}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Render fill-in question
+        function renderFillInQuestion(q) {
+            const blanks = q.blanks || 1;
+            let inputsHtml = '';
+            for (let i = 0; i < blanks; i++) {
+                inputsHtml += `
+                    <input type="text" class="blank-input" id="blank-${i}" 
+                           placeholder="Enter answer..." 
+                           oninput="updateFillInAnswer()">
+                    ${q.hints && q.hints[i] ? `<div class="hint-text">💡 ${q.hints[i]}</div>` : ''}
+                `;
+            }
+            return `
+                <div class="question-text">${q.question}</div>
+                <div class="fill-in-container">${inputsHtml}</div>
+            `;
+        }
+
+        // Render short answer question
+        function renderShortAnswerQuestion(q) {
+            return `
+                <div class="question-text">${q.question || 'Question loading...'}</div>
+                <div class="short-answer-container">
+                    <textarea class="short-answer-input" id="shortAnswer" 
+                              placeholder="${q.placeholder || '請輸入你的答案...'}"
+                              oninput="updateShortAnswer()"
+                              rows="4"></textarea>
+                </div>
+            `;
+        }
+
+        // Update short answer
+        function updateShortAnswer() {
+            const textarea = document.getElementById('shortAnswer');
+            if (textarea && textarea.value.trim().length > 0) {
+                currentAnswer = textarea.value.trim();
+                document.getElementById('submitBtn').disabled = false;
+            } else {
+                currentAnswer = null;
+                document.getElementById('submitBtn').disabled = true;
+            }
+        }
+
+        // Render matching question
+        function renderMatchingQuestion(q) {
+            return `
+                <div class="question-text">${q.question}</div>
+                <div class="matching-container">
+                    <div class="matching-column" id="leftColumn">
+                        ${q.leftItems.map((item, i) => `
+                            <div class="matching-item left-item" data-index="${i}">${item}</div>
+                        `).join('')}
+                    </div>
+                    <div class="matching-column" id="rightColumn">
+                        ${q.rightItems.map((item, i) => `
+                            <div class="matching-item right-item" data-index="${i}">${item}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render ordering question
+        function renderOrderingQuestion(q) {
+            return `
+                <div class="question-text">${q.question}</div>
+                <div class="ordering-container" id="orderingContainer">
+                    ${q.items.map((item, i) => `
+                        <div class="ordering-item" draggable="true" data-index="${i}">
+                            <div class="ordering-number">${i + 1}</div>
+                            <div class="ordering-text">${item}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // MC selection
+        function selectMCOption(el) {
+            if (isChecked) return;
+
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            currentAnswer = el.dataset.value;
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        // Fill-in answer update
+        function updateFillInAnswer() {
+            const inputs = document.querySelectorAll('.blank-input');
+            const answers = Array.from(inputs).map(inp => inp.value.trim());
+            currentAnswer = answers;
+            document.getElementById('submitBtn').disabled = answers.some(a => a === '');
+        }
+
+        // Matching initialization
+        let selectedLeft = null;
+        let matchingPairs = [];
+
+        function initMatching(question) {
+            matchingPairs = [];
+            selectedLeft = null;
+
+            document.querySelectorAll('.left-item').forEach(item => {
+                item.onclick = () => {
+                    if (isChecked) return;
+                    document.querySelectorAll('.left-item').forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                    selectedLeft = parseInt(item.dataset.index);
+                };
+            });
+
+            document.querySelectorAll('.right-item').forEach(item => {
+                item.onclick = () => {
+                    if (isChecked || selectedLeft === null) return;
+
+                    // Remove existing match for this left item
+                    matchingPairs = matchingPairs.filter(p => p[0] !== selectedLeft);
+
+                    // Add new match
+                    const rightIndex = parseInt(item.dataset.index);
+                    matchingPairs.push([selectedLeft, rightIndex]);
+
+                    // Visual feedback
+                    document.querySelectorAll('.left-item').forEach(i => i.classList.remove('selected', 'matched'));
+                    document.querySelectorAll('.right-item').forEach(i => i.classList.remove('matched'));
+
+                    matchingPairs.forEach(([l, r]) => {
+                        document.querySelector(`.left-item[data-index="${l}"]`).classList.add('matched');
+                        document.querySelector(`.right-item[data-index="${r}"]`).classList.add('matched');
+                    });
+
+                    selectedLeft = null;
+                    currentAnswer = matchingPairs;
+                    document.getElementById('submitBtn').disabled = matchingPairs.length < question.leftItems.length;
+                };
+            });
+        }
+
+        // Ordering initialization
+        function initOrdering() {
+            const container = document.getElementById('orderingContainer');
+            let draggedItem = null;
+
+            container.querySelectorAll('.ordering-item').forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    if (isChecked) { e.preventDefault(); return; }
+                    draggedItem = item;
+                    item.classList.add('dragging');
+                });
+
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                    updateOrderingAnswer();
+                });
+
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (draggedItem && draggedItem !== item) {
+                        const rect = item.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        if (e.clientY < midY) {
+                            container.insertBefore(draggedItem, item);
+                        } else {
+                            container.insertBefore(draggedItem, item.nextSibling);
+                        }
+                    }
+                });
+            });
+
+            updateOrderingAnswer();
+        }
+
+        function updateOrderingAnswer() {
+            const items = document.querySelectorAll('.ordering-item');
+            currentAnswer = Array.from(items).map(item => parseInt(item.dataset.index));
+
+            // Update numbers
+            items.forEach((item, i) => {
+                item.querySelector('.ordering-number').textContent = i + 1;
+            });
+
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        // Handle submit
+        async function handleSubmit() {
+            const btn = document.getElementById('submitBtn');
+
+            if (isChecked) {
+                // Move to next question
+                showQuestion(currentQuestionIndex + 1);
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Checking...';
+
+            try {
+                const question = questions[currentQuestionIndex];
+
+                const response = await fetch(`${API_BASE}/learn/lesson/answer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        sessionId,
+                        questionId: question.id,
+                        answer: currentAnswer,
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to check answer');
+                }
+
+                showFeedback(result);
+
+                if (!result.isCorrect && result.hearts !== undefined) {
+                    hearts = result.hearts;
+                    animateHeartLoss();
+
+                    if (hearts <= 0) {
+                        setTimeout(() => {
+                            alert('💔 You ran out of hearts! Take a break or practice to earn more.');
+                            window.location.href = '/learn.html';
+                        }, 1500);
+                        return;
+                    }
+                }
+
+                isChecked = true;
+                btn.disabled = false;
+                btn.textContent = 'Continue';
+
+            } catch (err) {
+                console.error('Answer error:', err);
+                btn.disabled = false;
+                btn.textContent = 'Check';
+                alert('Error: ' + err.message);
+            }
+        }
+
+        // Show feedback
+        function showFeedback(result) {
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            const feedbackTitle = document.getElementById('feedbackTitle');
+            const feedbackText = document.getElementById('feedbackText');
+            const question = questions[currentQuestionIndex];
+
+            if (result.isCorrect) {
+                feedbackContainer.className = 'feedback-container correct';
+                feedbackTitle.innerHTML = '<i class="fas fa-check-circle"></i> Correct! +' + xpConfig.correctAnswer + ' XP';
+            } else {
+                feedbackContainer.className = 'feedback-container incorrect';
+                feedbackTitle.innerHTML = '<i class="fas fa-times-circle"></i> Not quite right';
+            }
+
+            // Show explanation
+            let explanationText = result.explanation || '';
+
+            if (question.type === 'mc' && result.correctAnswer) {
+                explanationText = `Correct answer: ${result.correctAnswer}. ` + explanationText;
+            }
+
+            feedbackText.innerHTML = explanationText;
+
+            // Render LaTeX in feedback
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(feedbackText, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\[', right: '\\]', display: true },
+                        { left: '\\(', right: '\\)', display: false },
+                    ],
+                    throwOnError: false
+                });
+            }
+
+            // Highlight correct/incorrect options
+            if (question.type === 'mc') {
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.add('disabled');
+                    if (opt.dataset.value === result.correctAnswer) {
+                        opt.classList.add('correct');
+                    } else if (opt.classList.contains('selected') && !result.isCorrect) {
+                        opt.classList.add('incorrect');
+                    }
+                });
+            }
+        }
+
+        // Animate heart loss
+        function animateHeartLoss() {
+            const heartsEls = document.querySelectorAll('.heart:not(.empty)');
+            const lastHeart = heartsEls[heartsEls.length - 1];
+            if (lastHeart) {
+                lastHeart.classList.add('losing');
+                setTimeout(() => {
+                    updateHeartsDisplay();
+                }, 500);
+            }
+        }
+
+        // Complete lesson
+        async function completeLesson() {
+            document.getElementById('lessonContent').style.display = 'none';
+            document.getElementById('lessonFooter').style.display = 'none';
+            document.getElementById('progressFill').style.width = '100%';
+
+            try {
+                const response = await fetch(`${API_BASE}/learn/lesson/complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ sessionId }),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to complete lesson');
+                }
+
+                // Show results
+                showResults(result);
+
+            } catch (err) {
+                console.error('Complete error:', err);
+                showResults({
+                    results: { accuracy: 0 },
+                    xp: { total: 0 },
+                    newAchievements: [],
+                });
+            }
+        }
+
+        // Show results screen
+        function showResults(result) {
+            const screen = document.getElementById('resultsScreen');
+
+            if (result.results.isPerfect) {
+                document.getElementById('resultsIcon').textContent = '🌟';
+                document.getElementById('resultsTitle').textContent = 'Perfect!';
+                document.getElementById('resultsSubtitle').textContent = 'Amazing job! No mistakes!';
+            } else if (result.results.accuracy >= 80) {
+                document.getElementById('resultsIcon').textContent = '🎉';
+                document.getElementById('resultsTitle').textContent = 'Great Job!';
+            } else {
+                document.getElementById('resultsIcon').textContent = '💪';
+                document.getElementById('resultsTitle').textContent = 'Keep Practicing!';
+                document.getElementById('resultsSubtitle').textContent = "You'll get better with practice!";
+            }
+
+            document.getElementById('resultAccuracy').textContent = result.results.accuracy + '%';
+            document.getElementById('resultXP').textContent = '+' + result.xp.total;
+
+            // Show achievements
+            if (result.newAchievements && result.newAchievements.length > 0) {
+                const achievementsHtml = result.newAchievements.map(a => `
+                    <div style="background: var(--gold); color: #000; padding: 10px 20px; border-radius: 12px; margin: 5px;">
+                        🏆 ${a.name} ${a.name_zh ? `(${a.name_zh})` : ''}
+                    </div>
+                `).join('');
+                document.getElementById('achievementsContainer').innerHTML = achievementsHtml;
+            }
+
+            screen.classList.add('visible');
+        }
+    </script>
+</body>
+
+</html>

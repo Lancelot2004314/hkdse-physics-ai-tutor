@@ -10,3 +10,8 @@ ALTER TABLE users ADD COLUMN password_hash TEXT;
 -- 3. Phone + SMS (if configured later)
 
 
+
+
+
+
+

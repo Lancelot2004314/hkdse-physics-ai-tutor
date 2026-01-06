@@ -642,11 +642,13 @@
         const API_BASE = '/api';
         let isRegisterMode = false;
 
+        // Get redirect URL from query params (for returning to the page that triggered login)
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect') || '/';
+
         document.addEventListener('DOMContentLoaded', async () => {
             // Initialize i18n
             await window.i18n.initI18n();
-
-            const urlParams = new URLSearchParams(window.location.search);
 
             // Check for OAuth callback code
             const code = urlParams.get('code');
@@ -789,7 +791,7 @@
                     // #endregion
                     showLoginSuccess();
                     setTimeout(() => {
-                        window.location.href = '/';
+                        window.location.href = redirectUrl;
                     }, 1200);
                 } else {
                     showError(data.error || '操作失败，请重试');
@@ -824,9 +826,9 @@
 
                 if (response.ok && data.success) {
                     showLoginSuccess();
-                    // Clean URL and redirect to dashboard
+                    // Clean URL and redirect to original page or dashboard
                     setTimeout(() => {
-                        window.location.href = '/';
+                        window.location.href = redirectUrl;
                     }, 1200);
                 } else {
                     showError(data.error || '登入失敗，請重試');
@@ -852,10 +854,10 @@
                     const data = await response.json();
                     // Check if user is actually logged in (not null)
                     if (data.user && (data.user.email || data.user.phone)) {
-                        // Already logged in, redirect to dashboard
+                        // Already logged in, redirect to original page or dashboard
                         showLoginSuccess();
                         setTimeout(() => {
-                            window.location.href = '/';
+                            window.location.href = redirectUrl;
                         }, 1000);
                     }
                 }
@@ -889,8 +891,8 @@
         }
 
         function handleGuestLogin() {
-            // Go to dashboard as guest
-            window.location.href = '/';
+            // Go to original page or dashboard as guest
+            window.location.href = redirectUrl;
         }
 
         function showError(message) {

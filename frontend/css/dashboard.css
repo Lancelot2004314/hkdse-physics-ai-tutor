@@ -211,6 +211,20 @@
     color: white;
 }
 
+.feature-card.learn-card .card-icon {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: white;
+}
+
+.feature-card.learn-card {
+    border-color: #8b5cf6;
+}
+
+.feature-card.learn-card:hover {
+    border-color: #6d28d9;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
 .feature-card .card-content {
     flex: 1;
 }

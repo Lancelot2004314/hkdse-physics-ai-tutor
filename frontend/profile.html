@@ -4,726 +4,599 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - HKDSE Physics AI Tutor</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/thinka.css">
-    <link rel="stylesheet" href="css/ai-agent.css?v=6.3">
+    <title>Profile - DSE Physics AI Tutor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="/js/i18n.js"></script>
-</head>
-
-<body>
-    <!-- Particles Background -->
-    <div class="particles-container">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
-
-    <div class="app-layout">
-        <!-- Sidebar -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo"><i class="fas fa-atom"></i></div>
-                <div class="user-info">
-                    <div class="user-name" id="sideUserName">Guest</div>
-                    <div class="user-email" id="sideUserEmail"></div>
-                </div>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="/"><i class="fas fa-home"></i> <span
-                            data-i18n="nav.dashboard">Dashboard</span></a></li>
-                <li class="nav-item"><a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span
-                            data-i18n="nav.aiTutor">AI Tutor</span></a></li>
-                <li class="nav-item"><a href="/free-practice.html"><i class="fas fa-pen"></i> <span
-                            data-i18n="nav.freePractice">Free Practice</span></a></li>
-                <li class="nav-item"><a href="/statistics.html"><i class="fas fa-chart-bar"></i> <span
-                            data-i18n="nav.statistics">Statistics</span></a></li>
-                <li class="nav-item"><a href="/practice-history.html"><i class="fas fa-history"></i> <span
-                            data-i18n="nav.history">History</span></a></li>
-                <li class="nav-item"><a href="/bookmarks.html"><i class="fas fa-bookmark"></i> <span
-                            data-i18n="nav.bookmarks">Bookmarks</span></a></li>
-                <li class="nav-item"><a href="/leaderboard.html"><i class="fas fa-trophy"></i> <span
-                            data-i18n="nav.leaderboard">Leaderboard</span></a></li>
-                <li class="nav-item active"><a href="/profile.html"><i class="fas fa-user"></i> <span
-                            data-i18n="nav.profile">Profile</span></a></li>
-                <li class="nav-item admin-only" id="adminNavItem" hidden><a href="/admin.html"><i
-                            class="fas fa-cog"></i> <span data-i18n="nav.adminPanel">Admin Panel</span></a></li>
-            </ul>
-            <div class="sidebar-footer">
-                <div class="language-switcher-container" id="langSwitcherContainer"></div>
-                <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span
-                        data-i18n="nav.signOut">Sign Out</span></button>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="page-header animate-on-scroll fade-in-up">
-                <h1><i class="fas fa-user-circle"></i> <span data-i18n="profile.title">Profile</span></h1>
-            </header>
-
-            <!-- User Profile Section -->
-            <div class="profile-section card-lift animate-on-scroll fade-in-up stagger-1">
-                <div class="profile-avatar">
-                    <div class="avatar-image" id="avatarImage">
-                        <i class="fas fa-user" id="avatarIcon"></i>
-                        <img id="avatarImg" src="" alt="Avatar" style="display: none;">
-                    </div>
-                    <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
-                    <button class="avatar-edit btn-glow" id="avatarEditBtn">
-                        <i class="fas fa-camera"></i> <span data-i18n="profile.changePhoto">Change Photo</span>
-                    </button>
-                    <button class="avatar-remove" id="avatarRemoveBtn" style="display: none;">
-                        <i class="fas fa-trash"></i> <span data-i18n="profile.removePhoto">Remove</span>
-                    </button>
-                </div>
-                <div class="profile-form">
-                    <h2 data-i18n="profile.userProfile">User Profile</h2>
-                    <div class="form-group">
-                        <label><i class="fas fa-user"></i> <span data-i18n="profile.name">Name</span></label>
-                        <input type="text" id="profileName" data-i18n-placeholder="profile.name" placeholder="Your name"
-                            class="input-glow">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-envelope"></i> <span data-i18n="profile.email">Email</span></label>
-                        <input type="email" id="profileEmail" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-globe"></i> <span data-i18n="profile.language">Language</span></label>
-                        <select id="profileLanguage" class="input-glow">
-                            <option value="en">English</option>
-                            <option value="zh-HK">繁體中文</option>
-                            <option value="zh-CN">简体中文</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-id-badge"></i> <span data-i18n="profile.role">I am a...</span></label>
-                        <select id="profileRole" class="input-glow">
-                            <option value="student" data-i18n="profile.roles.student">Student</option>
-                            <option value="teacher" data-i18n="profile.roles.teacher">Teacher</option>
-                            <option value="parent" data-i18n="profile.roles.parent">Parent</option>
-                            <option value="other" data-i18n="profile.roles.other">Other</option>
-                        </select>
-                    </div>
-                    <button class="btn-primary btn-glow ripple" id="saveProfileBtn">
-                        <i class="fas fa-save"></i> <span data-i18n="common.saveChanges">Save Changes</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Payment Section -->
-            <div class="payment-section animate-on-scroll fade-in-up stagger-2">
-                <h2><i class="fas fa-credit-card"></i> <span data-i18n="profile.payment">Payment</span></h2>
-                <div class="plans-grid">
-                    <div class="plan-card free card-lift tilt-card">
-                        <h3 data-i18n="plans.free.name">Free</h3>
-                        <div class="plan-price">$0<span data-i18n="plans.free.perMonth">/month</span></div>
-                        <ul class="plan-features">
-                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature1">5 questions per
-                                    practice</span></li>
-                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature2">3 practices per
-                                    day</span></li>
-                            <li><i class="fas fa-check"></i> <span data-i18n="plans.free.feature3">Basic
-                                    statistics</span></li>
-                        </ul>
-                        <button class="btn-secondary" disabled data-i18n="profile.currentPlan">Current Plan</button>
-                    </div>
-                    <div class="plan-card premium card-lift tilt-card shine">
-                        <div class="plan-badge" data-i18n="plans.premium.discount">Discount limited to first 1,000
-                            users!</div>
-                        <h3 data-i18n="plans.premium.name">Premium</h3>
-                        <div class="plan-price">
-                            <span class="original">$59</span> $40<span data-i18n="plans.premium.perMonth">/month</span>
-                        </div>
-                        <ul class="plan-features">
-                            <li><i class="fas fa-star"></i> <span
-                                    data-i18n="plans.premium.feature1"><strong>Unlimited</strong> questions per
-                                    practice</span></li>
-                            <li><i class="fas fa-star"></i> <span
-                                    data-i18n="plans.premium.feature2"><strong>Unlimited</strong> practices per
-                                    day</span></li>
-                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature3">Advanced
-                                    statistics</span></li>
-                            <li><i class="fas fa-star"></i> <span data-i18n="plans.premium.feature4">30 days money back
-                                    guarantee</span></li>
-                        </ul>
-                        <button class="btn-primary btn-glow">Upgrade to Premium</button>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast-container" id="toastContainer"></div>
-
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .profile-section {
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --secondary: #1cb0f6;
+            --gold: #ffc800;
+            --streak: #ff9600;
+            --red: #ff4b4b;
+            --purple: #ce82ff;
+            --pink: #ff86d0;
+            --bg: #131f24;
+            --bg-secondary: #1a2c35;
+            --card: #1f3640;
+            --card-hover: #253d49;
+            --text: #ffffff;
+            --text-secondary: #afafaf;
+            --border: #37464f;
+            --sidebar-bg: #1a2c35;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
             display: flex;
-            gap: 40px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 2px solid var(--border);
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 20px 25px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .sidebar-nav { flex: 1; padding: 15px 0; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 25px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+        .nav-item.active { background: rgba(255, 134, 208, 0.15); color: var(--pink); border-left-color: var(--pink); }
+        .nav-item i { font-size: 22px; width: 28px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 15px 25px;
+            border-top: 2px solid var(--border);
+        }
+
+        .sidebar-footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            display: block;
+            padding: 8px 0;
+        }
+
+        /* Main */
+        .main-wrapper {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-header {
+            height: 60px;
             background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 25px;
+            gap: 20px;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--card);
             border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex: 1;
             padding: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Profile header */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding: 30px;
+            background: var(--card);
+            border-radius: 20px;
+            border: 2px solid var(--border);
             margin-bottom: 30px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .profile-avatar {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .avatar-image {
-            width: 140px;
-            height: 140px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--purple));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.5em;
-            color: white;
-            overflow: hidden;
-            position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 48px;
+            font-weight: 800;
+            border: 4px solid var(--secondary);
         }
 
-        .avatar-image:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.4);
-        }
-
-        .avatar-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .avatar-edit {
-            padding: 8px 20px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-
-        .avatar-edit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.4);
-        }
-
-        .avatar-remove {
-            padding: 6px 16px;
-            background: transparent;
-            border: 1px solid #ef4444;
-            border-radius: 6px;
-            color: #ef4444;
-            cursor: pointer;
-            font-size: 0.85em;
-            transition: all 0.3s ease;
-        }
-
-        .avatar-remove:hover {
-            background: #ef4444;
-            color: white;
-        }
-
-        .profile-form {
-            flex: 1;
-        }
-
-        .profile-form h2 {
-            color: var(--text-primary);
-            margin-bottom: 25px;
-            font-size: 1.5em;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            color: var(--text-secondary);
+        .profile-info h1 {
+            font-size: 28px;
+            font-weight: 800;
             margin-bottom: 8px;
-            font-size: 0.9em;
         }
 
-        .form-group label i {
-            margin-right: 8px;
-            color: var(--accent);
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 1em;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
-        }
-
-        .form-group input:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .payment-section {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 30px;
-        }
-
-        .payment-section h2 {
-            color: var(--text-primary);
-            margin-bottom: 25px;
-            font-size: 1.5em;
-        }
-
-        .payment-section h2 i {
-            margin-right: 10px;
-            color: var(--accent);
-        }
-
-        .plans-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-        }
-
-        .plan-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 30px;
-            position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .plan-card.premium {
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-            color: white;
-        }
-
-        .plan-badge {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.75em;
-            white-space: nowrap;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-        }
-
-        .plan-card h3 {
-            font-size: 1.4em;
+        .profile-info p {
+            color: var(--text-secondary);
             margin-bottom: 15px;
         }
 
-        .plan-price {
-            font-size: 2.5em;
+        .profile-stats {
+            display: flex;
+            gap: 25px;
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        .profile-stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Stats cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 25px;
+            border: 2px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-card-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .stat-card-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .stat-card.streak .stat-card-value { color: var(--streak); }
+        .stat-card.xp .stat-card-value { color: var(--gold); }
+        .stat-card.lessons .stat-card-value { color: var(--primary); }
+        .stat-card.gems .stat-card-value { color: var(--secondary); }
+
+        /* Achievements */
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .achievement-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid var(--border);
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .achievement-card.locked {
+            opacity: 0.4;
+        }
+
+        .achievement-card.locked .achievement-icon {
+            filter: grayscale(1);
+        }
+
+        .achievement-icon {
+            font-size: 50px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .achievement-name {
             font-weight: 700;
-            margin-bottom: 25px;
+            font-size: 14px;
+            margin-bottom: 5px;
         }
 
-        .plan-price span {
-            font-size: 0.4em;
-            font-weight: 400;
-            opacity: 0.8;
+        .achievement-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
         }
 
-        .plan-price .original {
-            text-decoration: line-through;
-            opacity: 0.5;
-            font-size: 0.5em;
-            margin-right: 5px;
+        /* Activity graph */
+        .activity-section {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 25px;
+            border: 2px solid var(--border);
         }
 
-        .plan-features {
-            list-style: none;
-            margin-bottom: 25px;
+        .activity-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 20px;
         }
 
-        .plan-features li {
+        .activity-graph {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .activity-day {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: var(--border);
+        }
+
+        .activity-day.level-1 { background: rgba(88, 204, 2, 0.3); }
+        .activity-day.level-2 { background: rgba(88, 204, 2, 0.5); }
+        .activity-day.level-3 { background: rgba(88, 204, 2, 0.7); }
+        .activity-day.level-4 { background: var(--primary); }
+
+        /* Right sidebar */
+        .right-sidebar {
+            width: 320px;
+            padding: 25px;
+            border-left: 2px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .sidebar-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .sidebar-card h3 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .friend-item:last-child {
+            border-bottom: none;
+        }
+
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            font-weight: 700;
         }
 
-        .plan-features li i {
-            color: #22c55e;
+        .friend-info {
+            flex: 1;
         }
 
-        .plan-card.premium .plan-features li i {
-            color: #fbbf24;
+        .friend-name {
+            font-weight: 700;
+            font-size: 14px;
         }
 
-        .plan-card.free .plan-features li {
-            border-color: var(--border);
+        .friend-xp {
+            font-size: 12px;
+            color: var(--text-secondary);
         }
 
-        .plan-card button {
+        .add-friends-btn {
+            display: block;
             width: 100%;
-            padding: 14px;
-            font-size: 1em;
-            font-weight: 600;
-        }
-
-        /* Toast styles */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            padding: 15px 25px;
-            border-radius: 10px;
-            color: white;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .toast.success {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-        }
-
-        .toast.error {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-        }
-
-        .toast.info {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
+            padding: 12px;
+            background: transparent;
+            border: 2px dashed var(--border);
+            color: var(--secondary);
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
             }
 
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translateX(100%);
-            }
+        .add-friends-btn:hover {
+            background: rgba(28, 176, 246, 0.1);
+            border-color: var(--secondary);
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .profile-section {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-
-            .profile-form {
-                width: 100%;
-            }
+        @media (max-width: 1200px) { .right-sidebar { display: none; } }
+        @media (max-width: 900px) {
+            .sidebar { width: 80px; }
+            .sidebar-logo span, .nav-item span { display: none; }
+            .sidebar-logo { justify-content: center; padding: 20px 10px; }
+            .nav-item { justify-content: center; padding: 14px; }
+            .sidebar-footer { display: none; }
+            .main-wrapper { margin-left: 80px; }
+            .profile-header { flex-direction: column; text-align: center; }
         }
     </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-atom"></i>
+            <span>DSE Physics</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="/learn.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span>Learn</span></a>
+            <a href="/leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i><span>Leaderboards</span></a>
+            <a href="/quests.html" class="nav-item"><i class="fas fa-tasks"></i><span>Quests</span></a>
+            <a href="/shop.html" class="nav-item"><i class="fas fa-store"></i><span>Shop</span></a>
+            <a href="/profile.html" class="nav-item active"><i class="fas fa-user" style="color: var(--pink);"></i><span>Profile</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/settings.html"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="stat-badge" style="color: var(--streak);"><i class="fas fa-fire"></i><span id="streak">0</span></div>
+            <div class="stat-badge" style="color: var(--secondary);"><i class="fas fa-gem"></i><span id="gems">500</span></div>
+            <div class="stat-badge" style="color: var(--red);"><i class="fas fa-heart"></i><span>5</span></div>
+        </header>
+
+        <div class="content-wrapper">
+            <main class="main-content">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-avatar" id="avatar">?</div>
+                    <div class="profile-info">
+                        <h1 id="userName">Loading...</h1>
+                        <p id="userEmail">Loading...</p>
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <div class="profile-stat-value" id="totalXp">0</div>
+                                <div class="profile-stat-label">Total XP</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="profile-stat-value" id="lessonsCompleted">0</div>
+                                <div class="profile-stat-label">Lessons</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="profile-stat-value" id="daysLearning">0</div>
+                                <div class="profile-stat-label">Days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card streak">
+                        <div class="stat-card-icon">🔥</div>
+                        <div class="stat-card-value" id="currentStreak">0</div>
+                        <div class="stat-card-label">Day Streak</div>
+                    </div>
+                    <div class="stat-card xp">
+                        <div class="stat-card-icon">⚡</div>
+                        <div class="stat-card-value" id="weeklyXp">0</div>
+                        <div class="stat-card-label">This Week</div>
+                    </div>
+                    <div class="stat-card lessons">
+                        <div class="stat-card-icon">📚</div>
+                        <div class="stat-card-value" id="perfectLessons">0</div>
+                        <div class="stat-card-label">Perfect Lessons</div>
+                    </div>
+                    <div class="stat-card gems">
+                        <div class="stat-card-icon">💎</div>
+                        <div class="stat-card-value" id="totalGems">500</div>
+                        <div class="stat-card-label">Gems Earned</div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <h2 class="section-title">🏆 Achievements</h2>
+                <div class="achievements-grid">
+                    <div class="achievement-card">
+                        <span class="achievement-icon">🎯</span>
+                        <div class="achievement-name">First Steps</div>
+                        <div class="achievement-desc">Complete first lesson</div>
+                    </div>
+                    <div class="achievement-card locked">
+                        <span class="achievement-icon">🔥</span>
+                        <div class="achievement-name">On Fire</div>
+                        <div class="achievement-desc">7 day streak</div>
+                    </div>
+                    <div class="achievement-card locked">
+                        <span class="achievement-icon">⭐</span>
+                        <div class="achievement-name">Perfectionist</div>
+                        <div class="achievement-desc">5 perfect lessons</div>
+                    </div>
+                    <div class="achievement-card locked">
+                        <span class="achievement-icon">🏅</span>
+                        <div class="achievement-name">XP Hunter</div>
+                        <div class="achievement-desc">Earn 1000 XP</div>
+                    </div>
+                    <div class="achievement-card locked">
+                        <span class="achievement-icon">🥇</span>
+                        <div class="achievement-name">Champion</div>
+                        <div class="achievement-desc">Top 3 in league</div>
+                    </div>
+                    <div class="achievement-card locked">
+                        <span class="achievement-icon">🎓</span>
+                        <div class="achievement-name">Heat Master</div>
+                        <div class="achievement-desc">Complete Unit 1</div>
+                    </div>
+                </div>
+
+                <!-- Activity -->
+                <div class="activity-section">
+                    <h3 class="activity-title">📊 Activity (Last 30 Days)</h3>
+                    <div class="activity-graph" id="activityGraph">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </main>
+
+            <aside class="right-sidebar">
+                <div class="sidebar-card">
+                    <h3>👥 Friends</h3>
+                    <div class="friend-item">
+                        <div class="friend-avatar">A</div>
+                        <div class="friend-info">
+                            <div class="friend-name">Alex</div>
+                            <div class="friend-xp">1,234 XP this week</div>
+                        </div>
+                    </div>
+                    <div class="friend-item">
+                        <div class="friend-avatar">J</div>
+                        <div class="friend-info">
+                            <div class="friend-name">Jordan</div>
+                            <div class="friend-xp">987 XP this week</div>
+                        </div>
+                    </div>
+                    <button class="add-friends-btn">
+                        <i class="fas fa-user-plus"></i> Add Friends
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </div>
 
     <script>
-        const API_BASE = '/api';
-        let currentUser = null;
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Initialize i18n first
-            await window.i18n.initI18n();
-            window.i18n.createLanguageSwitcher('langSwitcherContainer');
-
-            await loadProfile();
-            initEventListeners();
-            initScrollAnimations();
-        });
-
-        // Initialize scroll animations
-        function initScrollAnimations() {
-            const animatedElements = document.querySelectorAll('.animate-on-scroll');
-            if ('IntersectionObserver' in window) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('visible');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-                animatedElements.forEach(el => observer.observe(el));
-            } else {
-                animatedElements.forEach(el => el.classList.add('visible'));
-            }
-        }
-
+        // Load profile data
         async function loadProfile() {
             try {
-                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
-                if (response.ok) {
-                    const data = await response.json();
-                    currentUser = data.user;
-
-                    if (!currentUser) {
-                        window.location.href = '/login.html';
-                        return;
-                    }
-
-                    // Update sidebar
-                    document.getElementById('sideUserName').textContent = currentUser.name || currentUser.email?.split('@')[0] || 'User';
-                    document.getElementById('sideUserEmail').textContent = currentUser.email || '';
-
-                    // Update form
-                    document.getElementById('profileName').value = currentUser.name || '';
-                    document.getElementById('profileEmail').value = currentUser.email || '';
-                    document.getElementById('profileLanguage').value = currentUser.language || 'en';
-                    document.getElementById('profileRole').value = currentUser.role || 'student';
-
-                    // Update avatar
-                    updateAvatarDisplay(currentUser.avatar_url);
-
-                    checkAdminAccess();
-                } else {
-                    window.location.href = '/login.html';
-                }
-            } catch (err) {
-                console.error('Failed to load profile:', err);
-                showToast('Failed to load profile', 'error');
-            }
-        }
-
-        function updateAvatarDisplay(avatarUrl) {
-            const avatarIcon = document.getElementById('avatarIcon');
-            const avatarImg = document.getElementById('avatarImg');
-            const removeBtn = document.getElementById('avatarRemoveBtn');
-
-            if (avatarUrl) {
-                avatarIcon.style.display = 'none';
-                avatarImg.src = avatarUrl;
-                avatarImg.style.display = 'block';
-                removeBtn.style.display = 'block';
-            } else {
-                avatarIcon.style.display = 'block';
-                avatarImg.style.display = 'none';
-                removeBtn.style.display = 'none';
-            }
-        }
-
-        async function checkAdminAccess() {
-            try {
-                const response = await fetch(`${API_BASE}/admin/stats`, { credentials: 'include' });
-                if (response.ok) {
-                    const adminNav = document.getElementById('adminNavItem');
-                    if (adminNav) adminNav.hidden = false;
-                }
-            } catch (err) { /* Not admin */ }
-        }
-
-        function initEventListeners() {
-            // Save profile
-            document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
-
-            // Avatar upload
-            document.getElementById('avatarEditBtn').addEventListener('click', () => {
-                document.getElementById('avatarInput').click();
-            });
-
-            document.getElementById('avatarInput').addEventListener('change', uploadAvatar);
-
-            // Avatar remove
-            document.getElementById('avatarRemoveBtn').addEventListener('click', removeAvatar);
-
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', async () => {
-                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
-                window.location.href = '/';
-            });
-        }
-
-        async function saveProfile() {
-            const btn = document.getElementById('saveProfileBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            btn.disabled = true;
-
-            const name = document.getElementById('profileName').value.trim();
-            const language = document.getElementById('profileLanguage').value;
-            const role = document.getElementById('profileRole').value;
-
-            try {
-                const response = await fetch(`${API_BASE}/user/profile`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, language, role })
-                });
-
+                const response = await fetch('/api/auth/me', { credentials: 'include' });
                 const data = await response.json();
 
-                if (response.ok) {
-                    showToast(window.i18n.t('profile.profileSaved'), 'success');
-                    // Update sidebar name
-                    document.getElementById('sideUserName').textContent = name || currentUser.email?.split('@')[0] || 'User';
-                    // Update language if changed
-                    if (language !== window.i18n.getLanguage()) {
-                        await window.i18n.setLanguage(language);
-                    }
-                } else {
-                    showToast(data.error || window.i18n.t('errors.saveFailed'), 'error');
+                if (data.user) {
+                    document.getElementById('userName').textContent = data.user.displayName || data.user.name || 'Physics Learner';
+                    document.getElementById('userEmail').textContent = data.user.email || '';
+                    document.getElementById('avatar').textContent = (data.user.displayName || data.user.name || 'U')[0].toUpperCase();
+                }
+
+                // Try to load skill tree data for stats
+                const skillResponse = await fetch('/api/learn/skill-tree', { credentials: 'include' });
+                if (skillResponse.ok) {
+                    const skillData = await skillResponse.json();
+                    document.getElementById('totalXp').textContent = skillData.user?.totalXP || 0;
+                    document.getElementById('currentStreak').textContent = skillData.user?.currentStreak || 0;
+                    document.getElementById('streak').textContent = skillData.user?.currentStreak || 0;
                 }
             } catch (err) {
-                console.error('Failed to save profile:', err);
-                showToast('Failed to save profile', 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                console.error('Error loading profile:', err);
+            }
+            }
+
+        // Generate activity graph
+        function generateActivityGraph() {
+            const container = document.getElementById('activityGraph');
+            for (let i = 0; i < 30; i++) {
+                const day = document.createElement('div');
+                day.className = 'activity-day';
+                
+                // Random activity level for demo
+                const level = Math.floor(Math.random() * 5);
+                if (level > 0) day.classList.add(`level-${level}`);
+                
+                container.appendChild(day);
             }
         }
 
-        async function uploadAvatar(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Validate file size (2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                showToast('File too large. Maximum size is 2MB.', 'error');
-                return;
-            }
-
-            // Preview immediately
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('avatarIcon').style.display = 'none';
-                document.getElementById('avatarImg').src = e.target.result;
-                document.getElementById('avatarImg').style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-
-            // Upload
-            showToast('Uploading avatar...', 'info');
-
-            const formData = new FormData();
-            formData.append('avatar', file);
-
-            try {
-                const response = await fetch(`${API_BASE}/user/avatar`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    showToast('Avatar uploaded successfully!', 'success');
-                    updateAvatarDisplay(data.avatar_url);
-                } else {
-                    showToast(data.error || 'Failed to upload avatar', 'error');
-                    // Revert preview
-                    updateAvatarDisplay(currentUser.avatar_url);
-                }
-            } catch (err) {
-                console.error('Failed to upload avatar:', err);
-                showToast('Failed to upload avatar', 'error');
-                updateAvatarDisplay(currentUser.avatar_url);
-            }
-
-            // Clear input
-            event.target.value = '';
-        }
-
-        async function removeAvatar() {
-            if (!confirm('Are you sure you want to remove your avatar?')) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/user/avatar`, {
-                    method: 'DELETE',
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    showToast('Avatar removed', 'success');
-                    updateAvatarDisplay(null);
-                    currentUser.avatar_url = null;
-                } else {
-                    const data = await response.json();
-                    showToast(data.error || 'Failed to remove avatar', 'error');
-                }
-            } catch (err) {
-                console.error('Failed to remove avatar:', err);
-                showToast('Failed to remove avatar', 'error');
-            }
-        }
-
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-
-            const icons = {
-                success: 'fa-check-circle',
-                error: 'fa-exclamation-circle',
-                info: 'fa-info-circle'
-            };
-
-            toast.innerHTML = `<i class="fas ${icons[type]}"></i> ${message}`;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfile();
+            generateActivityGraph();
+        });
     </script>
-    <!-- AI Agent - Lancelot Assistant -->
-    <script src="/js/physics-avatar.js?v=6.3"></script>
-    <script src="/js/ai-agent.js?v=6.3"></script>
 </body>
 
 </html>
