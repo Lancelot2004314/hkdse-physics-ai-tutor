@@ -387,6 +387,36 @@
     "uploading": "Uploading...",
     "processing": "Processing..."
   },
+  "nav": {
+    "home": "Home",
+    "learn": "Learn",
+    "leaderboard": "Leaderboards",
+    "quests": "Quests",
+    "shop": "Shop",
+    "profile": "Profile",
+    "settings": "Settings",
+    "aiTutor": "AI Tutor"
+  },
+  "quests": {
+    "title": "Quests - DSE Physics AI Tutor",
+    "welcome": "Welcome!",
+    "subtitle": "Complete quests to earn rewards!<br>Quests refresh every day.",
+    "dailyQuests": "Daily Quests",
+    "monthlyChallenges": "Monthly Challenges",
+    "comingSoon": "Monthly challenges unlock soon!",
+    "comingSoonDesc": "Complete each month's challenge to earn exclusive badges",
+    "todayProgress": "Today's Progress",
+    "xpEarned": "XP Earned",
+    "lessonsCompleted": "Lessons",
+    "perfectLessons": "Perfect",
+    "startLesson": "START A LESSON",
+    "moreComingSoon": "More quests unlock soon",
+    "unlockHint": "Complete lessons to unlock more quests",
+    "claim": "CLAIM",
+    "claimed": "Claimed",
+    "gems": "Gems",
+    "hearts": "Hearts"
+  },
   "aiAgent": {
     "name": "Lancelot",
     "title": "Physics Learning Assistant",

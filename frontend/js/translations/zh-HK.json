@@ -387,6 +387,36 @@
     "uploading": "上傳中...",
     "processing": "處理中..."
   },
+  "nav": {
+    "home": "主頁",
+    "learn": "學習",
+    "leaderboard": "排行榜",
+    "quests": "任務",
+    "shop": "商店",
+    "profile": "個人資料",
+    "settings": "設定",
+    "aiTutor": "AI 導師"
+  },
+  "quests": {
+    "title": "每日任務 - DSE Physics AI Tutor",
+    "welcome": "歡迎！",
+    "subtitle": "完成任務獲得獎勵！<br>任務每天重置。",
+    "dailyQuests": "每日任務",
+    "monthlyChallenges": "月度挑戰",
+    "comingSoon": "月度挑戰即將推出！",
+    "comingSoonDesc": "完成每月挑戰獲得專屬徽章",
+    "todayProgress": "今日進度",
+    "xpEarned": "獲得 XP",
+    "lessonsCompleted": "課程數",
+    "perfectLessons": "完美課程",
+    "startLesson": "開始課程",
+    "moreComingSoon": "更多任務即將推出",
+    "unlockHint": "完成課程解鎖更多任務",
+    "claim": "領取",
+    "claimed": "已領取",
+    "gems": "寶石",
+    "hearts": "愛心"
+  },
   "aiAgent": {
     "name": "Lancelot",
     "title": "物理學習助手",

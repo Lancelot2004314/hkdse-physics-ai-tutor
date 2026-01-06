@@ -186,6 +186,12 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: all 0.3s;
+        }
+
+        .hearts-banner.disabled {
+            background: linear-gradient(135deg, #4a5568, #718096);
+            opacity: 0.7;
         }
 
         .hearts-banner-info h2 {
@@ -196,6 +202,21 @@
 
         .hearts-banner-info p {
             opacity: 0.9;
+        }
+
+        .hearts-display {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .hearts-display .heart {
+            font-size: 24px;
+            transition: transform 0.2s;
+        }
+
+        .hearts-display .heart.empty {
+            opacity: 0.3;
         }
 
         .hearts-banner-icon {
@@ -218,9 +239,16 @@
             transition: all 0.2s;
         }
 
-        .refill-btn:hover {
+        .refill-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+        }
+
+        .refill-btn:disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
         /* Shop items grid */
@@ -258,10 +286,14 @@
             margin-bottom: 5px;
         }
 
-        .item-equipped {
+        .item-owned {
             font-size: 12px;
             color: var(--primary);
             margin-bottom: 10px;
+        }
+
+        .item-owned.equipped {
+            color: var(--gold);
         }
 
         .item-description {
@@ -300,11 +332,144 @@
             color: white;
         }
 
-        .buy-btn.owned {
+        .buy-btn.equipped {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: #1a1a1a;
+            cursor: default;
+        }
+
+        .buy-btn.use-btn {
             background: var(--primary);
             border-color: var(--primary);
             color: white;
-            cursor: default;
+        }
+
+        .buy-btn.use-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Confirm Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+            border: 2px solid var(--border);
+            animation: modalPop 0.3s ease;
+        }
+
+        @keyframes modalPop {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .modal h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .modal p {
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+
+        .modal-price {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(28, 176, 246, 0.2);
+            padding: 8px 16px;
+            border-radius: 10px;
+            color: var(--secondary);
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.cancel {
+            background: var(--card-hover);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .modal-btn.confirm {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+
+        .modal-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--primary-dark);
+        }
+
+        /* Success Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--primary);
+            color: white;
+            padding: 16px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1001;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
 
         /* Right sidebar */
@@ -375,6 +540,7 @@
             .sidebar-footer { display: none; }
             .main-wrapper { margin-left: 80px; }
             .shop-grid { grid-template-columns: 1fr; }
+            .hearts-banner { flex-direction: column; gap: 20px; text-align: center; }
         }
     </style>
 </head>
@@ -401,9 +567,9 @@
 
     <div class="main-wrapper">
         <header class="top-header">
-            <div class="stat-badge" style="color: var(--streak);"><i class="fas fa-fire"></i><span>0</span></div>
+            <div class="stat-badge" style="color: var(--streak);"><i class="fas fa-fire"></i><span id="streakCount">0</span></div>
             <div class="stat-badge gems-badge"><i class="fas fa-gem"></i><span id="gemsCount">500</span></div>
-            <div class="stat-badge" style="color: var(--red);"><i class="fas fa-heart"></i><span>5</span></div>
+            <div class="stat-badge" style="color: var(--red);"><i class="fas fa-heart"></i><span id="heartsCount">5</span></div>
         </header>
 
         <div class="content-wrapper">
@@ -418,53 +584,60 @@
 
                 <!-- Hearts Section -->
                 <h3 class="section-title">❤️ Hearts</h3>
-                <div class="hearts-banner">
+                <div class="hearts-banner" id="heartsBanner">
                     <div class="hearts-banner-info">
-                        <h2>You earned 500 gems!</h2>
-                        <p>Get full hearts so you can practice more</p>
+                        <h2 id="heartsTitle">Refill Your Hearts</h2>
+                        <p id="heartsSubtitle">Get full hearts so you can practice more</p>
+                        <div class="hearts-display" id="heartsDisplay">
+                            <span class="heart">❤️</span>
+                            <span class="heart">❤️</span>
+                            <span class="heart">❤️</span>
+                            <span class="heart">❤️</span>
+                            <span class="heart">❤️</span>
+                        </div>
                     </div>
-                    <button class="refill-btn">
-                        <i class="fas fa-gem"></i> 350
+                    <button class="refill-btn" id="refillBtn" data-price="350" data-item="hearts">
+                        <i class="fas fa-gem"></i> 350 for 5 ❤️
                     </button>
                 </div>
 
                 <!-- Power-Ups Section -->
                 <h3 class="section-title">⚡ Power-Ups</h3>
                 <div class="shop-grid">
-                    <div class="shop-item">
+                    <div class="shop-item" data-item="streak-freeze" data-price="200" data-max="2" data-owned="0">
                         <span class="item-icon">🧊</span>
                         <div class="item-name">Streak Freeze</div>
-                        <div class="item-equipped">0 / 2 EQUIPPED</div>
+                        <div class="item-owned"><span class="owned-count">0</span> / 2 OWNED</div>
                         <div class="item-description">Streak Freeze allows your streak to remain in place for one full day of inactivity.</div>
                         <button class="buy-btn">
                             GET FOR: <i class="fas fa-gem"></i> 200
                         </button>
                     </div>
 
-                    <div class="shop-item">
+                    <div class="shop-item" data-item="double-xp" data-price="300" data-max="3" data-owned="0">
                         <span class="item-icon">⏰</span>
                         <div class="item-name">Double XP Boost</div>
-                        <div class="item-equipped">0 / 1 EQUIPPED</div>
+                        <div class="item-owned"><span class="owned-count">0</span> / 3 OWNED</div>
                         <div class="item-description">Earn double XP for the next 15 minutes of practice.</div>
                         <button class="buy-btn">
                             GET FOR: <i class="fas fa-gem"></i> 300
                         </button>
                     </div>
 
-                    <div class="shop-item">
+                    <div class="shop-item" data-item="hint-token" data-price="50" data-max="99" data-owned="0">
                         <span class="item-icon">💡</span>
                         <div class="item-name">Hint Token</div>
-                        <div class="item-equipped">0 OWNED</div>
+                        <div class="item-owned"><span class="owned-count">0</span> OWNED</div>
                         <div class="item-description">Get a helpful hint during any lesson question.</div>
                         <button class="buy-btn">
                             GET FOR: <i class="fas fa-gem"></i> 50
                         </button>
                     </div>
 
-                    <div class="shop-item">
+                    <div class="shop-item" data-item="heart-shield" data-price="100" data-max="5" data-owned="0">
                         <span class="item-icon">🛡️</span>
                         <div class="item-name">Heart Shield</div>
-                        <div class="item-equipped">0 OWNED</div>
+                        <div class="item-owned"><span class="owned-count">0</span> / 5 OWNED</div>
                         <div class="item-description">Prevent losing a heart on your next wrong answer.</div>
                         <button class="buy-btn">
                             GET FOR: <i class="fas fa-gem"></i> 100
@@ -474,30 +647,32 @@
 
                 <!-- Cosmetics Section -->
                 <h3 class="section-title">🎨 Cosmetics</h3>
-                <div class="shop-grid">
-                    <div class="shop-item">
+                <div class="shop-grid" id="cosmeticsGrid">
+                    <div class="shop-item" data-item="classic-owl" data-price="0" data-cosmetic="true" data-owned="true">
                         <span class="item-icon">🦉</span>
                         <div class="item-name">Classic Owl</div>
-                        <div class="item-equipped">DEFAULT</div>
-                        <div class="item-description">The classic owl mascot that guides your learning journey.</div>
-                        <button class="buy-btn owned">
-                            ✓ OWNED
+                        <div class="item-owned equipped">✓ EQUIPPED</div>
+                        <div class="item-description">The classic owl mascot that guides your learning journey. Appears on your profile and during lessons.</div>
+                        <button class="buy-btn equipped">
+                            ✓ EQUIPPED
                         </button>
                     </div>
 
-                    <div class="shop-item">
+                    <div class="shop-item" data-item="study-cat" data-price="500" data-cosmetic="true" data-owned="false">
                         <span class="item-icon">🐱</span>
                         <div class="item-name">Study Cat</div>
-                        <div class="item-description">A curious cat companion for your physics adventures.</div>
+                        <div class="item-owned"></div>
+                        <div class="item-description">A curious cat companion for your physics adventures. Replaces the owl on your profile and lessons.</div>
                         <button class="buy-btn">
                             GET FOR: <i class="fas fa-gem"></i> 500
                         </button>
                     </div>
 
-                    <div class="shop-item">
+                    <div class="shop-item" data-item="physics-bot" data-price="750" data-cosmetic="true" data-owned="false">
                         <span class="item-icon">🤖</span>
                         <div class="item-name">Physics Bot</div>
-                        <div class="item-description">A robot assistant programmed with physics knowledge.</div>
+                        <div class="item-owned"></div>
+                        <div class="item-description">A robot assistant programmed with physics knowledge. Replaces the owl on your profile and lessons.</div>
                         <button class="buy-btn">
                             GET FOR: <i class="fas fa-gem"></i> 750
                         </button>
@@ -536,31 +711,308 @@
         </div>
     </div>
 
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <div class="modal-icon" id="modalIcon">🧊</div>
+            <h2 id="modalTitle">Purchase Item?</h2>
+            <p id="modalDesc">Are you sure you want to buy this item?</p>
+            <div class="modal-price">
+                <i class="fas fa-gem"></i>
+                <span id="modalPrice">200</span>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="cancelBtn">Cancel</button>
+                <button class="modal-btn confirm" id="confirmBtn">Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Purchase successful!</span>
+    </div>
+
     <script>
-        // Handle purchases
-        document.querySelectorAll('.buy-btn:not(.owned)').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const price = parseInt(btn.textContent.match(/\d+/)?.[0] || 0);
-                const gems = parseInt(document.getElementById('gemsCount').textContent);
-                
-                if (gems >= price) {
-                    const newGems = gems - price;
-                    document.getElementById('gemsCount').textContent = newGems;
-                    document.getElementById('gemsDisplay').textContent = newGems;
-                    btn.classList.add('owned');
-                    btn.innerHTML = '✓ OWNED';
-                    
-                    // Animation
-                    btn.style.transform = 'scale(1.1)';
-                    setTimeout(() => btn.style.transform = '', 200);
+        // State management
+        let state = {
+            gems: 500,
+            hearts: 5,
+            maxHearts: 5,
+            streak: 0,
+            inventory: {
+                'streak-freeze': 0,
+                'double-xp': 0,
+                'hint-token': 0,
+                'heart-shield': 0
+            },
+            cosmetics: {
+                'classic-owl': { owned: true, equipped: true },
+                'study-cat': { owned: false, equipped: false },
+                'physics-bot': { owned: false, equipped: false }
+            }
+        };
+
+        // Load state from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('shopState');
+            if (saved) {
+                state = { ...state, ...JSON.parse(saved) };
+            }
+            updateUI();
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            localStorage.setItem('shopState', JSON.stringify(state));
+        }
+
+        // Update UI based on state
+        function updateUI() {
+            // Update gems display
+            document.getElementById('gemsCount').textContent = state.gems;
+            document.getElementById('gemsDisplay').textContent = state.gems;
+            document.getElementById('heartsCount').textContent = state.hearts;
+            document.getElementById('streakCount').textContent = state.streak;
+
+            // Update hearts banner
+            updateHeartsBanner();
+
+            // Update inventory items
+            document.querySelectorAll('.shop-item[data-item]').forEach(item => {
+                const itemId = item.dataset.item;
+                const isCosmetic = item.dataset.cosmetic === 'true';
+
+                if (isCosmetic) {
+                    updateCosmeticItem(item, itemId);
                 } else {
-                    alert('Not enough gems! Complete quests to earn more.');
+                    updateInventoryItem(item, itemId);
+                }
+            });
+        }
+
+        function updateHeartsBanner() {
+            const banner = document.getElementById('heartsBanner');
+            const btn = document.getElementById('refillBtn');
+            const title = document.getElementById('heartsTitle');
+            const subtitle = document.getElementById('heartsSubtitle');
+            const display = document.getElementById('heartsDisplay');
+
+            // Update hearts display
+            display.innerHTML = '';
+            for (let i = 0; i < state.maxHearts; i++) {
+                const heart = document.createElement('span');
+                heart.className = 'heart' + (i >= state.hearts ? ' empty' : '');
+                heart.textContent = i < state.hearts ? '❤️' : '🖤';
+                display.appendChild(heart);
+            }
+
+            // Check if hearts are full
+            if (state.hearts >= state.maxHearts) {
+                banner.classList.add('disabled');
+                btn.disabled = true;
+                title.textContent = 'Hearts Full!';
+                subtitle.textContent = 'You have all your hearts - go practice!';
+                btn.innerHTML = '✓ Full';
+            } else {
+                banner.classList.remove('disabled');
+                btn.disabled = false;
+                title.textContent = 'Refill Your Hearts';
+                subtitle.textContent = `You have ${state.hearts}/${state.maxHearts} hearts`;
+                btn.innerHTML = '<i class="fas fa-gem"></i> 350 for 5 ❤️';
+            }
+        }
+
+        function updateInventoryItem(item, itemId) {
+            const owned = state.inventory[itemId] || 0;
+            const max = parseInt(item.dataset.max);
+            const ownedDisplay = item.querySelector('.item-owned');
+            const btn = item.querySelector('.buy-btn');
+
+            item.dataset.owned = owned;
+            
+            if (max < 99) {
+                ownedDisplay.innerHTML = `<span class="owned-count">${owned}</span> / ${max} OWNED`;
+            } else {
+                ownedDisplay.innerHTML = `<span class="owned-count">${owned}</span> OWNED`;
+            }
+
+            if (owned >= max) {
+                btn.classList.add('equipped');
+                btn.innerHTML = '✓ MAX';
+                btn.disabled = true;
+            } else {
+                btn.classList.remove('equipped');
+                btn.disabled = false;
+                btn.innerHTML = `GET FOR: <i class="fas fa-gem"></i> ${item.dataset.price}`;
+            }
+        }
+
+        function updateCosmeticItem(item, itemId) {
+            const cosmetic = state.cosmetics[itemId];
+            const ownedDisplay = item.querySelector('.item-owned');
+            const btn = item.querySelector('.buy-btn');
+
+            if (cosmetic.equipped) {
+                ownedDisplay.className = 'item-owned equipped';
+                ownedDisplay.textContent = '✓ EQUIPPED';
+                btn.className = 'buy-btn equipped';
+                btn.innerHTML = '✓ EQUIPPED';
+            } else if (cosmetic.owned) {
+                ownedDisplay.className = 'item-owned';
+                ownedDisplay.textContent = 'OWNED';
+                btn.className = 'buy-btn use-btn';
+                btn.innerHTML = 'EQUIP';
+            } else {
+                ownedDisplay.className = 'item-owned';
+                ownedDisplay.textContent = '';
+                btn.className = 'buy-btn';
+                btn.innerHTML = `GET FOR: <i class="fas fa-gem"></i> ${item.dataset.price}`;
+            }
+        }
+
+        // Modal functions
+        let pendingPurchase = null;
+
+        function showModal(icon, title, desc, price, callback) {
+            document.getElementById('modalIcon').textContent = icon;
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalDesc').textContent = desc;
+            document.getElementById('modalPrice').textContent = price;
+            document.getElementById('confirmModal').classList.add('show');
+            pendingPurchase = callback;
+        }
+
+        function hideModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            pendingPurchase = null;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Purchase handlers
+        document.getElementById('refillBtn').addEventListener('click', function() {
+            if (this.disabled) return;
+            if (state.hearts >= state.maxHearts) return;
+
+            const price = 350;
+            if (state.gems < price) {
+                showToast('Not enough gems! Complete quests to earn more.');
+                return;
+            }
+
+            showModal('❤️', 'Refill Hearts?', `Restore all ${state.maxHearts} hearts to continue practicing.`, price, () => {
+                state.gems -= price;
+                state.hearts = state.maxHearts;
+                saveState();
+                updateUI();
+                showToast('Hearts fully restored!');
+            });
+        });
+
+        // Handle shop item purchases
+        document.querySelectorAll('.shop-item').forEach(item => {
+            const btn = item.querySelector('.buy-btn');
+            
+            btn.addEventListener('click', () => {
+                const itemId = item.dataset.item;
+                const price = parseInt(item.dataset.price);
+                const isCosmetic = item.dataset.cosmetic === 'true';
+                const icon = item.querySelector('.item-icon').textContent;
+                const name = item.querySelector('.item-name').textContent;
+
+                if (isCosmetic) {
+                    handleCosmeticPurchase(itemId, price, icon, name);
+                } else {
+                    handleInventoryPurchase(item, itemId, price, icon, name);
                 }
             });
         });
+
+        function handleInventoryPurchase(item, itemId, price, icon, name) {
+            const owned = state.inventory[itemId] || 0;
+            const max = parseInt(item.dataset.max);
+
+            if (owned >= max) return;
+
+            if (state.gems < price) {
+                showToast('Not enough gems! Complete quests to earn more.');
+                return;
+            }
+
+            showModal(icon, `Buy ${name}?`, `Add 1 ${name} to your inventory.`, price, () => {
+                state.gems -= price;
+                state.inventory[itemId] = (state.inventory[itemId] || 0) + 1;
+                saveState();
+                updateUI();
+                showToast(`${name} added to inventory!`);
+            });
+        }
+
+        function handleCosmeticPurchase(itemId, price, icon, name) {
+            const cosmetic = state.cosmetics[itemId];
+
+            if (cosmetic.equipped) return;
+
+            if (cosmetic.owned) {
+                // Equip the cosmetic
+                Object.keys(state.cosmetics).forEach(key => {
+                    state.cosmetics[key].equipped = false;
+                });
+                state.cosmetics[itemId].equipped = true;
+                saveState();
+                updateUI();
+                showToast(`${name} equipped!`);
+                return;
+            }
+
+            if (state.gems < price) {
+                showToast('Not enough gems! Complete quests to earn more.');
+                return;
+            }
+
+            showModal(icon, `Buy ${name}?`, `This mascot will appear on your profile and during lessons.`, price, () => {
+                state.gems -= price;
+                Object.keys(state.cosmetics).forEach(key => {
+                    state.cosmetics[key].equipped = false;
+                });
+                state.cosmetics[itemId].owned = true;
+                state.cosmetics[itemId].equipped = true;
+                saveState();
+                updateUI();
+                showToast(`${name} purchased and equipped!`);
+            });
+        }
+
+        // Modal button handlers
+        document.getElementById('cancelBtn').addEventListener('click', hideModal);
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            if (pendingPurchase) {
+                pendingPurchase();
+            }
+            hideModal();
+        });
+
+        // Close modal on overlay click
+        document.getElementById('confirmModal').addEventListener('click', (e) => {
+            if (e.target.id === 'confirmModal') {
+                hideModal();
+            }
+        });
+
+        // Initialize
+        loadState();
+
+        // For testing: simulate losing a heart
+        // Uncomment to test heart refill functionality
+        // setTimeout(() => { state.hearts = 2; saveState(); updateUI(); }, 1000);
     </script>
 </body>
 
 </html>
-
-
