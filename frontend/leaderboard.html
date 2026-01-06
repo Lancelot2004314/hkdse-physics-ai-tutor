@@ -639,10 +639,24 @@
         // Load leaderboard data
         async function loadLeaderboard() {
             try {
+                // First check if user is authenticated via /api/auth/me
+                const meResponse = await fetch('/api/auth/me', { credentials: 'include' });
+                const meData = await meResponse.json();
+                
+                console.log('Auth check:', meData);
+                
+                if (!meData.user) {
+                    console.log('Not authenticated, debug info:', meData.debug);
+                    showLoginPrompt();
+                    return;
+                }
+
+                // User is authenticated, now load league data
                 const response = await fetch('/api/learn/league', { credentials: 'include' });
 
-                // Handle unauthorized - show login prompt
+                // Handle unauthorized - this shouldn't happen if /api/auth/me worked
                 if (response.status === 401) {
+                    console.error('League API returned 401 but auth/me succeeded - this is a bug');
                     showLoginPrompt();
                     return;
                 }
