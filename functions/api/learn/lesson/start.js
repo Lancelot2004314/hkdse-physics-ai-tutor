@@ -220,13 +220,17 @@ export async function onRequestPost({ request, env }) {
             return Response.json({ error: 'Invalid skill node' }, { status: 400 });
         }
 
-        // Check hearts
+        // Check hearts - allow heart_practice mode even when hearts = 0
         const hearts = await getUserHearts(env.DB, user.id);
-        if (hearts <= 0) {
+        const isHeartPractice = lessonType === 'heart_practice';
+
+        if (hearts <= 0 && !isHeartPractice) {
             return Response.json({
                 error: 'No hearts remaining',
+                code: 'NO_HEARTS',
                 hearts: 0,
                 nextRefillAt: Date.now() + 4 * 60 * 60 * 1000,
+                canDoHeartPractice: true,
             }, { status: 400 });
         }
 
@@ -243,23 +247,12 @@ export async function onRequestPost({ request, env }) {
         const questions = await getQuestionsForLesson(env.DB, skillNodeId, targetDifficulty, lessonType, currentLevel);
 
         if (questions.length === 0) {
-            // #region agent log - Debug query
-            const debugCount = await env.DB.prepare(
-                'SELECT COUNT(*) as cnt FROM question_bank WHERE skill_node_id = ? AND status = ?'
-            ).bind(skillNodeId, 'ready').first();
-            const allSkillNodes = await env.DB.prepare(
-                'SELECT DISTINCT skill_node_id FROM question_bank WHERE skill_node_id IS NOT NULL LIMIT 10'
-            ).all();
-            // #endregion
-
             return Response.json({
-                error: 'No questions available for this skill',
+                error: '此技能暫無可用題目',
+                code: 'NO_QUESTIONS',
                 skillNodeId,
-                debug: {
-                    requestedSkillNode: skillNodeId,
-                    matchingQuestionsCount: debugCount?.cnt || 0,
-                    availableSkillNodes: allSkillNodes.results?.map(r => r.skill_node_id) || [],
-                }
+                skillName: node.name_zh || node.name,
+                message: '我們正在準備更多題目，請稍後再試或選擇其他技能練習。',
             }, { status: 404 });
         }
 
@@ -287,13 +280,14 @@ export async function onRequestPost({ request, env }) {
                 name_zh: node.name_zh,
             },
             lessonType,
+            isHeartPractice,
             difficulty: targetDifficulty,
             totalQuestions: questions.length,
             hearts,
             questions,
             xpConfig: {
                 correctAnswer: XP_CONFIG.correctAnswer,
-                correctAnswerBonus: XP_CONFIG.correctAnswerBonus,
+                correctAnswerBonus: XP_CONFIG.streakBonus,
                 lessonComplete: XP_CONFIG.lessonComplete,
                 perfectLesson: XP_CONFIG.perfectLesson,
             },

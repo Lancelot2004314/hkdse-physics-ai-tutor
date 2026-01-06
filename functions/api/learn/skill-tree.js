@@ -98,6 +98,27 @@ async function getTotalXP(db, userId) {
   return result?.total_xp || 0;
 }
 
+// Get today's daily progress
+async function getDailyProgress(db, userId) {
+  const today = new Date().toISOString().split('T')[0];
+  const result = await db.prepare(`
+    SELECT xp_earned, lessons_completed, goal_xp, goal_met 
+    FROM user_daily_progress 
+    WHERE user_id = ? AND date = ?
+  `).bind(userId, today).first();
+  
+  return result || { xp_earned: 0, lessons_completed: 0, goal_xp: 50, goal_met: 0 };
+}
+
+// Get total lessons completed across all skills
+async function getTotalLessonsCompleted(db, userId) {
+  const result = await db.prepare(`
+    SELECT COALESCE(SUM(lessons_completed), 0) as total FROM user_skill_progress WHERE user_id = ?
+  `).bind(userId).first();
+  
+  return result?.total || 0;
+}
+
 // Check if a skill node is unlocked based on prerequisites
 function isNodeUnlocked(nodeId, progressMap) {
   const node = SKILL_TREE_NODES.find(n => n.id === nodeId);
@@ -149,11 +170,13 @@ export async function onRequestGet({ request, env }) {
     }
     
     // Fetch user progress data
-    const [progressMap, hearts, streak, totalXP] = await Promise.all([
+    const [progressMap, hearts, streak, totalXP, dailyProgress, totalLessons] = await Promise.all([
       getUserSkillProgress(env.DB, user.id),
       getUserHearts(env.DB, user.id),
       getUserStreak(env.DB, user.id),
       getTotalXP(env.DB, user.id),
+      getDailyProgress(env.DB, user.id),
+      getTotalLessonsCompleted(env.DB, user.id),
     ]);
     
     // Build skill tree response with progress
@@ -209,6 +232,10 @@ export async function onRequestGet({ request, env }) {
       };
     });
     
+    // Leaderboard unlock requires 10 lessons
+    const LEADERBOARD_UNLOCK_LESSONS = 10;
+    const lessonsUntilLeaderboard = Math.max(0, LEADERBOARD_UNLOCK_LESSONS - totalLessons);
+    
     return Response.json({
       success: true,
       user: {
@@ -216,13 +243,26 @@ export async function onRequestGet({ request, env }) {
         displayName: user.display_name,
         avatarUrl: user.avatar_url,
         totalXP,
+        dailyXP: dailyProgress.xp_earned,
         currentStreak: streak.current_streak,
         longestStreak: streak.longest_streak,
+        totalLessonsCompleted: totalLessons,
       },
       hearts: {
         current: hearts.hearts,
         max: hearts.max_hearts,
         nextRefillAt: hearts.last_refill_at + 4 * 60 * 60 * 1000,
+      },
+      leaderboard: {
+        unlocked: totalLessons >= LEADERBOARD_UNLOCK_LESSONS,
+        lessonsRequired: LEADERBOARD_UNLOCK_LESSONS,
+        lessonsRemaining: lessonsUntilLeaderboard,
+      },
+      dailyGoal: {
+        xpEarned: dailyProgress.xp_earned,
+        goalXP: dailyProgress.goal_xp,
+        goalMet: dailyProgress.goal_met === 1,
+        lessonsToday: dailyProgress.lessons_completed,
       },
       units,
       xpConfig: XP_CONFIG,

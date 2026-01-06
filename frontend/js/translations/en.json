@@ -186,6 +186,17 @@
     "generating": "Generating questions...",
     "noTopicsSelected": "Please select at least one topic"
   },
+  "freePractice": {
+    "category": "Category",
+    "hkdse": "HKDSE Senior Secondary",
+    "subject": "Subject",
+    "questionLang": "Question Language",
+    "difficultyHint": "Select maximum difficulty level (1=Easy, 5=Hard)",
+    "selected": "Selected",
+    "topics": "topics",
+    "subjectChangeConfirm": "Switching subjects will clear your selected topics. Continue?",
+    "limitsAdjusted": "Question limits adjusted for selected language"
+  },
   "quiz": {
     "question": "Question",
     "of": "of",

@@ -566,6 +566,103 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(19, 31, 36, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border: 2px solid var(--border);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content h2 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .modal-content p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            padding: 16px 24px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.primary {
+            background: var(--red);
+            color: white;
+            box-shadow: 0 4px 0 #cc3c3c;
+        }
+
+        .modal-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #cc3c3c;
+        }
+
+        .modal-btn.secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .modal-btn.secondary:hover {
+            background: var(--card-hover);
+        }
+
+        .modal-note {
+            font-size: 13px !important;
+            margin-top: 16px !important;
+            color: var(--text-secondary) !important;
+        }
     </style>
 </head>
 
@@ -644,6 +741,7 @@
         let isChecked = false;
         let hearts = 5;
         let xpConfig = {};
+        let isHeartPractice = lessonType === 'heart_practice';
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
@@ -671,10 +769,17 @@
                         window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
                         return;
                     }
-                    // #region agent log
-                    console.error('[DEBUG] Start lesson error:', data);
-                    // #endregion
-                    throw new Error(data.error + (data.debug ? '\nDebug: ' + JSON.stringify(data.debug) : ''));
+                    // Handle no hearts case specially
+                    if (data.code === 'NO_HEARTS' && data.canDoHeartPractice) {
+                        showNoHeartsModal(data);
+                        return;
+                    }
+                    // Handle no questions case
+                    if (data.code === 'NO_QUESTIONS') {
+                        showNoQuestionsModal(data);
+                        return;
+                    }
+                    throw new Error(data.error);
                 }
 
                 const data = await response.json();
@@ -682,6 +787,12 @@
                 questions = data.questions;
                 hearts = data.hearts;
                 xpConfig = data.xpConfig;
+                isHeartPractice = data.isHeartPractice || false;
+
+                // Update UI for heart practice mode
+                if (isHeartPractice) {
+                    document.querySelector('.lesson-header').style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a5a)';
+                }
 
                 updateHeartsDisplay();
                 showQuestion(0);
@@ -689,8 +800,7 @@
 
             } catch (err) {
                 console.error('Start lesson error:', err);
-                alert('Error: ' + err.message);
-                window.location.href = '/learn.html';
+                showErrorModal(err.message);
             }
         }
 
@@ -1005,14 +1115,14 @@
 
                 showFeedback(result);
 
-                if (!result.isCorrect && result.hearts !== undefined) {
+                // Only deduct hearts if not in heart practice mode
+                if (!result.isHeartPractice && !result.isCorrect && result.hearts !== undefined) {
                     hearts = result.hearts;
                     animateHeartLoss();
 
                     if (hearts <= 0) {
                         setTimeout(() => {
-                            alert('💔 You ran out of hearts! Take a break or practice to earn more.');
-                            window.location.href = '/learn.html';
+                            showOutOfHeartsModal();
                         }, 1500);
                         return;
                     }
@@ -1039,10 +1149,18 @@
 
             if (result.isCorrect) {
                 feedbackContainer.className = 'feedback-container correct';
-                feedbackTitle.innerHTML = '<i class="fas fa-check-circle"></i> Correct! +' + xpConfig.correctAnswer + ' XP';
+                if (isHeartPractice) {
+                    feedbackTitle.innerHTML = '<i class="fas fa-check-circle"></i> 正確！';
+                } else {
+                    feedbackTitle.innerHTML = '<i class="fas fa-check-circle"></i> 正確！+' + xpConfig.correctAnswer + ' XP';
+                }
             } else {
                 feedbackContainer.className = 'feedback-container incorrect';
-                feedbackTitle.innerHTML = '<i class="fas fa-times-circle"></i> Not quite right';
+                if (isHeartPractice) {
+                    feedbackTitle.innerHTML = '<i class="fas fa-times-circle"></i> 答錯了（不扣心）';
+                } else {
+                    feedbackTitle.innerHTML = '<i class="fas fa-times-circle"></i> 答錯了';
+                }
             }
 
             // Show explanation
@@ -1129,21 +1247,36 @@
         function showResults(result) {
             const screen = document.getElementById('resultsScreen');
 
-            if (result.results.isPerfect) {
+            // Handle heart practice mode results
+            if (result.isHeartPractice) {
+                if (result.hearts?.earned > 0) {
+                    document.getElementById('resultsIcon').textContent = '❤️';
+                    document.getElementById('resultsTitle').textContent = '獲得愛心！';
+                    document.getElementById('resultsSubtitle').textContent = `你現在有 ${result.hearts.current} 顆心了`;
+                    document.getElementById('resultXP').textContent = '+1 ❤️';
+                } else {
+                    document.getElementById('resultsIcon').textContent = '💪';
+                    document.getElementById('resultsTitle').textContent = '繼續努力！';
+                    document.getElementById('resultsSubtitle').textContent = `需要答對 ${result.hearts?.requiredCorrect || 3} 題才能獲得愛心`;
+                    document.getElementById('resultXP').textContent = '+0 ❤️';
+                }
+            } else if (result.results.isPerfect) {
                 document.getElementById('resultsIcon').textContent = '🌟';
-                document.getElementById('resultsTitle').textContent = 'Perfect!';
-                document.getElementById('resultsSubtitle').textContent = 'Amazing job! No mistakes!';
+                document.getElementById('resultsTitle').textContent = '完美！';
+                document.getElementById('resultsSubtitle').textContent = '太厲害了！沒有錯誤！';
+                document.getElementById('resultXP').textContent = '+' + result.xp.total;
             } else if (result.results.accuracy >= 80) {
                 document.getElementById('resultsIcon').textContent = '🎉';
-                document.getElementById('resultsTitle').textContent = 'Great Job!';
+                document.getElementById('resultsTitle').textContent = '做得好！';
+                document.getElementById('resultXP').textContent = '+' + result.xp.total;
             } else {
                 document.getElementById('resultsIcon').textContent = '💪';
-                document.getElementById('resultsTitle').textContent = 'Keep Practicing!';
-                document.getElementById('resultsSubtitle').textContent = "You'll get better with practice!";
+                document.getElementById('resultsTitle').textContent = '繼續練習！';
+                document.getElementById('resultsSubtitle').textContent = '多練習就會進步！';
+                document.getElementById('resultXP').textContent = '+' + result.xp.total;
             }
 
             document.getElementById('resultAccuracy').textContent = result.results.accuracy + '%';
-            document.getElementById('resultXP').textContent = '+' + result.xp.total;
 
             // Show achievements
             if (result.newAchievements && result.newAchievements.length > 0) {
@@ -1156,6 +1289,98 @@
             }
 
             screen.classList.add('visible');
+        }
+
+        // Show no hearts modal
+        function showNoHeartsModal(data) {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-icon">💔</div>
+                    <h2>愛心用完了！</h2>
+                    <p>你可以：</p>
+                    <div class="modal-options">
+                        <button class="modal-btn primary" onclick="startHeartPractice()">
+                            <i class="fas fa-heart"></i> 練習賺取愛心
+                        </button>
+                        <button class="modal-btn secondary" onclick="window.location.href='/learn.html'">
+                            <i class="fas fa-clock"></i> 等待自動恢復
+                        </button>
+                    </div>
+                    <p class="modal-note">每4小時自動恢復1顆心</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Show out of hearts modal (when hearts run out during lesson)
+        function showOutOfHeartsModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-icon">💔</div>
+                    <h2>愛心用完了！</h2>
+                    <p>這節課結束了，但你可以練習來賺取更多愛心。</p>
+                    <div class="modal-options">
+                        <button class="modal-btn primary" onclick="window.location.href='/lesson.html?skill=${skillNodeId}&type=heart_practice'">
+                            <i class="fas fa-heart"></i> 練習賺取愛心
+                        </button>
+                        <button class="modal-btn secondary" onclick="window.location.href='/learn.html'">
+                            返回主頁
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Show error modal
+        function showErrorModal(message) {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-icon">❌</div>
+                    <h2>出錯了</h2>
+                    <p>${message}</p>
+                    <div class="modal-options">
+                        <button class="modal-btn primary" onclick="window.location.href='/learn.html'">
+                            返回主頁
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Start heart practice
+        function startHeartPractice() {
+            window.location.href = `/lesson.html?skill=${skillNodeId}&type=heart_practice`;
+        }
+
+        // Show no questions modal
+        function showNoQuestionsModal(data) {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-icon">📚</div>
+                    <h2>暫無題目</h2>
+                    <p>${data.skillName || '此技能'}目前還沒有可用的練習題目。</p>
+                    <p style="font-size: 14px; color: var(--text-secondary);">${data.message || '請選擇其他技能練習。'}</p>
+                    <div class="modal-options">
+                        <button class="modal-btn primary" onclick="window.location.href='/learn.html'">
+                            <i class="fas fa-arrow-left"></i> 返回選擇其他技能
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
     </script>
 </body>

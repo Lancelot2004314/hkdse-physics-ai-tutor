@@ -186,6 +186,17 @@
     "generating": "正在生成题目...",
     "noTopicsSelected": "请选择至少一个主题"
   },
+  "freePractice": {
+    "category": "类别",
+    "hkdse": "HKDSE 高中课程",
+    "subject": "科目",
+    "questionLang": "题目语言",
+    "difficultyHint": "选择最高难度等级（1=简单，5=困难）",
+    "selected": "已选",
+    "topics": "个主题",
+    "subjectChangeConfirm": "切换科目将清空已选主题，确定要继续吗？",
+    "limitsAdjusted": "题目数量已根据所选语言调整"
+  },
   "quiz": {
     "question": "题目",
     "of": "/",

@@ -148,13 +148,21 @@ function checkOrderingAnswer(question, userOrder) {
 // Grade short/long answer using AI
 async function gradeTextAnswer(question, userAnswer, env) {
   const openaiKey = env.OPENAI_API_KEY;
-  if (!openaiKey) {
-    // Fallback: always accept text answers as needing review
+  
+  // Check if user answer is too short to be valid
+  const trimmedAnswer = (userAnswer || '').trim();
+  if (trimmedAnswer.length < 3) {
     return {
-      isCorrect: true,
-      needsReview: true,
-      feedback: 'Answer submitted for review',
+      isCorrect: false,
+      score: 0,
+      feedback: '答案太短，請提供更詳細的回答。',
+      noHeartPenalty: false, // Still lose a heart for minimal effort
     };
+  }
+  
+  if (!openaiKey) {
+    // Fallback when no API key: use simple keyword matching
+    return gradeTextAnswerSimple(question, trimmedAnswer);
   }
   
   const modelAnswer = question.parsed.modelAnswer || 
@@ -177,7 +185,7 @@ Respond with JSON only:
 {
   "score": <0-100>,
   "isCorrect": <true if score >= 60>,
-  "feedback": "Brief encouraging feedback",
+  "feedback": "Brief encouraging feedback in Chinese",
   "keyPointsMissed": ["List of key points the student missed"],
   "improvement": "One suggestion for improvement"
 }`;
@@ -209,14 +217,54 @@ Respond with JSON only:
     
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        ...parsed,
+        noHeartPenalty: false,
+      };
     }
     
-    return { isCorrect: true, needsReview: true, feedback: 'Answer submitted' };
+    // AI didn't return valid JSON, fall back to simple grading
+    return gradeTextAnswerSimple(question, trimmedAnswer);
   } catch (err) {
     console.error('Grading error:', err);
-    return { isCorrect: true, needsReview: true, feedback: 'Answer submitted for review' };
+    // Fall back to simple grading on error
+    return gradeTextAnswerSimple(question, trimmedAnswer);
   }
+}
+
+// Simple keyword-based grading when AI is unavailable
+function gradeTextAnswerSimple(question, userAnswer) {
+  const modelAnswer = (question.parsed.modelAnswer || '').toLowerCase();
+  const keywords = question.parsed.keywords || [];
+  const userLower = userAnswer.toLowerCase();
+  
+  // Extract keywords from model answer if not provided
+  const keywordsToCheck = keywords.length > 0 
+    ? keywords 
+    : modelAnswer.split(/\s+/).filter(w => w.length > 3);
+  
+  // Count matching keywords
+  let matches = 0;
+  for (const keyword of keywordsToCheck) {
+    if (userLower.includes(keyword.toLowerCase())) {
+      matches++;
+    }
+  }
+  
+  const matchRatio = keywordsToCheck.length > 0 ? matches / keywordsToCheck.length : 0;
+  const score = Math.round(matchRatio * 100);
+  const isCorrect = score >= 50;
+  
+  return {
+    isCorrect,
+    score,
+    feedback: isCorrect 
+      ? '答案包含了一些重要的概念。繼續努力！' 
+      : '答案可能遺漏了一些關鍵概念。請參考正確答案學習。',
+    correctAnswer: question.parsed.modelAnswer || undefined,
+    noHeartPenalty: !isCorrect, // Don't penalize for simple grading failures
+  };
 }
 
 // Update user hearts
@@ -311,17 +359,20 @@ export async function onRequestPost({ request, env }) {
         result = { isCorrect: false, feedback: 'Unknown question type' };
     }
     
-    // Calculate XP
+    // Check if this is heart practice mode
+    const isHeartPractice = session.lesson_type === 'heart_practice';
+    
+    // Calculate XP (0 for heart practice)
     let xpEarned = 0;
-    if (result.isCorrect) {
+    if (result.isCorrect && !isHeartPractice) {
       xpEarned = 10; // Base XP for correct answer
       
       // Streak bonus could be added here
     }
     
-    // Update hearts if wrong
+    // Update hearts if wrong (but NOT during heart practice or if noHeartPenalty flag is set)
     let currentHearts = null;
-    if (!result.isCorrect) {
+    if (!result.isCorrect && !isHeartPractice && !result.noHeartPenalty) {
       currentHearts = await updateHearts(env.DB, user.id, 1);
     }
     
@@ -336,6 +387,7 @@ export async function onRequestPost({ request, env }) {
     return Response.json({
       success: true,
       isCorrect: result.isCorrect,
+      isHeartPractice,
       xpEarned,
       ...result,
       progress: {
