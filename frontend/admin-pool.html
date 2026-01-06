@@ -1196,22 +1196,44 @@
 
         function formatMathText(text) {
             if (!text) return '';
-            // Process text while preserving LaTeX math blocks
-            // We need to avoid replacing \n with <br> inside $ ... $ or $$ ... $$
             
-            // Split by math delimiters, keeping delimiters
-            // Handle both $$ (display) and $ (inline) math
+            // First, auto-wrap LaTeX commands that are not inside $...$
+            // Common LaTeX patterns that should be wrapped
+            const latexPatterns = [
+                /\\(sin|cos|tan|cot|sec|csc|arcsin|arccos|arctan|log|ln|exp|sqrt|frac|cdot|times|div|pm|mp|leq|geq|neq|approx|equiv|sum|prod|int|infty|partial|nabla|theta|alpha|beta|gamma|delta|epsilon|phi|psi|omega|pi|mu|sigma|lambda|rho)\b/g,
+                /\\[a-zA-Z]+\{[^}]*\}/g,  // \command{...}
+                /[a-zA-Z]_\{?[0-9a-zA-Z]+\}?/g,  // subscripts like n_1, θ_2
+                /[a-zA-Z]\^\{?[0-9a-zA-Z°]+\}?/g,  // superscripts like x^2, 30°
+                /\d+\\?°/g,  // degrees like 30° or 30\circ
+            ];
+            
+            // Check if text already has $ delimiters
+            const hasDollarDelimiters = text.includes('$');
+            
+            // If no $ delimiters but has LaTeX commands, try to wrap them
+            if (!hasDollarDelimiters) {
+                // Wrap segments containing LaTeX commands
+                text = text.replace(/((?:[a-zA-Z_\d]*\\[a-zA-Z]+[^.\s,;:!?]*)+)/g, (match) => {
+                    // Don't double-wrap if already has $
+                    if (match.startsWith('$') || match.endsWith('$')) return match;
+                    return '$' + match + '$';
+                });
+                
+                // Also wrap common math expressions like "n_1 = 1" 
+                text = text.replace(/([a-zA-Z]_\d\s*=\s*[\d.]+)/g, '$$$1$$');
+            }
+            
+            // Process text while preserving LaTeX math blocks
             const parts = [];
             let remaining = text;
             let inMath = false;
             let mathDelimiter = '';
-            
+
             while (remaining.length > 0) {
                 if (!inMath) {
-                    // Look for start of math: $$ or $
                     const displayMatch = remaining.indexOf('$$');
                     const inlineMatch = remaining.indexOf('$');
-                    
+
                     let nextMathStart = -1;
                     if (displayMatch !== -1 && (inlineMatch === -1 || displayMatch <= inlineMatch)) {
                         nextMathStart = displayMatch;
@@ -1220,13 +1242,11 @@
                         nextMathStart = inlineMatch;
                         mathDelimiter = '$';
                     }
-                    
+
                     if (nextMathStart === -1) {
-                        // No more math, process rest as text
                         parts.push({ type: 'text', content: remaining });
                         break;
                     } else {
-                        // Add text before math
                         if (nextMathStart > 0) {
                             parts.push({ type: 'text', content: remaining.substring(0, nextMathStart) });
                         }
@@ -1234,31 +1254,25 @@
                         inMath = true;
                     }
                 } else {
-                    // Look for end of current math block
                     const endMatch = remaining.indexOf(mathDelimiter);
                     if (endMatch === -1) {
-                        // Unclosed math block, treat rest as math
                         parts.push({ type: 'math', content: mathDelimiter + remaining, delimiter: mathDelimiter });
                         break;
                     } else {
-                        // Complete math block
                         parts.push({ type: 'math', content: mathDelimiter + remaining.substring(0, endMatch) + mathDelimiter, delimiter: mathDelimiter });
                         remaining = remaining.substring(endMatch + mathDelimiter.length);
                         inMath = false;
                     }
                 }
             }
-            
-            // Now format each part appropriately
+
             return parts.map(part => {
                 if (part.type === 'text') {
-                    // For non-math text: escape HTML and convert newlines
                     return part.content
                         .replace(/</g, '&lt;')
                         .replace(/>/g, '&gt;')
                         .replace(/\n/g, '<br>');
                 } else {
-                    // For math: keep as-is (don't escape, don't add <br>)
                     return part.content;
                 }
             }).join('');
