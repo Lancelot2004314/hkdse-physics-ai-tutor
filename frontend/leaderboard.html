@@ -669,11 +669,13 @@
             document.getElementById('leaderboardSubtitle').textContent = 'Sign in to compete in weekly leaderboards';
             document.getElementById('leagueTabs').style.display = 'none';
 
+            // Include redirect parameter to return to this page after login
+            const redirectUrl = encodeURIComponent(window.location.pathname);
             container.innerHTML = `
                 <div class="login-prompt">
                     <h2>🏆 Join the Competition!</h2>
                     <p>Login to see rankings and compete with other learners</p>
-                    <a href="/login.html" class="login-btn">Login to Continue</a>
+                    <a href="/login.html?redirect=${redirectUrl}" class="login-btn">Login to Continue</a>
                 </div>
             `;
         }
