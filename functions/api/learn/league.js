@@ -4,7 +4,7 @@
  * POST /api/learn/league/join - Join current week's league
  */
 
-import { getUserFromSession } from '../../../shared/auth.js';
+import { getUserFromSession, getCorsHeaders, jsonResponse, errorResponse } from '../../../shared/auth.js';
 
 // Helper to get user from session (with display_name alias)
 async function getUser(request, env) {
@@ -16,6 +16,11 @@ async function getUser(request, env) {
     ...user,
     display_name: user.name || user.email?.split('@')[0] || 'Anonymous',
   };
+}
+
+// Handle CORS preflight
+export async function onRequestOptions({ request }) {
+  return new Response(null, { headers: getCorsHeaders(request) });
 }
 
 // Get current week's league ID (YYYY-WW format)
@@ -84,7 +89,7 @@ export async function onRequestGet({ request, env }) {
   try {
     const user = await getUser(request, env);
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return errorResponse(401, 'Unauthorized', request);
     }
     
     const leagueId = getCurrentLeagueId();
@@ -98,7 +103,7 @@ export async function onRequestGet({ request, env }) {
         lp.user_id,
         lp.xp_earned,
         lp.tier,
-        u.display_name,
+        u.name as display_name,
         u.avatar_url
       FROM league_participants lp
       JOIN users u ON lp.user_id = u.id
@@ -150,7 +155,7 @@ export async function onRequestGet({ request, env }) {
     const timeRemaining = Math.max(0, endDateTime.getTime() - Date.now());
     const daysRemaining = Math.ceil(timeRemaining / (24 * 60 * 60 * 1000));
     
-    return Response.json({
+    return jsonResponse({
       success: true,
       league: {
         id: leagueId,
@@ -169,11 +174,11 @@ export async function onRequestGet({ request, env }) {
       totalParticipants: participants.length,
       promotionCount: 3,
       demotionCount: Math.min(3, Math.max(0, participants.length - 5)),
-    });
+    }, 200, {}, request);
     
   } catch (err) {
     console.error('League GET error:', err);
-    return Response.json({ error: err.message }, { status: 500 });
+    return errorResponse(500, err.message, request);
   }
 }
 
@@ -182,7 +187,7 @@ export async function onRequestPost({ request, env }) {
   try {
     const user = await getUser(request, env);
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return errorResponse(401, 'Unauthorized', request);
     }
     
     const leagueId = getCurrentLeagueId();
@@ -196,10 +201,10 @@ export async function onRequestPost({ request, env }) {
     ).bind(leagueId, user.id).first();
     
     if (existing) {
-      return Response.json({
+      return jsonResponse({
         success: false,
         error: 'Already participating in this week\'s league',
-      });
+      }, 200, {}, request);
     }
     
     // Get current week's XP
@@ -224,18 +229,18 @@ export async function onRequestPost({ request, env }) {
       WHERE league_id = ? AND xp_earned > ?
     `).bind(leagueId, currentXP).first();
     
-    return Response.json({
+    return jsonResponse({
       success: true,
       message: 'Joined this week\'s league!',
       leagueId,
       currentRank: (rankResult?.rank || 0) + 1,
       currentXP,
       tier,
-    });
+    }, 200, {}, request);
     
   } catch (err) {
     console.error('League POST error:', err);
-    return Response.json({ error: err.message }, { status: 500 });
+    return errorResponse(500, err.message, request);
   }
 }
 
