@@ -430,7 +430,7 @@
         <header class="top-header">
             <div class="stat-badge" style="color: var(--streak);"><i class="fas fa-fire"></i><span id="streak">0</span></div>
             <div class="stat-badge" style="color: var(--secondary);"><i class="fas fa-gem"></i><span id="gems">500</span></div>
-            <div class="stat-badge" style="color: var(--red);"><i class="fas fa-heart"></i><span>5</span></div>
+            <div class="stat-badge" style="color: var(--red);"><i class="fas fa-heart"></i><span id="hearts">5</span></div>
         </header>
 
         <div class="content-wrapper">
@@ -478,43 +478,14 @@
                     <div class="stat-card gems">
                         <div class="stat-card-icon">💎</div>
                         <div class="stat-card-value" id="totalGems">500</div>
-                        <div class="stat-card-label">Gems Earned</div>
+                        <div class="stat-card-label">Starting Gems</div>
                     </div>
                 </div>
 
                 <!-- Achievements -->
                 <h2 class="section-title">🏆 Achievements</h2>
-                <div class="achievements-grid">
-                    <div class="achievement-card">
-                        <span class="achievement-icon">🎯</span>
-                        <div class="achievement-name">First Steps</div>
-                        <div class="achievement-desc">Complete first lesson</div>
-                    </div>
-                    <div class="achievement-card locked">
-                        <span class="achievement-icon">🔥</span>
-                        <div class="achievement-name">On Fire</div>
-                        <div class="achievement-desc">7 day streak</div>
-                    </div>
-                    <div class="achievement-card locked">
-                        <span class="achievement-icon">⭐</span>
-                        <div class="achievement-name">Perfectionist</div>
-                        <div class="achievement-desc">5 perfect lessons</div>
-                    </div>
-                    <div class="achievement-card locked">
-                        <span class="achievement-icon">🏅</span>
-                        <div class="achievement-name">XP Hunter</div>
-                        <div class="achievement-desc">Earn 1000 XP</div>
-                    </div>
-                    <div class="achievement-card locked">
-                        <span class="achievement-icon">🥇</span>
-                        <div class="achievement-name">Champion</div>
-                        <div class="achievement-desc">Top 3 in league</div>
-                    </div>
-                    <div class="achievement-card locked">
-                        <span class="achievement-icon">🎓</span>
-                        <div class="achievement-name">Heat Master</div>
-                        <div class="achievement-desc">Complete Unit 1</div>
-                    </div>
+                <div class="achievements-grid" id="achievementsGrid">
+                    <!-- Loaded dynamically -->
                 </div>
 
                 <!-- Activity -->
@@ -529,19 +500,10 @@
             <aside class="right-sidebar">
                 <div class="sidebar-card">
                     <h3>👥 Friends</h3>
-                    <div class="friend-item">
-                        <div class="friend-avatar">A</div>
-                        <div class="friend-info">
-                            <div class="friend-name">Alex</div>
-                            <div class="friend-xp">1,234 XP this week</div>
-                        </div>
-                    </div>
-                    <div class="friend-item">
-                        <div class="friend-avatar">J</div>
-                        <div class="friend-info">
-                            <div class="friend-name">Jordan</div>
-                            <div class="friend-xp">987 XP this week</div>
-                        </div>
+                    <div id="friendsList">
+                        <p style="color: var(--text-secondary); text-align: center; padding: 20px 0; font-size: 14px;">
+                            No friends yet.<br>Invite your classmates to learn together!
+                        </p>
                     </div>
                     <button class="add-friends-btn">
                         <i class="fas fa-user-plus"></i> Add Friends
@@ -564,30 +526,140 @@
                     document.getElementById('avatar').textContent = (data.user.displayName || data.user.name || 'U')[0].toUpperCase();
                 }
 
-                // Try to load skill tree data for stats
+                // Load skill tree data for stats
                 const skillResponse = await fetch('/api/learn/skill-tree', { credentials: 'include' });
                 if (skillResponse.ok) {
                     const skillData = await skillResponse.json();
-                    document.getElementById('totalXp').textContent = skillData.user?.totalXP || 0;
-                    document.getElementById('currentStreak').textContent = skillData.user?.currentStreak || 0;
-                    document.getElementById('streak').textContent = skillData.user?.currentStreak || 0;
+                    const user = skillData.user || {};
+                    const hearts = skillData.hearts || {};
+                    
+                    // Update all stats from API
+                    document.getElementById('totalXp').textContent = user.totalXP || 0;
+                    document.getElementById('lessonsCompleted').textContent = user.totalLessonsCompleted || 0;
+                    document.getElementById('currentStreak').textContent = user.currentStreak || 0;
+                    document.getElementById('streak').textContent = user.currentStreak || 0;
+                    
+                    // Update hearts in header
+                    document.getElementById('hearts').textContent = hearts.current ?? 5;
                 }
+                
+                // Load achievements data for more stats
+                const achieveResponse = await fetch('/api/learn/achievements', { credentials: 'include' });
+                if (achieveResponse.ok) {
+                    const achieveData = await achieveResponse.json();
+                    const stats = achieveData.stats || {};
+                    
+                    // Update perfect lessons from achievements API
+                    document.getElementById('perfectLessons').textContent = stats.perfectLessons || 0;
+                    
+                    // Render achievements
+                    renderAchievements(achieveData.achievements || []);
+                }
+                
             } catch (err) {
                 console.error('Error loading profile:', err);
+                // Show default achievements if API fails
+                renderDefaultAchievements();
             }
+        }
+        
+        // Render achievements from API
+        function renderAchievements(achievements) {
+            const container = document.getElementById('achievementsGrid');
+            container.innerHTML = '';
+            
+            // Take first 6 achievements to display
+            const displayAchievements = achievements.slice(0, 6);
+            
+            if (displayAchievements.length === 0) {
+                renderDefaultAchievements();
+                return;
             }
+            
+            displayAchievements.forEach(a => {
+                const isLocked = !a.earned;
+                const card = document.createElement('div');
+                card.className = `achievement-card${isLocked ? ' locked' : ''}`;
+                card.innerHTML = `
+                    <span class="achievement-icon">${a.badgeIcon || '🏆'}</span>
+                    <div class="achievement-name">${a.name}</div>
+                    <div class="achievement-desc">${a.description}</div>
+                    ${!isLocked ? '' : `<div class="achievement-progress" style="margin-top: 8px; font-size: 11px; color: var(--secondary);">${Math.round(a.progress || 0)}%</div>`}
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // Show default locked achievements if API fails
+        function renderDefaultAchievements() {
+            const container = document.getElementById('achievementsGrid');
+            const defaults = [
+                { icon: '🎯', name: 'First Steps', desc: 'Complete first lesson' },
+                { icon: '🔥', name: 'On Fire', desc: '7 day streak' },
+                { icon: '⭐', name: 'Perfectionist', desc: '5 perfect lessons' },
+                { icon: '🏅', name: 'XP Hunter', desc: 'Earn 1000 XP' },
+                { icon: '🥇', name: 'Champion', desc: 'Top 3 in league' },
+                { icon: '🎓', name: 'Heat Master', desc: 'Complete Unit 1' },
+            ];
+            
+            container.innerHTML = defaults.map(a => `
+                <div class="achievement-card locked">
+                    <span class="achievement-icon">${a.icon}</span>
+                    <div class="achievement-name">${a.name}</div>
+                    <div class="achievement-desc">${a.desc}</div>
+                </div>
+            `).join('');
+        }
 
-        // Generate activity graph
-        function generateActivityGraph() {
+        // Generate activity graph from real data
+        async function generateActivityGraph() {
             const container = document.getElementById('activityGraph');
+            container.innerHTML = '';
+            
+            // Try to load activity data from API
+            try {
+                const response = await fetch('/api/learn/activity?days=30', { credentials: 'include' });
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Calculate weekly XP (last 7 days)
+                    const last7Days = (data.activity || []).slice(-7);
+                    const weeklyXp = last7Days.reduce((sum, d) => sum + (d.xp || 0), 0);
+                    document.getElementById('weeklyXp').textContent = weeklyXp;
+                    
+                    // Calculate learning days (days with activity in the past 30 days)
+                    const daysLearning = data.summary?.activeDays || 0;
+                    document.getElementById('daysLearning').textContent = daysLearning;
+                    
+                    if (data.activity && data.activity.length > 0) {
+                        data.activity.forEach(day => {
+                            const dayEl = document.createElement('div');
+                            dayEl.className = 'activity-day';
+                            dayEl.title = `${day.date}: ${day.xp || 0} XP`;
+                            
+                            // Calculate level based on XP earned that day
+                            const xp = day.xp || 0;
+                            let level = 0;
+                            if (xp >= 100) level = 4;
+                            else if (xp >= 50) level = 3;
+                            else if (xp >= 20) level = 2;
+                            else if (xp > 0) level = 1;
+                            
+                            if (level > 0) dayEl.classList.add(`level-${level}`);
+                            container.appendChild(dayEl);
+                        });
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.log('Activity API not available, showing empty graph');
+            }
+            
+            // Fallback: show empty graph (no activity yet)
             for (let i = 0; i < 30; i++) {
                 const day = document.createElement('div');
                 day.className = 'activity-day';
-                
-                // Random activity level for demo
-                const level = Math.floor(Math.random() * 5);
-                if (level > 0) day.classList.add(`level-${level}`);
-                
+                day.title = 'No activity';
                 container.appendChild(day);
             }
         }
