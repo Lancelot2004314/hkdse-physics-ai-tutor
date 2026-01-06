@@ -4,24 +4,18 @@
  * POST /api/learn/league/join - Join current week's league
  */
 
-import { parseSessionCookie, hashToken } from '../../../shared/auth.js';
+import { getUserFromSession } from '../../../shared/auth.js';
 
-// Helper to get user from session
+// Helper to get user from session (with display_name alias)
 async function getUser(request, env) {
-  const cookieHeader = request.headers.get('Cookie');
-  const sessionToken = parseSessionCookie(cookieHeader);
-  if (!sessionToken) return null;
+  const user = await getUserFromSession(request, env);
+  if (!user) return null;
   
-  const tokenHash = await hashToken(sessionToken);
-  const session = await env.DB.prepare(
-    'SELECT user_id FROM sessions WHERE token_hash = ?'
-  ).bind(tokenHash).first();
-  
-  if (!session) return null;
-  
-  return await env.DB.prepare(
-    'SELECT id, email, name as display_name, avatar_url FROM users WHERE id = ?'
-  ).bind(session.user_id).first();
+  // Add display_name alias for compatibility
+  return {
+    ...user,
+    display_name: user.name || user.email?.split('@')[0] || 'Anonymous',
+  };
 }
 
 // Get current week's league ID (YYYY-WW format)
