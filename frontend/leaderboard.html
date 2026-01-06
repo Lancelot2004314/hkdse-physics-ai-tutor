@@ -29,7 +29,11 @@
             --sidebar-hover: #233a47;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Nunito', -apple-system, sans-serif;
@@ -64,7 +68,10 @@
             border-bottom: 2px solid var(--border);
         }
 
-        .sidebar-nav { flex: 1; padding: 15px 0; }
+        .sidebar-nav {
+            flex: 1;
+            padding: 15px 0;
+        }
 
         .nav-item {
             display: flex;
@@ -79,9 +86,22 @@
             border-left: 4px solid transparent;
         }
 
-        .nav-item:hover { background: var(--sidebar-hover); color: var(--text); }
-        .nav-item.active { background: rgba(255, 200, 0, 0.15); color: var(--gold); border-left-color: var(--gold); }
-        .nav-item i { font-size: 22px; width: 28px; text-align: center; }
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 200, 0, 0.15);
+            color: var(--gold);
+            border-left-color: var(--gold);
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            width: 28px;
+            text-align: center;
+        }
 
         .sidebar-footer {
             padding: 15px 25px;
@@ -161,9 +181,17 @@
             transform: scale(1.2);
         }
 
-        .trophy-bronze { color: var(--bronze); }
-        .trophy-gold { color: var(--gold); }
-        .trophy-silver { color: var(--silver); }
+        .trophy-bronze {
+            color: var(--bronze);
+        }
+
+        .trophy-gold {
+            color: var(--gold);
+        }
+
+        .trophy-silver {
+            color: var(--silver);
+        }
 
         .leaderboard-title {
             font-size: 28px;
@@ -242,9 +270,17 @@
             color: var(--text-secondary);
         }
 
-        .rank-number.top-1 { color: var(--gold); }
-        .rank-number.top-2 { color: var(--silver); }
-        .rank-number.top-3 { color: var(--bronze); }
+        .rank-number.top-1 {
+            color: var(--gold);
+        }
+
+        .rank-number.top-2 {
+            color: var(--silver);
+        }
+
+        .rank-number.top-3 {
+            color: var(--bronze);
+        }
 
         .rank-avatar {
             width: 45px;
@@ -368,32 +404,148 @@
             margin: 0 auto 20px;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Join League Button */
+        .join-league-btn {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 20px auto;
+            padding: 16px 32px;
+            background: var(--primary);
+            border: none;
+            color: #fff;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .join-league-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .join-league-btn:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Login prompt */
+        .login-prompt {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .login-prompt h2 {
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .login-prompt p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .login-btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: var(--secondary);
+            color: #fff;
+            border-radius: 14px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover {
+            background: #1899d6;
+            transform: translateY(-2px);
+        }
+
+        /* League info */
+        .league-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 2px solid var(--border);
+        }
+
+        .league-info .time-remaining {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        /* Promotion/Demotion zones */
+        .ranking-item.promotion-zone {
+            background: rgba(88, 204, 2, 0.08);
+            border-left: 4px solid var(--primary);
+        }
+
+        .ranking-item.demotion-zone {
+            background: rgba(255, 75, 75, 0.08);
+            border-left: 4px solid var(--red);
+        }
 
         /* Responsive */
-        @media (max-width: 1200px) { .right-sidebar { display: none; } }
+        @media (max-width: 1200px) {
+            .right-sidebar {
+                display: none;
+            }
+        }
+
         @media (max-width: 900px) {
-            .sidebar { width: 80px; }
-            .sidebar-logo span, .nav-item span { display: none; }
-            .sidebar-logo { justify-content: center; padding: 20px 10px; }
-            .nav-item { justify-content: center; padding: 14px; }
-            .sidebar-footer { display: none; }
-            .main-wrapper { margin-left: 80px; }
+            .sidebar {
+                width: 80px;
+            }
+
+            .sidebar-logo span,
+            .nav-item span {
+                display: none;
+            }
+
+            .sidebar-logo {
+                justify-content: center;
+                padding: 20px 10px;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 14px;
+            }
+
+            .sidebar-footer {
+                display: none;
+            }
+
+            .main-wrapper {
+                margin-left: 80px;
+            }
         }
     </style>
 </head>
 
 <body>
-        <!-- Sidebar -->
+    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-logo">
-                    <i class="fas fa-atom"></i>
+            <i class="fas fa-atom"></i>
             <span>DSE Physics</span>
-                </div>
+        </div>
         <nav class="sidebar-nav">
             <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
             <a href="/learn.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span>Learn</span></a>
-            <a href="/leaderboard.html" class="nav-item active"><i class="fas fa-trophy" style="color: var(--gold);"></i><span>Leaderboards</span></a>
+            <a href="/leaderboard.html" class="nav-item active"><i class="fas fa-trophy"
+                    style="color: var(--gold);"></i><span>Leaderboards</span></a>
             <a href="/quests.html" class="nav-item"><i class="fas fa-tasks"></i><span>Quests</span></a>
             <a href="/shop.html" class="nav-item"><i class="fas fa-store"></i><span>Shop</span></a>
             <a href="/profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
@@ -406,34 +558,45 @@
 
     <div class="main-wrapper">
         <header class="top-header">
-            <div class="stat-badge" style="color: var(--streak);"><i class="fas fa-fire"></i><span id="streak">0</span></div>
-            <div class="stat-badge" style="color: var(--secondary);"><i class="fas fa-gem"></i><span>500</span></div>
-            <div class="stat-badge" style="color: var(--red);"><i class="fas fa-heart"></i><span id="hearts">5</span></div>
-            </header>
+            <div class="stat-badge" style="color: var(--streak);"><i class="fas fa-fire"></i><span id="streak">0</span>
+            </div>
+            <div class="stat-badge" style="color: var(--secondary);"><i class="fas fa-gem"></i><span id="gems">0</span>
+            </div>
+            <div class="stat-badge" style="color: var(--red);"><i class="fas fa-heart"></i><span id="hearts">5</span>
+            </div>
+        </header>
 
         <div class="content-wrapper">
             <main class="main-content">
-                <div class="leaderboard-header">
+                <div class="leaderboard-header" id="leaderboardHeader">
                     <div class="trophy-icons">
-                        <span class="trophy-icon trophy-bronze">🥉</span>
-                        <span class="trophy-icon trophy-gold">🥇</span>
                         <span class="trophy-icon trophy-silver">🥈</span>
-            </div>
-                    <h1 class="leaderboard-title">Unlock Leaderboards!</h1>
-                    <p class="leaderboard-subtitle">Complete 10 more lessons to start competing</p>
+                        <span class="trophy-icon trophy-gold">🥇</span>
+                        <span class="trophy-icon trophy-bronze">🥉</span>
+                    </div>
+                    <h1 class="leaderboard-title" id="leaderboardTitle">Weekly Leaderboard</h1>
+                    <p class="leaderboard-subtitle" id="leaderboardSubtitle">Compete with other learners!</p>
                 </div>
 
-                <div class="league-tabs">
-                    <div class="league-tab active">Bronze League</div>
-                    <div class="league-tab">Silver League</div>
-                    <div class="league-tab">Gold League</div>
+                <div class="league-info" id="leagueInfo" style="display: none;">
+                    <span class="time-remaining" id="timeRemaining"></span>
+                </div>
+
+                <div class="league-tabs" id="leagueTabs">
+                    <div class="league-tab active" data-tier="bronze">Bronze League</div>
+                    <div class="league-tab" data-tier="silver">Silver League</div>
+                    <div class="league-tab" data-tier="gold">Gold League</div>
+                </div>
+
+                <div id="joinLeagueContainer" style="display: none;">
+                    <button class="join-league-btn" id="joinLeagueBtn">Join This Week's League</button>
                 </div>
 
                 <div class="rankings-list" id="rankingsList">
                     <div class="loading-state">
                         <div class="loading-spinner"></div>
                         <p>Loading rankings...</p>
-            </div>
+                    </div>
                 </div>
             </main>
 
@@ -447,54 +610,236 @@
 
                 <a href="/learn.html" class="start-lesson-btn">START A LESSON</a>
             </aside>
-            </div>
+        </div>
     </div>
 
     <script>
+        // State
+        let currentTier = 'bronze';
+        let leaderboardData = null;
+        let isLoggedIn = false;
+
+        // Load user stats for header
+        async function loadUserStats() {
+            try {
+                const response = await fetch('/api/user/profile', { credentials: 'include' });
+                if (!response.ok) return;
+
+                const data = await response.json();
+                if (data.user) {
+                    document.getElementById('streak').textContent = data.user.streak || 0;
+                    document.getElementById('gems').textContent = data.user.gems || 0;
+                    document.getElementById('hearts').textContent = data.user.hearts ?? 5;
+                }
+            } catch (err) {
+                console.error('Failed to load user stats:', err);
+            }
+        }
+
         // Load leaderboard data
         async function loadLeaderboard() {
             try {
                 const response = await fetch('/api/learn/league', { credentials: 'include' });
+
+                // Handle unauthorized - show login prompt
+                if (response.status === 401) {
+                    showLoginPrompt();
+                    return;
+                }
+
                 if (!response.ok) throw new Error('Failed to load');
-                
-                    const data = await response.json();
-                renderRankings(data.rankings || []);
+
+                isLoggedIn = true;
+                const data = await response.json();
+                leaderboardData = data;
+
+                // Update UI based on participation status
+                updateLeaderboardUI(data);
+
             } catch (err) {
-                // Show demo data
-                renderRankings(generateDemoRankings());
+                console.error('Leaderboard error:', err);
+                showLoginPrompt();
             }
         }
 
-        function generateDemoRankings() {
-            const names = ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Quinn', 'Avery', 'Parker', 'Drew'];
-            return names.map((name, i) => ({
-                rank: i + 1,
-                name: name,
-                xp: Math.floor(500 - i * 40 + Math.random() * 20),
-                isCurrentUser: i === 4
-            }));
+        // Show login prompt for unauthenticated users
+        function showLoginPrompt() {
+            const container = document.getElementById('rankingsList');
+            document.getElementById('leaderboardTitle').textContent = 'Login Required';
+            document.getElementById('leaderboardSubtitle').textContent = 'Sign in to compete in weekly leaderboards';
+            document.getElementById('leagueTabs').style.display = 'none';
+
+            container.innerHTML = `
+                <div class="login-prompt">
+                    <h2>🏆 Join the Competition!</h2>
+                    <p>Login to see rankings and compete with other learners</p>
+                    <a href="/login.html" class="login-btn">Login to Continue</a>
+                </div>
+            `;
         }
 
-        function renderRankings(rankings) {
+        // Update UI based on league data
+        function updateLeaderboardUI(data) {
+            const { currentUser, league, leaderboard } = data;
+
+            // Show league info with time remaining
+            if (league) {
+                const leagueInfo = document.getElementById('leagueInfo');
+                leagueInfo.style.display = 'block';
+                document.getElementById('timeRemaining').textContent =
+                    `⏰ ${league.daysRemaining} day${league.daysRemaining !== 1 ? 's' : ''} remaining this week`;
+            }
+
+            // Check if user is participating
+            if (!currentUser.isParticipating) {
+                // Show join league prompt
+                document.getElementById('leaderboardTitle').textContent = 'Join the League!';
+                document.getElementById('leaderboardSubtitle').textContent = 'Compete with other learners this week';
+                document.getElementById('joinLeagueContainer').style.display = 'block';
+
+                // If there are other participants, still show the leaderboard
+                if (leaderboard && leaderboard.length > 0) {
+                    renderRankings(leaderboard, data);
+                } else {
+                    document.getElementById('rankingsList').innerHTML = `
+                        <div class="loading-state">
+                            <p style="color: var(--text-secondary);">Be the first to join this week's league!</p>
+                        </div>
+                    `;
+                }
+            } else {
+                // User is participating - show full leaderboard
+                document.getElementById('leaderboardTitle').textContent = 'Weekly Leaderboard';
+                document.getElementById('leaderboardSubtitle').textContent =
+                    `You're ranked #${currentUser.rank} with ${currentUser.xpEarned} XP`;
+                document.getElementById('joinLeagueContainer').style.display = 'none';
+
+                renderRankings(leaderboard, data);
+            }
+
+            // Set active tier tab based on user's tier
+            if (currentUser.tier) {
+                setActiveTier(currentUser.tier);
+            }
+        }
+
+        // Render rankings list
+        function renderRankings(leaderboard, data) {
             const container = document.getElementById('rankingsList');
-            const maxXP = rankings[0]?.xp || 500;
-            
-            container.innerHTML = rankings.map(r => `
-                <div class="ranking-item ${r.isCurrentUser ? 'current-user' : ''}">
+
+            if (!leaderboard || leaderboard.length === 0) {
+                container.innerHTML = `
+                    <div class="loading-state">
+                        <p style="color: var(--text-secondary);">No participants yet this week</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Filter by tier if needed
+            let filtered = leaderboard;
+            if (currentTier !== 'all') {
+                filtered = leaderboard.filter(p => p.tier === currentTier);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="loading-state">
+                        <p style="color: var(--text-secondary);">No participants in this league tier</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const maxXP = filtered[0]?.xpEarned || 500;
+            const totalCount = data?.totalParticipants || filtered.length;
+
+            container.innerHTML = filtered.map(r => {
+                const name = r.displayName || 'Anonymous';
+                const xp = r.xpEarned || 0;
+                const isPromotion = r.inPromotionZone;
+                const isDemotion = r.inDemotionZone;
+
+                let zoneClass = '';
+                if (r.isCurrentUser) zoneClass = 'current-user';
+                else if (isPromotion) zoneClass = 'promotion-zone';
+                else if (isDemotion) zoneClass = 'demotion-zone';
+
+                return `
+                <div class="ranking-item ${zoneClass}">
                     <div class="rank-number ${r.rank <= 3 ? 'top-' + r.rank : ''}">${r.rank}</div>
-                    <div class="rank-avatar">${r.name[0]}</div>
+                    <div class="rank-avatar">${name[0].toUpperCase()}</div>
                     <div class="rank-info">
-                        <div class="rank-name">${r.name}${r.isCurrentUser ? ' (You)' : ''}</div>
+                        <div class="rank-name">${name}${r.isCurrentUser ? ' (You)' : ''}</div>
                         <div class="rank-xp-bar">
-                            <div class="rank-xp-fill" style="width: ${(r.xp / maxXP) * 100}%;"></div>
+                            <div class="rank-xp-fill" style="width: ${(xp / maxXP) * 100}%;"></div>
                         </div>
                     </div>
-                    <div class="rank-xp">${r.xp} XP</div>
-                    </div>
-                `).join('');
+                    <div class="rank-xp">${xp} XP</div>
+                </div>
+            `;
+            }).join('');
         }
 
-        document.addEventListener('DOMContentLoaded', loadLeaderboard);
+        // Join league
+        async function joinLeague() {
+            const btn = document.getElementById('joinLeagueBtn');
+            btn.disabled = true;
+            btn.textContent = 'Joining...';
+
+            try {
+                const response = await fetch('/api/learn/league/join', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Reload leaderboard to show updated state
+                    await loadLeaderboard();
+                } else {
+                    alert(data.error || 'Failed to join league');
+                    btn.disabled = false;
+                    btn.textContent = 'Join This Week\'s League';
+                }
+            } catch (err) {
+                console.error('Join league error:', err);
+                alert('Failed to join league. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Join This Week\'s League';
+            }
+        }
+
+        // Set active tier tab
+        function setActiveTier(tier) {
+            currentTier = tier;
+            document.querySelectorAll('.league-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tier === tier);
+            });
+
+            // Re-render with filter if we have data
+            if (leaderboardData && leaderboardData.leaderboard) {
+                renderRankings(leaderboardData.leaderboard, leaderboardData);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserStats();
+            loadLeaderboard();
+
+            // Setup join button
+            document.getElementById('joinLeagueBtn').addEventListener('click', joinLeague);
+
+            // Setup tier tabs
+            document.querySelectorAll('.league-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    setActiveTier(tab.dataset.tier);
+                });
+            });
+        });
     </script>
 </body>
 
