@@ -642,9 +642,9 @@
                 // First check if user is authenticated via /api/auth/me
                 const meResponse = await fetch('/api/auth/me', { credentials: 'include' });
                 const meData = await meResponse.json();
-                
+
                 console.log('Auth check:', meData);
-                
+
                 if (!meData.user) {
                     console.log('Not authenticated, debug info:', meData.debug);
                     showLoginPrompt();
@@ -804,7 +804,7 @@
             btn.textContent = 'Joining...';
 
             try {
-                const response = await fetch('/api/learn/league/join', {
+                const response = await fetch('/api/learn/league', {
                     method: 'POST',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' }

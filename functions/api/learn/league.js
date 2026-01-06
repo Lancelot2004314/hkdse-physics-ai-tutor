@@ -10,7 +10,7 @@ import { getUserFromSession, getCorsHeaders, jsonResponse, errorResponse } from 
 async function getUser(request, env) {
   const user = await getUserFromSession(request, env);
   if (!user) return null;
-  
+
   // Add display_name alias for compatibility
   return {
     ...user,
@@ -40,7 +40,7 @@ function getWeekDates(leagueId) {
   const startDate = new Date(year, 0, 1 + daysOffset);
   const endDate = new Date(startDate);
   endDate.setDate(endDate.getDate() + 6);
-  
+
   return {
     startDate: startDate.toISOString().split('T')[0],
     endDate: endDate.toISOString().split('T')[0],
@@ -52,7 +52,7 @@ async function ensureLeagueExists(db, leagueId) {
   const existing = await db.prepare(
     'SELECT id FROM weekly_leagues WHERE id = ?'
   ).bind(leagueId).first();
-  
+
   if (!existing) {
     const { startDate, endDate } = getWeekDates(leagueId);
     await db.prepare(`
@@ -60,7 +60,7 @@ async function ensureLeagueExists(db, leagueId) {
       VALUES (?, ?, ?, 'active', ?)
     `).bind(leagueId, startDate, endDate, Date.now()).run();
   }
-  
+
   return leagueId;
 }
 
@@ -71,7 +71,7 @@ async function getWeeklyXP(db, userId, startDate) {
     FROM user_daily_progress
     WHERE user_id = ? AND date >= ?
   `).bind(userId, startDate).first();
-  
+
   return result?.xp || 0;
 }
 
@@ -91,12 +91,12 @@ export async function onRequestGet({ request, env }) {
     if (!user) {
       return errorResponse(401, 'Unauthorized', request);
     }
-    
+
     const leagueId = getCurrentLeagueId();
     await ensureLeagueExists(env.DB, leagueId);
-    
+
     const { startDate, endDate } = getWeekDates(leagueId);
-    
+
     // Get all participants for this league
     const participantsResult = await env.DB.prepare(`
       SELECT 
@@ -110,9 +110,9 @@ export async function onRequestGet({ request, env }) {
       WHERE lp.league_id = ?
       ORDER BY lp.xp_earned DESC
     `).bind(leagueId).all();
-    
+
     const participants = participantsResult.results || [];
-    
+
     // Update XP for each participant from daily progress
     for (const p of participants) {
       const currentXP = await getWeeklyXP(env.DB, p.user_id, startDate);
@@ -123,16 +123,16 @@ export async function onRequestGet({ request, env }) {
         p.xp_earned = currentXP;
       }
     }
-    
+
     // Sort by XP and assign ranks
     participants.sort((a, b) => b.xp_earned - a.xp_earned);
-    
+
     const leaderboard = participants.map((p, index) => {
       const rank = index + 1;
       const isCurrentUser = p.user_id === user.id;
       const inPromotionZone = rank <= 3;
       const inDemotionZone = rank > participants.length - 3 && participants.length > 5;
-      
+
       return {
         rank,
         userId: p.user_id,
@@ -145,16 +145,16 @@ export async function onRequestGet({ request, env }) {
         inDemotionZone,
       };
     });
-    
+
     // Find current user's position
     const currentUserEntry = leaderboard.find(p => p.isCurrentUser);
     const isParticipating = !!currentUserEntry;
-    
+
     // Calculate time remaining
     const endDateTime = new Date(endDate + 'T23:59:59');
     const timeRemaining = Math.max(0, endDateTime.getTime() - Date.now());
     const daysRemaining = Math.ceil(timeRemaining / (24 * 60 * 60 * 1000));
-    
+
     return jsonResponse({
       success: true,
       league: {
@@ -175,7 +175,7 @@ export async function onRequestGet({ request, env }) {
       promotionCount: 3,
       demotionCount: Math.min(3, Math.max(0, participants.length - 5)),
     }, 200, {}, request);
-    
+
   } catch (err) {
     console.error('League GET error:', err);
     return errorResponse(500, err.message, request);
@@ -189,46 +189,46 @@ export async function onRequestPost({ request, env }) {
     if (!user) {
       return errorResponse(401, 'Unauthorized', request);
     }
-    
+
     const leagueId = getCurrentLeagueId();
     await ensureLeagueExists(env.DB, leagueId);
-    
+
     const { startDate } = getWeekDates(leagueId);
-    
+
     // Check if already participating
     const existing = await env.DB.prepare(
       'SELECT * FROM league_participants WHERE league_id = ? AND user_id = ?'
     ).bind(leagueId, user.id).first();
-    
+
     if (existing) {
       return jsonResponse({
         success: false,
         error: 'Already participating in this week\'s league',
       }, 200, {}, request);
     }
-    
+
     // Get current week's XP
     const currentXP = await getWeeklyXP(env.DB, user.id, startDate);
-    
+
     // Get user's tier from total XP
     const totalXPResult = await env.DB.prepare(`
       SELECT COALESCE(SUM(xp_earned), 0) as total FROM user_skill_progress WHERE user_id = ?
     `).bind(user.id).first();
-    
+
     const tier = getUserTier(totalXPResult?.total || 0, 0);
-    
+
     // Join league
     await env.DB.prepare(`
       INSERT INTO league_participants (league_id, user_id, xp_earned, tier)
       VALUES (?, ?, ?, ?)
     `).bind(leagueId, user.id, currentXP, tier).run();
-    
+
     // Get current rank
     const rankResult = await env.DB.prepare(`
       SELECT COUNT(*) as rank FROM league_participants
       WHERE league_id = ? AND xp_earned > ?
     `).bind(leagueId, currentXP).first();
-    
+
     return jsonResponse({
       success: true,
       message: 'Joined this week\'s league!',
@@ -237,7 +237,7 @@ export async function onRequestPost({ request, env }) {
       currentXP,
       tier,
     }, 200, {}, request);
-    
+
   } catch (err) {
     console.error('League POST error:', err);
     return errorResponse(500, err.message, request);
