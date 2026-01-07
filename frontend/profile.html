@@ -392,6 +392,102 @@
             border-color: var(--secondary);
         }
 
+        /* Edit name styles */
+        .profile-name-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-name-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .edit-name-btn:hover {
+            color: var(--secondary);
+            background: rgba(28, 176, 246, 0.1);
+        }
+
+        .name-edit-form {
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .name-edit-form.active {
+            display: flex;
+        }
+
+        .name-input {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 15px;
+            color: var(--text);
+            font-size: 18px;
+            font-weight: 700;
+            font-family: inherit;
+            width: 200px;
+        }
+
+        .name-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        .save-name-btn {
+            background: var(--primary);
+            border: none;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .save-name-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .save-name-btn:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+        }
+
+        .cancel-name-btn {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cancel-name-btn:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .name-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .name-display.hidden {
+            display: none;
+        }
+
         /* Responsive */
         @media (max-width: 1200px) { .right-sidebar { display: none; } }
         @media (max-width: 900px) {
@@ -439,7 +535,19 @@
                 <div class="profile-header">
                     <div class="profile-avatar" id="avatar">?</div>
                     <div class="profile-info">
-                        <h1 id="userName">Loading...</h1>
+                        <div class="profile-name-container">
+                            <div class="name-display" id="nameDisplay">
+                                <h1 id="userName">Loading...</h1>
+                                <button class="edit-name-btn" id="editNameBtn" title="Edit name">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                            </div>
+                            <div class="name-edit-form" id="nameEditForm">
+                                <input type="text" class="name-input" id="nameInput" placeholder="Enter your name" maxlength="50">
+                                <button class="save-name-btn" id="saveNameBtn">Save</button>
+                                <button class="cancel-name-btn" id="cancelNameBtn">Cancel</button>
+                            </div>
+                        </div>
                         <p id="userEmail">Loading...</p>
                         <div class="profile-stats">
                             <div class="profile-stat">
@@ -664,9 +772,92 @@
             }
         }
 
+        // Edit name functionality
+        function setupNameEdit() {
+            const editBtn = document.getElementById('editNameBtn');
+            const saveBtn = document.getElementById('saveNameBtn');
+            const cancelBtn = document.getElementById('cancelNameBtn');
+            const nameDisplay = document.getElementById('nameDisplay');
+            const nameEditForm = document.getElementById('nameEditForm');
+            const nameInput = document.getElementById('nameInput');
+            const userNameEl = document.getElementById('userName');
+
+            editBtn.addEventListener('click', () => {
+                // Get current name (excluding fallback)
+                const currentName = userNameEl.textContent;
+                nameInput.value = currentName === 'Physics Learner' ? '' : currentName;
+                nameDisplay.classList.add('hidden');
+                nameEditForm.classList.add('active');
+                nameInput.focus();
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                nameDisplay.classList.remove('hidden');
+                nameEditForm.classList.remove('active');
+            });
+
+            saveBtn.addEventListener('click', saveName);
+            
+            // Also save on Enter key
+            nameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveName();
+                }
+            });
+
+            async function saveName() {
+                const newName = nameInput.value.trim();
+                if (!newName) {
+                    alert('Please enter a name');
+                    return;
+                }
+
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+
+                try {
+                    const response = await fetch('/api/user/profile', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: newName })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.user) {
+                        // Update UI
+                        userNameEl.textContent = data.user.name || newName;
+                        document.getElementById('avatar').textContent = newName[0].toUpperCase();
+                        
+                        // Hide form
+                        nameDisplay.classList.remove('hidden');
+                        nameEditForm.classList.remove('active');
+                        
+                        // Show success feedback
+                        editBtn.innerHTML = '<i class="fas fa-check"></i>';
+                        editBtn.style.color = 'var(--primary)';
+                        setTimeout(() => {
+                            editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+                            editBtn.style.color = '';
+                        }, 2000);
+                    } else {
+                        alert(data.error || 'Failed to save name');
+                    }
+                } catch (err) {
+                    console.error('Error saving name:', err);
+                    alert('Failed to save name. Please try again.');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             loadProfile();
             generateActivityGraph();
+            setupNameEdit();
         });
     </script>
 </body>
