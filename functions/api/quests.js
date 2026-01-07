@@ -27,10 +27,10 @@ function getTimeUntilReset() {
   const now = new Date();
   const hktOffset = 8 * 60 * 60 * 1000;
   const hktNow = new Date(now.getTime() + hktOffset);
-  
+
   const midnight = new Date(hktNow);
   midnight.setUTCHours(23, 59, 59, 999);
-  
+
   return midnight.getTime() - hktNow.getTime();
 }
 
@@ -111,7 +111,7 @@ export async function onRequestOptions({ request }) {
  */
 export async function onRequestGet({ request, env }) {
   const corsHeaders = getCorsHeaders(request);
-  
+
   try {
     const user = await getUserFromSession(request, env);
     if (!user) {
@@ -122,7 +122,7 @@ export async function onRequestGet({ request, env }) {
     }
 
     const today = getTodayDate();
-    
+
     // Get quest definitions
     let questDefs = [];
     try {
@@ -136,7 +136,7 @@ export async function onRequestGet({ request, env }) {
       // Table might not exist yet, use defaults
       console.log('Using default quests, table may not exist:', e.message);
     }
-    
+
     if (questDefs.length === 0) {
       questDefs = DEFAULT_QUESTS;
     }
@@ -147,7 +147,7 @@ export async function onRequestGet({ request, env }) {
 
     // Get or create quest progress for today
     const quests = [];
-    
+
     for (const def of questDefs.slice(0, 4)) { // Limit to 4 quests per day
       // Get existing progress
       let progress;
@@ -282,7 +282,7 @@ export async function onRequestGet({ request, env }) {
  */
 export async function onRequestPost({ request, env }) {
   const corsHeaders = getCorsHeaders(request);
-  
+
   try {
     const user = await getUserFromSession(request, env);
     if (!user) {
@@ -428,4 +428,5 @@ export async function onRequestPost({ request, env }) {
     });
   }
 }
+
 

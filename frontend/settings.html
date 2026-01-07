@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -7,6 +7,7 @@
     <title>Settings - DSE Physics AI Tutor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="/js/i18n.js"></script>
     <style>
         :root {
             --primary: #58cc02;
@@ -304,22 +305,22 @@
             <span>DSE Physics</span>
         </div>
         <nav class="sidebar-nav">
-            <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
-            <a href="/learn.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span>Learn</span></a>
-            <a href="/leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i><span>Leaderboards</span></a>
-            <a href="/quests.html" class="nav-item"><i class="fas fa-tasks"></i><span>Quests</span></a>
-            <a href="/shop.html" class="nav-item"><i class="fas fa-store"></i><span>Shop</span></a>
-            <a href="/profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+            <a href="/" class="nav-item"><i class="fas fa-home"></i><span data-i18n="nav.home">Home</span></a>
+            <a href="/learn.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span data-i18n="nav.learn">Learn</span></a>
+            <a href="/leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i><span data-i18n="nav.leaderboard">Leaderboards</span></a>
+            <a href="/quests.html" class="nav-item"><i class="fas fa-tasks"></i><span data-i18n="nav.quests">Quests</span></a>
+            <a href="/shop.html" class="nav-item"><i class="fas fa-store"></i><span data-i18n="nav.shop">Shop</span></a>
+            <a href="/profile.html" class="nav-item"><i class="fas fa-user"></i><span data-i18n="nav.profile">Profile</span></a>
         </nav>
         <div class="sidebar-footer">
-            <a href="/settings.html" class="active"><i class="fas fa-cog"></i> Settings</a>
-            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+            <a href="/settings.html" class="active"><i class="fas fa-cog"></i> <span data-i18n="nav.settings">Settings</span></a>
+            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a>
         </div>
     </aside>
 
     <div class="main-wrapper">
         <header class="top-header">
-            <h1><i class="fas fa-cog"></i> Settings</h1>
+            <h1><i class="fas fa-cog"></i> <span data-i18n="settings.title">Settings</span></h1>
         </header>
 
         <main class="main-content">
@@ -327,15 +328,15 @@
             <div class="settings-section">
                 <div class="section-header">
                     <i class="fas fa-sliders-h"></i>
-                    Preferences
+                    <span data-i18n="settings.preferences">Preferences</span>
                 </div>
                 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Language / 語言</h3>
-                        <p>Choose your preferred language</p>
+                        <h3 data-i18n="settings.language">Language / 語言</h3>
+                        <p data-i18n="settings.languageDesc">Choose your preferred language</p>
                     </div>
-                    <select class="setting-select">
+                    <select class="setting-select" id="languageSelect">
                         <option value="zh-HK">繁體中文</option>
                         <option value="zh-CN">简体中文</option>
                         <option value="en">English</option>
@@ -344,8 +345,8 @@
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Dark Mode</h3>
-                        <p>Use dark theme (currently active)</p>
+                        <h3 data-i18n="settings.darkMode">Dark Mode</h3>
+                        <p data-i18n="settings.darkModeDesc">Use dark theme (currently active)</p>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" checked>
@@ -355,8 +356,8 @@
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Sound Effects</h3>
-                        <p>Play sounds for correct/incorrect answers</p>
+                        <h3 data-i18n="settings.soundEffects">Sound Effects</h3>
+                        <p data-i18n="settings.soundEffectsDesc">Play sounds for correct/incorrect answers</p>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" checked>
@@ -366,8 +367,8 @@
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Animations</h3>
-                        <p>Show XP and reward animations</p>
+                        <h3 data-i18n="settings.animations">Animations</h3>
+                        <p data-i18n="settings.animationsDesc">Show XP and reward animations</p>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" checked>
@@ -380,13 +381,13 @@
             <div class="settings-section">
                 <div class="section-header">
                     <i class="fas fa-bell"></i>
-                    Notifications
+                    <span data-i18n="settings.notifications">Notifications</span>
                 </div>
                 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Daily Reminders</h3>
-                        <p>Remind me to practice every day</p>
+                        <h3 data-i18n="settings.dailyReminders">Daily Reminders</h3>
+                        <p data-i18n="settings.dailyRemindersDesc">Remind me to practice every day</p>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" checked>
@@ -396,8 +397,8 @@
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Streak Notifications</h3>
-                        <p>Notify when streak is at risk</p>
+                        <h3 data-i18n="settings.streakNotifications">Streak Notifications</h3>
+                        <p data-i18n="settings.streakNotificationsDesc">Notify when streak is at risk</p>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" checked>
@@ -407,8 +408,8 @@
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Leaderboard Updates</h3>
-                        <p>Notify about ranking changes</p>
+                        <h3 data-i18n="settings.leaderboardUpdates">Leaderboard Updates</h3>
+                        <p data-i18n="settings.leaderboardUpdatesDesc">Notify about ranking changes</p>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox">
@@ -421,39 +422,39 @@
             <div class="settings-section">
                 <div class="section-header">
                     <i class="fas fa-graduation-cap"></i>
-                    Learning
+                    <span data-i18n="settings.learning">Learning</span>
                 </div>
                 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Daily Goal</h3>
-                        <p>XP target for each day</p>
+                        <h3 data-i18n="settings.dailyGoal">Daily Goal</h3>
+                        <p data-i18n="settings.dailyGoalDesc">XP target for each day</p>
                     </div>
-                    <select class="setting-select">
-                        <option value="10">Casual (10 XP)</option>
-                        <option value="20" selected>Regular (20 XP)</option>
-                        <option value="50">Serious (50 XP)</option>
-                        <option value="100">Intense (100 XP)</option>
+                    <select class="setting-select" id="dailyGoalSelect">
+                        <option value="10" data-i18n="settings.casual">Casual (10 XP)</option>
+                        <option value="20" selected data-i18n="settings.regular">Regular (20 XP)</option>
+                        <option value="50" data-i18n="settings.serious">Serious (50 XP)</option>
+                        <option value="100" data-i18n="settings.intense">Intense (100 XP)</option>
                     </select>
                 </div>
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Difficulty Level</h3>
-                        <p>Adjust question difficulty</p>
+                        <h3 data-i18n="settings.difficultyLevel">Difficulty Level</h3>
+                        <p data-i18n="settings.difficultyLevelDesc">Adjust question difficulty</p>
                     </div>
-                    <select class="setting-select">
-                        <option value="auto" selected>Adaptive</option>
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
+                    <select class="setting-select" id="difficultySelect">
+                        <option value="auto" selected data-i18n="settings.adaptive">Adaptive</option>
+                        <option value="easy" data-i18n="practice.easy">Easy</option>
+                        <option value="medium" data-i18n="practice.medium">Medium</option>
+                        <option value="hard" data-i18n="practice.hard">Hard</option>
                     </select>
                 </div>
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Show Explanations</h3>
-                        <p>Always show detailed explanations</p>
+                        <h3 data-i18n="settings.showExplanations">Show Explanations</h3>
+                        <p data-i18n="settings.showExplanationsDesc">Always show detailed explanations</p>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" checked>
@@ -466,31 +467,31 @@
             <div class="settings-section">
                 <div class="section-header">
                     <i class="fas fa-user-cog"></i>
-                    Account
+                    <span data-i18n="settings.account">Account</span>
                 </div>
                 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Email</h3>
-                        <p id="userEmail">Loading...</p>
+                        <h3 data-i18n="profile.email">Email</h3>
+                        <p id="userEmail" data-i18n="common.loading">Loading...</p>
                     </div>
-                    <button class="btn btn-secondary">Change</button>
+                    <button class="btn btn-secondary" data-i18n="settings.change">Change</button>
                 </div>
 
                 <div class="setting-item">
                     <div class="setting-info">
-                        <h3>Password</h3>
+                        <h3 data-i18n="settings.password">Password</h3>
                         <p>••••••••</p>
                     </div>
-                    <button class="btn btn-secondary">Change</button>
+                    <button class="btn btn-secondary" data-i18n="settings.change">Change</button>
                 </div>
 
                 <div class="account-actions">
                     <button class="btn btn-danger" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i> Sign Out
+                        <i class="fas fa-sign-out-alt"></i> <span data-i18n="nav.signOut">Sign Out</span>
                     </button>
                     <button class="btn btn-danger" style="opacity: 0.7;">
-                        <i class="fas fa-trash"></i> Delete Account
+                        <i class="fas fa-trash"></i> <span data-i18n="settings.deleteAccount">Delete Account</span>
                     </button>
                 </div>
             </div>
@@ -498,6 +499,35 @@
     </div>
 
     <script>
+        // Initialize i18n and load user info
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            await window.i18n.initI18n();
+            
+            // Set language selector to current language
+            const langSelect = document.getElementById('languageSelect');
+            langSelect.value = window.i18n.getLanguage();
+            
+            // Handle language change
+            langSelect.addEventListener('change', async (e) => {
+                await window.i18n.setLanguage(e.target.value);
+                
+                // Also save to server if logged in
+                try {
+                    await fetch('/api/user/profile', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ language: e.target.value })
+                    });
+                } catch (err) {
+                    // Ignore errors for non-logged-in users
+                }
+            });
+            
+            await loadUser();
+        });
+
         // Load user info
         async function loadUser() {
             try {
@@ -505,6 +535,13 @@
                 const data = await response.json();
                 if (data.user) {
                     document.getElementById('userEmail').textContent = data.user.email || 'Not set';
+                    document.getElementById('userEmail').removeAttribute('data-i18n');
+                    
+                    // Set language from user preference
+                    if (data.user.language && data.user.language !== window.i18n.getLanguage()) {
+                        await window.i18n.setLanguage(data.user.language);
+                        document.getElementById('languageSelect').value = data.user.language;
+                    }
                 }
             } catch (err) {
                 console.error('Error loading user:', err);
@@ -516,8 +553,6 @@
                 .then(() => window.location.href = '/login.html')
                 .catch(console.error);
         }
-
-        document.addEventListener('DOMContentLoaded', loadUser);
     </script>
 </body>
 

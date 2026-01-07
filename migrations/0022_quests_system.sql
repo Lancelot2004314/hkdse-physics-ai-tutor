@@ -99,3 +99,4 @@ INSERT OR IGNORE INTO quest_definitions (id, quest_type, name, name_zh, icon, cr
     ('weekly-streak-7', 'weekly', 'Maintain 7-day streak', '維持 7 天連續學習', '🔥', 'streak', 7, 'gems', 100, 11, '{"min_level": 1}'),
     ('weekly-perfect-5', 'weekly', 'Get 5 Perfect Lessons', '完成 5 個完美課程', '🌟', 'perfect_lessons', 5, 'gems', 75, 12, '{"min_level": 3}');
 
+
