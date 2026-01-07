@@ -7,6 +7,7 @@
     <title>Learn - DSE Physics AI Tutor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="/js/i18n.js"></script>
     <style>
         :root {
             /* Duolingo-inspired color palette */
@@ -1212,40 +1213,40 @@
         <nav class="mobile-nav">
             <a href="/" class="mobile-nav-item">
                 <i class="fas fa-home" style="color: #58cc02;"></i>
-                <span>首頁</span>
+                <span data-i18n="nav.home">Home</span>
             </a>
             <a href="/learn.html" class="mobile-nav-item active">
                 <i class="fas fa-graduation-cap" style="color: #ff4b4b;"></i>
-                <span>學習</span>
+                <span data-i18n="nav.learn">Learn</span>
             </a>
             <a href="/leaderboard.html" class="mobile-nav-item">
                 <i class="fas fa-trophy" style="color: #ffc800;"></i>
-                <span>排行榜</span>
+                <span data-i18n="nav.leaderboard">Leaderboards</span>
             </a>
             <a href="/quests.html" class="mobile-nav-item">
                 <i class="fas fa-tasks" style="color: #ff9600;"></i>
-                <span>任務</span>
+                <span data-i18n="nav.quests">Quests</span>
             </a>
             <a href="/shop.html" class="mobile-nav-item">
                 <i class="fas fa-store" style="color: #ce82ff;"></i>
-                <span>商店</span>
+                <span data-i18n="nav.shop">Shop</span>
             </a>
             <a href="/profile.html" class="mobile-nav-item">
                 <i class="fas fa-user" style="color: #ff86d0;"></i>
-                <span>個人資料</span>
+                <span data-i18n="nav.profile">Profile</span>
             </a>
             <div class="mobile-nav-divider"></div>
             <a href="/settings.html" class="mobile-nav-item">
                 <i class="fas fa-cog" style="color: var(--text-secondary);"></i>
-                <span>設定</span>
+                <span data-i18n="nav.settings">Settings</span>
             </a>
             <a href="/ai-tutor.html" class="mobile-nav-item">
                 <i class="fas fa-robot" style="color: #1cb0f6;"></i>
-                <span>AI 導師</span>
+                <span data-i18n="nav.aiTutor">AI Tutor</span>
             </a>
             <a href="/free-practice.html" class="mobile-nav-item">
                 <i class="fas fa-dumbbell" style="color: var(--text-secondary);"></i>
-                <span>自由練習</span>
+                <span data-i18n="learn.freePractice">Free Practice</span>
             </a>
         </nav>
     </div>
@@ -1260,34 +1261,34 @@
         <nav class="sidebar-nav">
             <a href="/" class="nav-item">
                 <i class="fas fa-home nav-icon-home"></i>
-                <span>Home</span>
+                <span data-i18n="nav.home">Home</span>
             </a>
             <a href="/learn.html" class="nav-item active">
                 <i class="fas fa-graduation-cap nav-icon-learn"></i>
-                <span>Learn</span>
+                <span data-i18n="nav.learn">Learn</span>
             </a>
             <a href="/leaderboard.html" class="nav-item">
                 <i class="fas fa-trophy nav-icon-leaderboard"></i>
-                <span>Leaderboards</span>
+                <span data-i18n="nav.leaderboard">Leaderboards</span>
             </a>
             <a href="/quests.html" class="nav-item">
                 <i class="fas fa-tasks nav-icon-quests"></i>
-                <span>Quests</span>
+                <span data-i18n="nav.quests">Quests</span>
             </a>
             <a href="/shop.html" class="nav-item">
                 <i class="fas fa-store nav-icon-shop"></i>
-                <span>Shop</span>
+                <span data-i18n="nav.shop">Shop</span>
             </a>
             <a href="/profile.html" class="nav-item">
                 <i class="fas fa-user nav-icon-profile"></i>
-                <span>Profile</span>
+                <span data-i18n="nav.profile">Profile</span>
             </a>
         </nav>
 
         <div class="sidebar-footer">
-            <a href="/settings.html"><i class="fas fa-cog"></i> Settings</a>
-            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
-            <a href="/free-practice.html"><i class="fas fa-dumbbell"></i> Free Practice</a>
+            <a href="/settings.html"><i class="fas fa-cog"></i> <span data-i18n="nav.settings">Settings</span></a>
+            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a>
+            <a href="/free-practice.html"><i class="fas fa-dumbbell"></i> <span data-i18n="learn.freePractice">Free Practice</span></a>
         </div>
     </aside>
 
@@ -1319,7 +1320,7 @@
             <main class="skill-tree-container" id="skillTreeContainer">
                 <div class="loading-state" id="loadingState">
                     <div class="loading-spinner"></div>
-                    <div>Loading your learning path...</div>
+                    <div data-i18n="learn.loadingPath">Loading your learning path...</div>
                 </div>
             </main>
 
@@ -1330,26 +1331,26 @@
                     <div class="sidebar-card-header">
                         <div class="sidebar-card-title">
                             <i class="fas fa-trophy" style="color: var(--gold);"></i>
-                            <span id="leaderboardTitle">排行榜</span>
+                            <span id="leaderboardTitle" data-i18n="learn.leaderboardTitle">Leaderboard</span>
                         </div>
                     </div>
                     <div class="leaderboard-locked" id="leaderboardContent">
                         <div class="leaderboard-icon">🏆</div>
-                        <p id="leaderboardMessage">載入中...</p>
+                        <p id="leaderboardMessage" data-i18n="common.loading">Loading...</p>
                     </div>
                 </div>
 
                 <!-- Daily Quests Card -->
                 <div class="sidebar-card">
                     <div class="sidebar-card-header">
-                        <div class="sidebar-card-title">每日任務</div>
-                        <span class="sidebar-card-link" onclick="location.href='/quests.html'">查看全部</span>
+                        <div class="sidebar-card-title" data-i18n="learn.dailyQuests">Daily Quests</div>
+                        <span class="sidebar-card-link" onclick="location.href='/quests.html'" data-i18n="learn.viewAll">View All</span>
                     </div>
 
                     <div class="quest-item">
                         <div class="quest-icon">⚡</div>
                         <div class="quest-info">
-                            <div class="quest-name" id="questName">獲得 50 XP</div>
+                            <div class="quest-name" id="questName">Earn 50 XP</div>
                             <div class="quest-progress-bar">
                                 <div class="quest-progress-fill" id="questProgress" style="width: 0%;"></div>
                             </div>
@@ -1363,12 +1364,12 @@
                     <div class="sidebar-card-header">
                         <div class="sidebar-card-title">
                             <i class="fas fa-fire" style="color: var(--streak);"></i>
-                            連續學習
+                            <span data-i18n="learn.streak">Streak</span>
                         </div>
                     </div>
                     <div style="text-align: center; padding: 10px 0;">
                         <div style="font-size: 48px; font-weight: 800; color: var(--streak);" id="streakDays">0</div>
-                        <div style="color: var(--text-secondary);">天</div>
+                        <div style="color: var(--text-secondary);" data-i18n="learn.days">days</div>
                     </div>
                 </div>
             </aside>
@@ -1388,6 +1389,10 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            if (window.i18n && window.i18n.initI18n) {
+                await window.i18n.initI18n();
+            }
             await loadSkillTree();
         });
 
@@ -1415,13 +1420,21 @@
                 document.getElementById('loadingState').innerHTML = `
                     <div style="text-align: center; color: var(--red);">
                         <i class="fas fa-exclamation-circle" style="font-size: 48px; margin-bottom: 16px;"></i>
-                        <p>Failed to load: ${err.message}</p>
+                        <p>${t('learn.failedToLoad')}: ${err.message}</p>
                         <button onclick="location.reload()" style="margin-top: 16px; padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700;">
-                            Retry
+                            ${t('learn.retry')}
                         </button>
                     </div>
                 `;
             }
+        }
+
+        // Helper to get translation
+        function t(key, params = {}) {
+            if (window.i18n && window.i18n.t) {
+                return window.i18n.t(key, params);
+            }
+            return key;
         }
 
         // Update header stats
@@ -1448,11 +1461,11 @@
                 const leaderboardMessage = document.getElementById('leaderboardMessage');
 
                 if (leaderboard.unlocked) {
-                    leaderboardTitle.textContent = '排行榜';
-                    leaderboardMessage.innerHTML = '<a href="/leaderboard.html" style="color: var(--secondary); text-decoration: none;">查看排行榜 →</a>';
+                    leaderboardTitle.textContent = t('learn.leaderboardTitle');
+                    leaderboardMessage.innerHTML = `<a href="/leaderboard.html" style="color: var(--secondary); text-decoration: none;">${t('learn.viewLeaderboard')}</a>`;
                 } else {
-                    leaderboardTitle.textContent = '解鎖排行榜！';
-                    leaderboardMessage.textContent = `再完成 ${leaderboard.lessonsRemaining} 節課即可參與競爭`;
+                    leaderboardTitle.textContent = t('learn.unlockLeaderboard');
+                    leaderboardMessage.textContent = t('learn.lessonsRemaining', { count: leaderboard.lessonsRemaining });
                 }
             }
 
@@ -1462,7 +1475,7 @@
                 const dailyXP = dailyGoal.xpEarned || 0;
                 const questProgress = Math.min(100, (dailyXP / goalXP) * 100);
                 document.getElementById('questProgress').style.width = `${questProgress}%`;
-                document.getElementById('questName').textContent = `獲得 ${goalXP} XP (${dailyXP}/${goalXP})`;
+                document.getElementById('questName').textContent = `${t('learn.earnXP', { amount: goalXP })} (${dailyXP}/${goalXP})`;
 
                 if (dailyGoal.goalMet) {
                     document.getElementById('questReward').textContent = '✅';
@@ -1480,15 +1493,20 @@
                 const banner = document.createElement('div');
                 banner.className = 'unit-banner';
                 banner.style.background = `linear-gradient(135deg, ${unit.color}, ${adjustColor(unit.color, -20)})`;
+                
+                // Get localized unit name based on current language
+                const lang = window.i18n?.getLanguage?.() || 'en';
+                const unitName = lang.startsWith('zh') ? (unit.name_zh || unit.name) : unit.name;
+                
                 banner.innerHTML = `
                     <div class="unit-banner-left">
                         <div class="unit-banner-info">
-                            <h2>單元 ${unit.id.split('-')[1] || '1'}</h2>
-                            <h1><i class="fas fa-${unit.icon}"></i> ${unit.name_zh || unit.name}</h1>
+                            <h2>${t('learn.unit')} ${unit.id.split('-')[1] || '1'}</h2>
+                            <h1><i class="fas fa-${unit.icon}"></i> ${unitName}</h1>
                         </div>
                     </div>
                     <button class="guidebook-btn" onclick="showGuidebook('${unit.id}')">
-                        <i class="fas fa-book"></i> 學習指南
+                        <i class="fas fa-book"></i> ${t('learn.guidebook')}
                     </button>
                 `;
                 container.appendChild(banner);
@@ -1617,12 +1635,16 @@
 
             startBtn.classList.add('visible');
 
+            // Get localized node name
+            const lang = window.i18n?.getLanguage?.() || 'en';
+            const nodeName = lang.startsWith('zh') ? (node.name_zh || node.name) : node.name;
+
             if (node.status === 'needs_review') {
-                startBtnText.textContent = `Review ${node.name_zh || node.name}`;
+                startBtnText.textContent = `${t('learn.review')} ${nodeName}`;
             } else if (node.status === 'legendary') {
-                startBtnText.textContent = `Practice ${node.name_zh || node.name}`;
+                startBtnText.textContent = `${t('learn.practice')} ${nodeName}`;
             } else {
-                startBtnText.textContent = `Start ${node.name_zh || node.name}`;
+                startBtnText.textContent = `${t('learn.start')} ${nodeName}`;
             }
         }
 
@@ -1681,14 +1703,14 @@
                 // Show locked message
                 const unit = skillTreeData?.units?.find(u => u.id === unitId);
                 const remaining = 5 - (unit?.completedNodes || 0);
-                alert(`需要再完成 ${remaining} 個技能才能解鎖此寶箱！`);
+                alert(t('learn.needMoreSkills', { count: remaining }));
                 return;
             }
 
             // Check if already claimed (stored in localStorage)
             const claimedChests = JSON.parse(localStorage.getItem('claimedChests') || '[]');
             if (claimedChests.includes(chestId)) {
-                alert('這個寶箱已經被領取過了！');
+                alert(t('learn.chestAlreadyClaimed'));
                 return;
             }
 
@@ -1713,14 +1735,14 @@
             modal.innerHTML = `
                 <div class="treasure-content">
                     <div class="treasure-icon">🎁</div>
-                    <div class="treasure-title">恭喜！</div>
-                    <p style="color: var(--text-secondary);">你打開了寶箱並獲得了</p>
+                    <div class="treasure-title">${t('learn.congratulations')}</div>
+                    <p style="color: var(--text-secondary);">${t('learn.chestOpened')}</p>
                     <div class="treasure-reward">
                         <i class="fas fa-gem"></i>
                         <span>+${gemsAwarded}</span>
                     </div>
                     <button class="treasure-close" onclick="this.closest('.treasure-modal').remove()">
-                        太棒了！
+                        ${t('learn.awesome')}
                     </button>
                 </div>
             `;
@@ -1740,23 +1762,32 @@
             const unit = skillTreeData?.units?.find(u => u.id === unitId);
             if (!unit) return;
 
+            // Get language for localized names
+            const lang = window.i18n?.getLanguage?.() || 'en';
+            const isZh = lang.startsWith('zh');
+
             // Create modal
             const modal = document.createElement('div');
             modal.className = 'guidebook-modal';
             modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
 
-            const topicsHtml = unit.nodes.map((node, i) => `
+            const topicsHtml = unit.nodes.map((node, i) => {
+                const nodeName = isZh ? (node.name_zh || node.name) : node.name;
+                return `
                 <div class="guidebook-topic ${node.status !== 'locked' ? 'unlocked' : ''}">
                     <div class="topic-number">${i + 1}</div>
                     <div class="topic-info">
-                        <div class="topic-name">${node.name_zh || node.name}</div>
+                        <div class="topic-name">${nodeName}</div>
                         <div class="topic-desc">${node.description || ''}</div>
                     </div>
                     <div class="topic-status">
                         ${node.currentLevel >= 5 ? '⭐' : node.currentLevel > 0 ? '📖' : '🔒'}
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
+
+            const unitName = isZh ? (unit.name_zh || unit.name) : unit.name;
 
             modal.innerHTML = `
                 <div class="guidebook-content">
@@ -1765,14 +1796,14 @@
                             <i class="fas fa-times"></i>
                         </button>
                         <div class="guidebook-icon"><i class="fas fa-${unit.icon}"></i></div>
-                        <h2>${unit.name_zh || unit.name}</h2>
+                        <h2>${unitName}</h2>
                         <p>${unit.description || ''}</p>
                         <div class="guidebook-progress">
-                            進度：${unit.completedNodes} / ${unit.totalNodes} 個技能完成
+                            ${t('learn.progress')}: ${t('learn.skillsCompleted', { completed: unit.completedNodes, total: unit.totalNodes })}
                         </div>
                     </div>
                     <div class="guidebook-body">
-                        <h3>學習主題</h3>
+                        <h3>${t('learn.learningTopics')}</h3>
                         <div class="guidebook-topics">
                             ${topicsHtml}
                         </div>

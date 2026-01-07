@@ -7,6 +7,7 @@
     <title>Leaderboards - DSE Physics AI Tutor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="/js/i18n.js"></script>
     <style>
         :root {
             --primary: #58cc02;
@@ -542,17 +543,17 @@
             <span>DSE Physics</span>
         </div>
         <nav class="sidebar-nav">
-            <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
-            <a href="/learn.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span>Learn</span></a>
+            <a href="/" class="nav-item"><i class="fas fa-home"></i><span data-i18n="nav.home">Home</span></a>
+            <a href="/learn.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span data-i18n="nav.learn">Learn</span></a>
             <a href="/leaderboard.html" class="nav-item active"><i class="fas fa-trophy"
-                    style="color: var(--gold);"></i><span>Leaderboards</span></a>
-            <a href="/quests.html" class="nav-item"><i class="fas fa-tasks"></i><span>Quests</span></a>
-            <a href="/shop.html" class="nav-item"><i class="fas fa-store"></i><span>Shop</span></a>
-            <a href="/profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+                    style="color: var(--gold);"></i><span data-i18n="nav.leaderboard">Leaderboards</span></a>
+            <a href="/quests.html" class="nav-item"><i class="fas fa-tasks"></i><span data-i18n="nav.quests">Quests</span></a>
+            <a href="/shop.html" class="nav-item"><i class="fas fa-store"></i><span data-i18n="nav.shop">Shop</span></a>
+            <a href="/profile.html" class="nav-item"><i class="fas fa-user"></i><span data-i18n="nav.profile">Profile</span></a>
         </nav>
         <div class="sidebar-footer">
-            <a href="/settings.html"><i class="fas fa-cog"></i> Settings</a>
-            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+            <a href="/settings.html"><i class="fas fa-cog"></i> <span data-i18n="nav.settings">Settings</span></a>
+            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a>
         </div>
     </aside>
 
@@ -574,8 +575,8 @@
                         <span class="trophy-icon trophy-gold">🥇</span>
                         <span class="trophy-icon trophy-bronze">🥉</span>
                     </div>
-                    <h1 class="leaderboard-title" id="leaderboardTitle">Weekly Leaderboard</h1>
-                    <p class="leaderboard-subtitle" id="leaderboardSubtitle">Compete with other learners!</p>
+                    <h1 class="leaderboard-title" id="leaderboardTitle" data-i18n="leaderboardPage.title">Weekly Leaderboard</h1>
+                    <p class="leaderboard-subtitle" id="leaderboardSubtitle" data-i18n="leaderboardPage.subtitle">Compete with other learners!</p>
                 </div>
 
                 <div class="league-info" id="leagueInfo" style="display: none;">
@@ -583,32 +584,32 @@
                 </div>
 
                 <div class="league-tabs" id="leagueTabs">
-                    <div class="league-tab active" data-tier="bronze">Bronze League</div>
-                    <div class="league-tab" data-tier="silver">Silver League</div>
-                    <div class="league-tab" data-tier="gold">Gold League</div>
+                    <div class="league-tab active" data-tier="bronze" data-i18n="leaderboardPage.bronzeLeague">Bronze League</div>
+                    <div class="league-tab" data-tier="silver" data-i18n="leaderboardPage.silverLeague">Silver League</div>
+                    <div class="league-tab" data-tier="gold" data-i18n="leaderboardPage.goldLeague">Gold League</div>
                 </div>
 
                 <div id="joinLeagueContainer" style="display: none;">
-                    <button class="join-league-btn" id="joinLeagueBtn">Join This Week's League</button>
+                    <button class="join-league-btn" id="joinLeagueBtn" data-i18n="leaderboardPage.joinThisWeek">Join This Week's League</button>
                 </div>
 
                 <div class="rankings-list" id="rankingsList">
                     <div class="loading-state">
                         <div class="loading-spinner"></div>
-                        <p>Loading rankings...</p>
+                        <p data-i18n="leaderboardPage.loadingRankings">Loading rankings...</p>
                     </div>
                 </div>
             </main>
 
             <aside class="right-sidebar">
                 <div class="info-card">
-                    <div class="info-card-title">WHAT ARE LEADERBOARDS?</div>
-                    <h3>Do lessons. Earn XP. Compete.</h3>
-                    <p>Earn XP through lessons, then compete with players in a weekly leaderboard</p>
+                    <div class="info-card-title" data-i18n="leaderboardPage.whatAreLeaderboards">WHAT ARE LEADERBOARDS?</div>
+                    <h3 data-i18n="leaderboardPage.leaderboardExplain">Do lessons. Earn XP. Compete.</h3>
+                    <p data-i18n="leaderboardPage.leaderboardDesc">Earn XP through lessons, then compete with players in a weekly leaderboard</p>
                     <div class="mascot-image">🦉</div>
                 </div>
 
-                <a href="/learn.html" class="start-lesson-btn">START A LESSON</a>
+                <a href="/learn.html" class="start-lesson-btn" data-i18n="leaderboardPage.startLesson">START A LESSON</a>
             </aside>
         </div>
     </div>
@@ -679,17 +680,17 @@
         // Show login prompt for unauthenticated users
         function showLoginPrompt() {
             const container = document.getElementById('rankingsList');
-            document.getElementById('leaderboardTitle').textContent = 'Login Required';
-            document.getElementById('leaderboardSubtitle').textContent = 'Sign in to compete in weekly leaderboards';
+            document.getElementById('leaderboardTitle').textContent = t('leaderboardPage.loginRequired');
+            document.getElementById('leaderboardSubtitle').textContent = t('leaderboardPage.loginSubtitle');
             document.getElementById('leagueTabs').style.display = 'none';
 
             // Include redirect parameter to return to this page after login
             const redirectUrl = encodeURIComponent(window.location.pathname);
             container.innerHTML = `
                 <div class="login-prompt">
-                    <h2>🏆 Join the Competition!</h2>
-                    <p>Login to see rankings and compete with other learners</p>
-                    <a href="/login.html?redirect=${redirectUrl}" class="login-btn">Login to Continue</a>
+                    <h2>🏆 ${t('leaderboardPage.joinCompetition')}</h2>
+                    <p>${t('leaderboardPage.loginPrompt')}</p>
+                    <a href="/login.html?redirect=${redirectUrl}" class="login-btn">${t('leaderboardPage.loginToContinue')}</a>
                 </div>
             `;
         }
@@ -703,14 +704,14 @@
                 const leagueInfo = document.getElementById('leagueInfo');
                 leagueInfo.style.display = 'block';
                 document.getElementById('timeRemaining').textContent =
-                    `⏰ ${league.daysRemaining} day${league.daysRemaining !== 1 ? 's' : ''} remaining this week`;
+                    `⏰ ${t('leaderboardPage.daysRemaining', { count: league.daysRemaining })}`;
             }
 
             // Check if user is participating
             if (!currentUser.isParticipating) {
                 // Show join league prompt
-                document.getElementById('leaderboardTitle').textContent = 'Join the League!';
-                document.getElementById('leaderboardSubtitle').textContent = 'Compete with other learners this week';
+                document.getElementById('leaderboardTitle').textContent = t('leaderboardPage.joinLeague');
+                document.getElementById('leaderboardSubtitle').textContent = t('leaderboardPage.joinLeagueDesc');
                 document.getElementById('joinLeagueContainer').style.display = 'block';
 
                 // If there are other participants, still show the leaderboard
@@ -719,15 +720,15 @@
                 } else {
                     document.getElementById('rankingsList').innerHTML = `
                         <div class="loading-state">
-                            <p style="color: var(--text-secondary);">Be the first to join this week's league!</p>
+                            <p style="color: var(--text-secondary);">${t('leaderboardPage.beFirst')}</p>
                         </div>
                     `;
                 }
             } else {
                 // User is participating - show full leaderboard
-                document.getElementById('leaderboardTitle').textContent = 'Weekly Leaderboard';
+                document.getElementById('leaderboardTitle').textContent = t('leaderboardPage.title');
                 document.getElementById('leaderboardSubtitle').textContent =
-                    `You're ranked #${currentUser.rank} with ${currentUser.xpEarned} XP`;
+                    t('leaderboardPage.yourRank', { rank: currentUser.rank, xp: currentUser.xpEarned });
                 document.getElementById('joinLeagueContainer').style.display = 'none';
 
                 renderRankings(leaderboard, data);
@@ -746,7 +747,7 @@
             if (!leaderboard || leaderboard.length === 0) {
                 container.innerHTML = `
                     <div class="loading-state">
-                        <p style="color: var(--text-secondary);">No participants yet this week</p>
+                        <p style="color: var(--text-secondary);">${t('leaderboardPage.noParticipants')}</p>
                     </div>
                 `;
                 return;
@@ -761,7 +762,7 @@
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="loading-state">
-                        <p style="color: var(--text-secondary);">No participants in this league tier</p>
+                        <p style="color: var(--text-secondary);">${t('leaderboardPage.noParticipantsInTier')}</p>
                     </div>
                 `;
                 return;
@@ -841,8 +842,20 @@
             }
         }
 
+        // Helper to get translation
+        function t(key, params = {}) {
+            if (window.i18n && window.i18n.t) {
+                return window.i18n.t(key, params);
+            }
+            return key;
+        }
+
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            if (window.i18n && window.i18n.initI18n) {
+                await window.i18n.initI18n();
+            }
             loadUserStats();
             loadLeaderboard();
 

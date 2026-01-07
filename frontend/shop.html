@@ -7,6 +7,7 @@
     <title>Shop - DSE Physics AI Tutor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="/js/i18n.js"></script>
     <style>
         :root {
             --primary: #58cc02;
@@ -552,16 +553,16 @@
             <span>DSE Physics</span>
         </div>
         <nav class="sidebar-nav">
-            <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
-            <a href="/learn.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span>Learn</span></a>
-            <a href="/leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i><span>Leaderboards</span></a>
-            <a href="/quests.html" class="nav-item"><i class="fas fa-tasks"></i><span>Quests</span></a>
-            <a href="/shop.html" class="nav-item active"><i class="fas fa-store" style="color: var(--purple);"></i><span>Shop</span></a>
-            <a href="/profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+            <a href="/" class="nav-item"><i class="fas fa-home"></i><span data-i18n="nav.home">Home</span></a>
+            <a href="/learn.html" class="nav-item"><i class="fas fa-graduation-cap"></i><span data-i18n="nav.learn">Learn</span></a>
+            <a href="/leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i><span data-i18n="nav.leaderboard">Leaderboards</span></a>
+            <a href="/quests.html" class="nav-item"><i class="fas fa-tasks"></i><span data-i18n="nav.quests">Quests</span></a>
+            <a href="/shop.html" class="nav-item active"><i class="fas fa-store" style="color: var(--purple);"></i><span data-i18n="nav.shop">Shop</span></a>
+            <a href="/profile.html" class="nav-item"><i class="fas fa-user"></i><span data-i18n="nav.profile">Profile</span></a>
         </nav>
         <div class="sidebar-footer">
-            <a href="/settings.html"><i class="fas fa-cog"></i> Settings</a>
-            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> AI Tutor</a>
+            <a href="/settings.html"><i class="fas fa-cog"></i> <span data-i18n="nav.settings">Settings</span></a>
+            <a href="/ai-tutor.html"><i class="fas fa-robot"></i> <span data-i18n="nav.aiTutor">AI Tutor</span></a>
         </div>
     </aside>
 
@@ -575,7 +576,7 @@
         <div class="content-wrapper">
             <main class="main-content">
                 <div class="shop-header">
-                    <h1>🛒 Shop</h1>
+                    <h1>🛒 <span data-i18n="shop.title">Shop</span></h1>
                     <div class="gems-display">
                         <i class="fas fa-gem"></i>
                         <span id="gemsDisplay">500</span>
@@ -583,11 +584,11 @@
                 </div>
 
                 <!-- Hearts Section -->
-                <h3 class="section-title">❤️ Hearts</h3>
+                <h3 class="section-title">❤️ <span data-i18n="shop.hearts">Hearts</span></h3>
                 <div class="hearts-banner" id="heartsBanner">
                     <div class="hearts-banner-info">
-                        <h2 id="heartsTitle">Refill Your Hearts</h2>
-                        <p id="heartsSubtitle">Get full hearts so you can practice more</p>
+                        <h2 id="heartsTitle" data-i18n="shop.refillHearts">Refill Your Hearts</h2>
+                        <p id="heartsSubtitle" data-i18n="shop.refillDesc">Get full hearts so you can practice more</p>
                         <div class="hearts-display" id="heartsDisplay">
                             <span class="heart">❤️</span>
                             <span class="heart">❤️</span>
@@ -602,79 +603,79 @@
                 </div>
 
                 <!-- Power-Ups Section -->
-                <h3 class="section-title">⚡ Power-Ups</h3>
+                <h3 class="section-title">⚡ <span data-i18n="shop.powerUps">Power-Ups</span></h3>
                 <div class="shop-grid">
                     <div class="shop-item" data-item="streak-freeze" data-price="200" data-max="2" data-owned="0">
                         <span class="item-icon">🧊</span>
-                        <div class="item-name">Streak Freeze</div>
-                        <div class="item-owned"><span class="owned-count">0</span> / 2 OWNED</div>
-                        <div class="item-description">Streak Freeze allows your streak to remain in place for one full day of inactivity.</div>
+                        <div class="item-name" data-i18n="shop.streakFreeze">Streak Freeze</div>
+                        <div class="item-owned"><span class="owned-count">0</span> / 2 <span data-i18n="shop.owned">OWNED</span></div>
+                        <div class="item-description" data-i18n="shop.streakFreezeDesc">Streak Freeze allows your streak to remain in place for one full day of inactivity.</div>
                         <button class="buy-btn">
-                            GET FOR: <i class="fas fa-gem"></i> 200
+                            <span data-i18n="shop.getFor">GET FOR:</span> <i class="fas fa-gem"></i> 200
                         </button>
                     </div>
 
                     <div class="shop-item" data-item="double-xp" data-price="300" data-max="3" data-owned="0">
                         <span class="item-icon">⏰</span>
-                        <div class="item-name">Double XP Boost</div>
-                        <div class="item-owned"><span class="owned-count">0</span> / 3 OWNED</div>
-                        <div class="item-description">Earn double XP for the next 15 minutes of practice.</div>
+                        <div class="item-name" data-i18n="shop.doubleXP">Double XP Boost</div>
+                        <div class="item-owned"><span class="owned-count">0</span> / 3 <span data-i18n="shop.owned">OWNED</span></div>
+                        <div class="item-description" data-i18n="shop.doubleXPDesc">Earn double XP for the next 15 minutes of practice.</div>
                         <button class="buy-btn">
-                            GET FOR: <i class="fas fa-gem"></i> 300
+                            <span data-i18n="shop.getFor">GET FOR:</span> <i class="fas fa-gem"></i> 300
                         </button>
                     </div>
 
                     <div class="shop-item" data-item="hint-token" data-price="50" data-max="99" data-owned="0">
                         <span class="item-icon">💡</span>
-                        <div class="item-name">Hint Token</div>
-                        <div class="item-owned"><span class="owned-count">0</span> OWNED</div>
-                        <div class="item-description">Get a helpful hint during any lesson question.</div>
+                        <div class="item-name" data-i18n="shop.hintToken">Hint Token</div>
+                        <div class="item-owned"><span class="owned-count">0</span> <span data-i18n="shop.owned">OWNED</span></div>
+                        <div class="item-description" data-i18n="shop.hintTokenDesc">Get a helpful hint during any lesson question.</div>
                         <button class="buy-btn">
-                            GET FOR: <i class="fas fa-gem"></i> 50
+                            <span data-i18n="shop.getFor">GET FOR:</span> <i class="fas fa-gem"></i> 50
                         </button>
                     </div>
 
                     <div class="shop-item" data-item="heart-shield" data-price="100" data-max="5" data-owned="0">
                         <span class="item-icon">🛡️</span>
-                        <div class="item-name">Heart Shield</div>
-                        <div class="item-owned"><span class="owned-count">0</span> / 5 OWNED</div>
-                        <div class="item-description">Prevent losing a heart on your next wrong answer.</div>
+                        <div class="item-name" data-i18n="shop.heartShield">Heart Shield</div>
+                        <div class="item-owned"><span class="owned-count">0</span> / 5 <span data-i18n="shop.owned">OWNED</span></div>
+                        <div class="item-description" data-i18n="shop.heartShieldDesc">Prevent losing a heart on your next wrong answer.</div>
                         <button class="buy-btn">
-                            GET FOR: <i class="fas fa-gem"></i> 100
+                            <span data-i18n="shop.getFor">GET FOR:</span> <i class="fas fa-gem"></i> 100
                         </button>
                     </div>
                 </div>
 
                 <!-- Cosmetics Section -->
-                <h3 class="section-title">🎨 Cosmetics</h3>
+                <h3 class="section-title">🎨 <span data-i18n="shop.cosmetics">Cosmetics</span></h3>
                 <div class="shop-grid" id="cosmeticsGrid">
                     <div class="shop-item" data-item="classic-owl" data-price="0" data-cosmetic="true" data-owned="true">
                         <span class="item-icon">🦉</span>
-                        <div class="item-name">Classic Owl</div>
-                        <div class="item-owned equipped">✓ EQUIPPED</div>
-                        <div class="item-description">The classic owl mascot that guides your learning journey. Appears on your profile and during lessons.</div>
+                        <div class="item-name" data-i18n="shop.classicOwl">Classic Owl</div>
+                        <div class="item-owned equipped">✓ <span data-i18n="shop.equipped">EQUIPPED</span></div>
+                        <div class="item-description" data-i18n="shop.classicOwlDesc">The classic owl mascot that guides your learning journey. Appears on your profile and during lessons.</div>
                         <button class="buy-btn equipped">
-                            ✓ EQUIPPED
+                            ✓ <span data-i18n="shop.equipped">EQUIPPED</span>
                         </button>
                     </div>
 
                     <div class="shop-item" data-item="study-cat" data-price="500" data-cosmetic="true" data-owned="false">
                         <span class="item-icon">🐱</span>
-                        <div class="item-name">Study Cat</div>
+                        <div class="item-name" data-i18n="shop.studyCat">Study Cat</div>
                         <div class="item-owned"></div>
-                        <div class="item-description">A curious cat companion for your physics adventures. Replaces the owl on your profile and lessons.</div>
+                        <div class="item-description" data-i18n="shop.studyCatDesc">A curious cat companion for your physics adventures. Replaces the owl on your profile and lessons.</div>
                         <button class="buy-btn">
-                            GET FOR: <i class="fas fa-gem"></i> 500
+                            <span data-i18n="shop.getFor">GET FOR:</span> <i class="fas fa-gem"></i> 500
                         </button>
                     </div>
 
                     <div class="shop-item" data-item="physics-bot" data-price="750" data-cosmetic="true" data-owned="false">
                         <span class="item-icon">🤖</span>
-                        <div class="item-name">Physics Bot</div>
+                        <div class="item-name" data-i18n="shop.physicsBot">Physics Bot</div>
                         <div class="item-owned"></div>
-                        <div class="item-description">A robot assistant programmed with physics knowledge. Replaces the owl on your profile and lessons.</div>
+                        <div class="item-description" data-i18n="shop.physicsBotDesc">A robot assistant programmed with physics knowledge. Replaces the owl on your profile and lessons.</div>
                         <button class="buy-btn">
-                            GET FOR: <i class="fas fa-gem"></i> 750
+                            <span data-i18n="shop.getFor">GET FOR:</span> <i class="fas fa-gem"></i> 750
                         </button>
                     </div>
                 </div>
@@ -682,27 +683,27 @@
 
             <aside class="right-sidebar">
                 <div class="info-card">
-                    <h3>💎 Earn More Gems</h3>
-                    <p>Complete activities to earn gems for the shop!</p>
+                    <h3>💎 <span data-i18n="shop.earnMoreGems">Earn More Gems</span></h3>
+                    <p data-i18n="shop.earnGemsDesc">Complete activities to earn gems for the shop!</p>
                     <div class="earn-gems-list">
                         <div class="earn-gems-item">
                             <i class="fas fa-tasks"></i>
-                            <span>Daily Quests</span>
+                            <span data-i18n="shop.dailyQuestsReward">Daily Quests</span>
                             <strong>+5-20</strong>
                         </div>
                         <div class="earn-gems-item">
                             <i class="fas fa-star"></i>
-                            <span>Perfect Lesson</span>
+                            <span data-i18n="shop.perfectLessonReward">Perfect Lesson</span>
                             <strong>+10</strong>
                         </div>
                         <div class="earn-gems-item">
                             <i class="fas fa-fire"></i>
-                            <span>7-Day Streak</span>
+                            <span data-i18n="shop.streakReward">7-Day Streak</span>
                             <strong>+50</strong>
                         </div>
                         <div class="earn-gems-item">
                             <i class="fas fa-trophy"></i>
-                            <span>Leaderboard Top 3</span>
+                            <span data-i18n="shop.leaderboardReward">Leaderboard Top 3</span>
                             <strong>+100</strong>
                         </div>
                     </div>
@@ -715,15 +716,15 @@
     <div class="modal-overlay" id="confirmModal">
         <div class="modal">
             <div class="modal-icon" id="modalIcon">🧊</div>
-            <h2 id="modalTitle">Purchase Item?</h2>
-            <p id="modalDesc">Are you sure you want to buy this item?</p>
+            <h2 id="modalTitle" data-i18n="shop.purchaseConfirm">Purchase Item?</h2>
+            <p id="modalDesc" data-i18n="shop.purchaseDesc">Are you sure you want to buy this item?</p>
             <div class="modal-price">
                 <i class="fas fa-gem"></i>
                 <span id="modalPrice">200</span>
             </div>
             <div class="modal-buttons">
-                <button class="modal-btn cancel" id="cancelBtn">Cancel</button>
-                <button class="modal-btn confirm" id="confirmBtn">Buy Now</button>
+                <button class="modal-btn cancel" id="cancelBtn" data-i18n="common.cancel">Cancel</button>
+                <button class="modal-btn confirm" id="confirmBtn" data-i18n="shop.buyNow">Buy Now</button>
             </div>
         </div>
     </div>
@@ -812,14 +813,14 @@
             if (state.hearts >= state.maxHearts) {
                 banner.classList.add('disabled');
                 btn.disabled = true;
-                title.textContent = 'Hearts Full!';
-                subtitle.textContent = 'You have all your hearts - go practice!';
-                btn.innerHTML = '✓ Full';
+                title.textContent = t('shop.heartsFull');
+                subtitle.textContent = t('shop.heartsFullDesc');
+                btn.innerHTML = `✓ ${t('shop.fullLabel')}`;
             } else {
                 banner.classList.remove('disabled');
                 btn.disabled = false;
-                title.textContent = 'Refill Your Hearts';
-                subtitle.textContent = `You have ${state.hearts}/${state.maxHearts} hearts`;
+                title.textContent = t('shop.refillHearts');
+                subtitle.textContent = `${state.hearts}/${state.maxHearts} ❤️`;
                 btn.innerHTML = '<i class="fas fa-gem"></i> 350 for 5 ❤️';
             }
         }
@@ -903,16 +904,16 @@
 
             const price = 350;
             if (state.gems < price) {
-                showToast('Not enough gems! Complete quests to earn more.');
+                showToast(t('shop.notEnoughGems'));
                 return;
             }
 
-            showModal('❤️', 'Refill Hearts?', `Restore all ${state.maxHearts} hearts to continue practicing.`, price, () => {
+            showModal('❤️', t('shop.refillHearts') + '?', t('shop.refillDesc'), price, () => {
                 state.gems -= price;
                 state.hearts = state.maxHearts;
                 saveState();
                 updateUI();
-                showToast('Hearts fully restored!');
+                showToast(t('shop.heartsRestored'));
             });
         });
 
@@ -942,16 +943,16 @@
             if (owned >= max) return;
 
             if (state.gems < price) {
-                showToast('Not enough gems! Complete quests to earn more.');
+                showToast(t('shop.notEnoughGems'));
                 return;
             }
 
-            showModal(icon, `Buy ${name}?`, `Add 1 ${name} to your inventory.`, price, () => {
+            showModal(icon, t('shop.purchaseConfirm'), t('shop.purchaseDesc'), price, () => {
                 state.gems -= price;
                 state.inventory[itemId] = (state.inventory[itemId] || 0) + 1;
                 saveState();
                 updateUI();
-                showToast(`${name} added to inventory!`);
+                showToast(t('shop.addedToInventory', { item: name }));
             });
         }
 
@@ -968,16 +969,16 @@
                 state.cosmetics[itemId].equipped = true;
                 saveState();
                 updateUI();
-                showToast(`${name} equipped!`);
+                showToast(t('shop.itemEquipped', { item: name }));
                 return;
             }
 
             if (state.gems < price) {
-                showToast('Not enough gems! Complete quests to earn more.');
+                showToast(t('shop.notEnoughGems'));
                 return;
             }
 
-            showModal(icon, `Buy ${name}?`, `This mascot will appear on your profile and during lessons.`, price, () => {
+            showModal(icon, t('shop.purchaseConfirm'), t('shop.purchaseDesc'), price, () => {
                 state.gems -= price;
                 Object.keys(state.cosmetics).forEach(key => {
                     state.cosmetics[key].equipped = false;
@@ -986,7 +987,7 @@
                 state.cosmetics[itemId].equipped = true;
                 saveState();
                 updateUI();
-                showToast(`${name} purchased and equipped!`);
+                showToast(t('shop.purchaseSuccess'));
             });
         }
 
@@ -1006,7 +1007,24 @@
             }
         });
 
+        // Helper to get translation
+        function t(key, params = {}) {
+            if (window.i18n && window.i18n.t) {
+                return window.i18n.t(key, params);
+            }
+            return key;
+        }
+
         // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize i18n first
+            if (window.i18n && window.i18n.initI18n) {
+                await window.i18n.initI18n();
+            }
+            loadState();
+        });
+        
+        // Also run loadState immediately for backwards compatibility
         loadState();
 
         // For testing: simulate losing a heart
